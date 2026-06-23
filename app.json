@@ -1,12 +1,17 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "A-FIT",
+    "slug": "A-FIT",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/A-FIT.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/A-FIT.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#121624"
+    },
     "ios": {
       "icon": "./assets/expo.icon"
     },
@@ -17,7 +22,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.abosufyan.myapp"
     },
     "web": {
       "output": "static",
@@ -34,11 +40,19 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ef1949a0-753f-4324-af02-5f9bc0307576"
+      }
+    },
+    "owner": "abosufyan"
   }
 }
