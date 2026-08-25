@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '@/context/AuthContext';
 import { colors } from '@/styles/global';
@@ -14,6 +14,17 @@ export default function HomeHeader() {
     day: 'numeric',
   });
 
+  const handleLogoutPress = () => {
+    Alert.alert(
+      'تسجيل الخروج',
+      'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        { text: 'خروج', style: 'destructive', onPress: logout },
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.userInfo}>
@@ -24,7 +35,7 @@ export default function HomeHeader() {
 
       <TouchableOpacity
         style={styles.logoutButton}
-        onPress={logout}
+        onPress={handleLogoutPress}
         activeOpacity={0.7}
       >
         <Ionicons name="log-out-outline" size={22} color={colors.alert} />

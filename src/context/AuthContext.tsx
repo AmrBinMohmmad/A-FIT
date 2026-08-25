@@ -89,9 +89,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    setUser(null);
-    setToken(null);
-    await authStorage.clear();
+    try {
+      if (token) {
+        await authService.logout();
+      }
+    } catch (e) {
+      console.error('Failed to logout on backend', e);
+    } finally {
+      setUser(null);
+      setToken(null);
+      await authStorage.clear();
+    }
   };
 
   const isAuthenticated = !!token && !!user;

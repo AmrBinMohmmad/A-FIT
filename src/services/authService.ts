@@ -48,4 +48,11 @@ export const authService = {
   async resendVerificationCode(): Promise<MessageResponse> {
     return await apiClient.post<MessageResponse>('/auth/resendCode');
   },
+
+  /**
+   * Revoke current access token on the backend.
+   */
+  async logout(): Promise<MessageResponse> {
+    return await apiClient.post<MessageResponse>('/auth/logout');
+  },
 };
