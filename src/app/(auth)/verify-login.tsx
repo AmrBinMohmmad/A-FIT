@@ -8,12 +8,18 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
-import { colors } from '@/styles/global';
+import { useTheme } from '@/context/ThemeContext';
+import { useToast } from '@/context/ToastContext';
 import { AuthHeader } from '@/components/auth/AuthHeader';
 import { OtpInput } from '@/components/auth/OtpInput';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
 export default function VerifyLoginScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -24,6 +30,8 @@ export default function VerifyLoginScreen() {
   const [countdown, setCountdown] = useState(90);
 
   const { submitLoginOtp, requestLoginOtp } = useAuth();
+  const { colors, isDark } = useTheme();
+  const toast = useToast();
   const router = useRouter();
 
   useEffect(() => {
@@ -36,18 +44,22 @@ export default function VerifyLoginScreen() {
 
   const handleVerify = async () => {
     if (code.length !== 6) {
-      setErrorMessage('Please enter the full 6-digit code');
+      setErrorMessage('يرجى إدخال الرمز المكون من 6 أرقام كاملاً');
+      toast.warning('يرجى إدخال الرمز المكون من 6 أرقام كاملاً');
       return;
     }
 
     setIsLoading(true);
     setErrorMessage(null);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
     try {
       await submitLoginOtp(email || '', code);
-      // Navigation is automatically handled by AuthContext state change in root _layout
+      toast.success('تم تسجيل الدخول بنجاح 👋');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Invalid code. Please try again.');
+      const msg = err?.message || 'رمز الدخول غير صحيح، حاول مرة أخرى';
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -58,160 +70,204 @@ export default function VerifyLoginScreen() {
 
     setIsResending(true);
     setErrorMessage(null);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
     try {
       await requestLoginOtp(email || '');
       setCountdown(90);
       setCode('');
+      toast.success('تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to resend code. Please try again.');
+      const msg = err?.message || 'تعذر إعادة إرسال الرمز. يرجى المحاولة لاحقاً.';
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setIsResending(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: colors.background }]}
+      edges={['top', 'left', 'right']}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
-        <AuthHeader
-          title="Enter Login Code"
-          subtitle={`We sent a 6-digit code to\n${email || 'your email'}`}
-        />
-
-        <View style={styles.card}>
-          <OtpInput
-            value={code}
-            onChange={(val) => {
-              setCode(val);
-              if (errorMessage) setErrorMessage(null);
-            }}
-            disabled={isLoading}
-          />
-
-          {errorMessage ? (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{errorMessage}</Text>
-            </View>
-          ) : null}
-
-          <TouchableOpacity
-            style={[
-              styles.button,
-              (isLoading || code.length !== 6) && styles.buttonDisabled,
-            ]}
-            onPress={handleVerify}
-            disabled={isLoading || code.length !== 6}
-            activeOpacity={0.8}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#1a1a2e" />
-            ) : (
-              <Text style={styles.buttonText}>Verify & Sign In</Text>
-            )}
-          </TouchableOpacity>
-
-          <View style={styles.resendContainer}>
-            {countdown > 0 ? (
-              <Text style={styles.countdownText}>
-                Resend code in {countdown}s
-              </Text>
-            ) : (
-              <TouchableOpacity
-                onPress={handleResend}
-                disabled={isResending}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.resendLink}>
-                  {isResending ? 'Sending...' : 'Resend Code'}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={[styles.container, { backgroundColor: colors.background }]}
         >
-          <Text style={styles.backButtonText}>← Use different email</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <AuthHeader
+              title="أدخل رمز الدخول 🔐"
+              subtitle={`أرسلنا رمز تحقق مكوّن من 6 أرقام إلى\n${email || 'بريدك الإلكتروني'}`}
+            />
+
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: isDark ? colors.surface : colors.surface,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <OtpInput
+                value={code}
+                onChange={(val) => {
+                  setCode(val);
+                  if (errorMessage) setErrorMessage(null);
+                }}
+                disabled={isLoading}
+              />
+
+              {errorMessage ? (
+                <View
+                  style={[
+                    styles.errorContainer,
+                    {
+                      backgroundColor: isDark ? 'rgba(248, 81, 73, 0.12)' : 'rgba(220, 38, 38, 0.08)',
+                      borderColor: isDark ? 'rgba(248, 81, 73, 0.25)' : 'rgba(220, 38, 38, 0.2)',
+                    },
+                  ]}
+                >
+                  <Ionicons name="alert-circle" size={16} color={colors.danger} />
+                  <Text style={[styles.errorText, { color: colors.danger }]}>
+                    {errorMessage}
+                  </Text>
+                </View>
+              ) : null}
+
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  { backgroundColor: colors.primary },
+                  (isLoading || code.length !== 6) && styles.buttonDisabled,
+                ]}
+                onPress={handleVerify}
+                disabled={isLoading || code.length !== 6}
+                activeOpacity={0.85}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#0D1117" />
+                ) : (
+                  <Text style={styles.buttonText}>التحقق وتسجيل الدخول</Text>
+                )}
+              </TouchableOpacity>
+
+              <View style={styles.resendContainer}>
+                {countdown > 0 ? (
+                  <Text style={[styles.countdownText, { color: colors.textSecondary }]}>
+                    إعادة الإرسال متاحة بعد {countdown} ثانية
+                  </Text>
+                ) : (
+                  <TouchableOpacity
+                    onPress={handleResend}
+                    disabled={isResending}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.resendLink, { color: colors.primary }]}>
+                      {isResending ? 'جاري الإرسال...' : 'إعادة إرسال الرمز'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="arrow-forward" size={16} color={colors.textSecondary} />
+              <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>
+                الرجوع واستخدام بريد إلكتروني آخر
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 24,
+    padding: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   errorContainer: {
-    backgroundColor: 'rgba(255, 82, 82, 0.15)',
-    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    padding: 10,
     borderRadius: 10,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 82, 82, 0.3)',
   },
   errorText: {
-    color: colors.alert,
     fontSize: 13,
-    textAlign: 'center',
+    fontWeight: '600',
+    flex: 1,
+    textAlign: 'right',
   },
   button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 16,
-    borderRadius: 12,
+    height: 54,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 4,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   buttonText: {
-    color: '#1a1a2e',
+    color: '#0D1117',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '900',
   },
   resendContainer: {
     alignItems: 'center',
     marginTop: 20,
   },
   countdownText: {
-    color: colors.textSecondary,
-    fontSize: 14,
+    fontSize: 13,
+    fontWeight: '500',
   },
   resendLink: {
-    color: colors.primary,
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
   backButton: {
-    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
     marginTop: 28,
   },
   backButtonText: {
-    color: colors.textSecondary,
     fontSize: 14,
+    fontWeight: '600',
   },
 });

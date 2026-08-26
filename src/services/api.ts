@@ -54,8 +54,8 @@ async function request<T = any>(
     if (!response.ok) {
       const errorMessage =
         data?.message ||
-        (data?.errors ? Object.values(data.errors).flat().join(', ') : null) ||
-        `Request failed with status ${response.status}`;
+        (data?.errors ? Object.values(data.errors).flat().join('، ') : null) ||
+        `فشل الطلب (رمز الخطأ: ${response.status})`;
       throw new ApiError(errorMessage, response.status, data?.errors);
     }
 
@@ -68,11 +68,11 @@ async function request<T = any>(
     }
 
     if (error.name === 'AbortError') {
-      throw new ApiError('Connection timed out. Please check your network or server URL.', 408);
+      throw new ApiError('انتهت مهلة الاتصال. يرجى التحقق من الشبكة أو الخادم.', 408);
     }
 
     throw new ApiError(
-      error.message || 'Unable to connect to server. Please check your network connection.',
+      error.message || 'تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.',
       0
     );
   }

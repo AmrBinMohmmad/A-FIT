@@ -1,23 +1,25 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { lightColors, darkColors } from '@/styles/theme';
+import { lightColors, darkColors, type ColorTheme } from '@/styles/global';
 
-type ThemePreference = 'light' | 'dark' | 'system';
+export type ThemePreference = 'light' | 'dark' | 'system';
 
-type ThemeContextType = {
-  colors: typeof lightColors;
+interface ThemeContextType {
+  colors: ColorTheme;
   scheme: 'light' | 'dark';
   preference: ThemePreference;
   setThemePreference: (value: ThemePreference) => Promise<void>;
-};
+  toggleTheme: () => Promise<void>;
+  isDark: boolean;
+}
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const STORAGE_KEY = 'themePreference';
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const systemScheme = useColorScheme(); 
-  const [preference, setPreference] = useState<ThemePreference>('system');
+  const systemScheme = useColorScheme();
+  const [preference, setPreference] = useState<ThemePreference>('dark');
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -29,7 +31,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     });
   }, []);
 
-  const activeScheme: 'light' | 'dark' = preference === 'system' ? (systemScheme || 'dark') : preference;
+  const activeScheme: 'light' | 'dark' =
+    preference === 'system' ? systemScheme || 'dark' : preference;
   const colors = activeScheme === 'light' ? lightColors : darkColors;
 
   const setThemePreference = async (value: ThemePreference) => {
@@ -37,10 +40,24 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     await AsyncStorage.setItem(STORAGE_KEY, value);
   };
 
-  if (!loaded) return null; 
+  const toggleTheme = async () => {
+    const next = activeScheme === 'dark' ? 'light' : 'dark';
+    await setThemePreference(next);
+  };
+
+  if (!loaded) return null;
 
   return (
-    <ThemeContext.Provider value={{ colors, scheme: activeScheme, preference, setThemePreference }}>
+    <ThemeContext.Provider
+      value={{
+        colors,
+        scheme: activeScheme,
+        preference,
+        setThemePreference,
+        toggleTheme,
+        isDark: activeScheme === 'dark',
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );
