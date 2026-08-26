@@ -1,45 +1,100 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import * as Haptics from 'expo-haptics';
 import { useAuth } from '@/context/AuthContext';
-import { colors } from '@/styles/global';
+import { useTheme } from '@/context/ThemeContext';
+import { FONTS } from '@/styles/global';
 
 export default function HomeHeader() {
   const { user, logout } = useAuth();
+  const { colors, isDark, toggleTheme } = useTheme();
 
-  const currentDate = new Date().toLocaleDateString('ar-EG-u-nu-latn', {
+  const currentDate = new Date().toLocaleDateString('ar-SA', {
     weekday: 'long',
-    year: 'numeric',
-    month: 'short',
     day: 'numeric',
+    month: 'short',
   });
 
   const handleLogoutPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     Alert.alert(
       'تسجيل الخروج',
       'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
       [
         { text: 'إلغاء', style: 'cancel' },
-        { text: 'خروج', style: 'destructive', onPress: logout },
+        {
+          text: 'خروج',
+          style: 'destructive',
+          onPress: () => {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+            logout();
+          },
+        },
       ]
     );
   };
 
+  const handleThemeToggle = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    toggleTheme();
+  };
+
+  const userInitial = user?.name ? user.name.trim().charAt(0).toUpperCase() : 'ب';
+
   return (
     <View style={styles.container}>
-      <View style={styles.userInfo}>
-        <Text style={styles.welcomeText}>مرحباً بك 👋</Text>
-        <Text style={styles.userName}>{user?.name || 'البطل'}</Text>
-        <Text style={styles.date}>{currentDate}</Text>
+      <View style={styles.userSection}>
+        <View
+          style={[
+            styles.avatar,
+            { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(5, 150, 105, 0.12)' },
+          ]}
+        >
+          <Text style={[styles.avatarText, { color: colors.primary }]}>{userInitial}</Text>
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={[styles.greeting, { color: colors.textSecondary }]}>مرحباً يا بطل 👋</Text>
+          <Text style={[styles.userName, { color: colors.text }]} numberOfLines={1}>
+            {user?.name || 'مستخدم أي-فت'}
+          </Text>
+          <Text style={[styles.date, { color: colors.textMuted }]}>{currentDate}</Text>
+        </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={handleLogoutPress}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="log-out-outline" size={22} color={colors.alert} />
-      </TouchableOpacity>
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={[
+            styles.iconButton,
+            {
+              backgroundColor: isDark ? colors.surfaceElevated : colors.surface,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={handleThemeToggle}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name={isDark ? 'sunny-outline' : 'moon-outline'}
+            size={20}
+            color={isDark ? '#FBBF24' : colors.primary}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.iconButton,
+            {
+              backgroundColor: isDark ? colors.surfaceElevated : colors.surface,
+              borderColor: isDark ? 'rgba(248, 81, 73, 0.2)' : 'rgba(220, 38, 38, 0.2)',
+            },
+          ]}
+          onPress={handleLogoutPress}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="log-out-outline" size={20} color={colors.danger} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -49,32 +104,61 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
-    paddingVertical: 8,
+    marginBottom: 20,
+    paddingVertical: 6,
   },
-  userInfo: {
+  userSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
     flex: 1,
   },
-  welcomeText: {
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: FONTS.bold,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  greeting: {
     fontSize: 13,
-    color: colors.textSecondary,
+    fontWeight: '500',
+    fontFamily: FONTS.regular,
     marginBottom: 2,
+    writingDirection: 'rtl',
   },
   userName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 4,
+    fontSize: 19,
+    fontWeight: '800',
+    fontFamily: FONTS.bold,
+    marginBottom: 2,
+    writingDirection: 'rtl',
   },
   date: {
     fontSize: 12,
-    color: colors.primary,
+    fontWeight: '500',
+    fontFamily: FONTS.regular,
+    writingDirection: 'rtl',
   },
-  logoutButton: {
-    backgroundColor: colors.surface,
-    padding: 10,
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconButton: {
+    width: 40,
+    height: 40,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 82, 82, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

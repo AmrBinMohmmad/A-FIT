@@ -6,7 +6,7 @@ import {
   Pressable,
   Text,
 } from 'react-native';
-import { colors } from '@/styles/global';
+import { useTheme } from '@/context/ThemeContext';
 
 interface OtpInputProps {
   length?: number;
@@ -23,6 +23,7 @@ export function OtpInput({
 }: OtpInputProps) {
   const inputRef = useRef<TextInput>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const { colors, isDark } = useTheme();
 
   const handlePress = () => {
     if (!disabled) {
@@ -37,7 +38,6 @@ export function OtpInput({
 
   return (
     <Pressable onPress={handlePress} style={styles.container}>
-      {/* Hidden real input capturing user keystrokes & paste */}
       <TextInput
         ref={inputRef}
         value={value}
@@ -54,7 +54,6 @@ export function OtpInput({
         autoFocus
       />
 
-      {/* Visible segmented digit boxes */}
       <View style={styles.boxesContainer}>
         {digits.map((digit, index) => {
           const isCurrent = isFocused && index === value.length;
@@ -65,12 +64,21 @@ export function OtpInput({
               key={index}
               style={[
                 styles.box,
-                isCurrent && styles.boxFocused,
-                isFilled && styles.boxFilled,
+                {
+                  backgroundColor: isDark ? colors.surfaceElevated : colors.surfaceElevated,
+                  borderColor: isCurrent
+                    ? colors.primary
+                    : isFilled
+                    ? colors.borderActive
+                    : colors.border,
+                },
+                isCurrent && {
+                  backgroundColor: isDark ? 'rgba(16, 185, 129, 0.1)' : 'rgba(5, 150, 105, 0.08)',
+                },
                 disabled && styles.boxDisabled,
               ]}
             >
-              <Text style={styles.digitText}>{digit}</Text>
+              <Text style={[styles.digitText, { color: colors.text }]}>{digit}</Text>
             </View>
           );
         })}
@@ -92,6 +100,7 @@ const styles = StyleSheet.create({
   },
   boxesContainer: {
     flexDirection: 'row',
+    direction: 'ltr',
     justifyContent: 'space-between',
     width: '100%',
     maxWidth: 320,
@@ -99,20 +108,11 @@ const styles = StyleSheet.create({
   },
   box: {
     flex: 1,
-    height: 54,
-    borderRadius: 12,
-    backgroundColor: colors.surface,
+    height: 56,
+    borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  boxFocused: {
-    borderColor: colors.primary,
-    backgroundColor: 'rgba(79, 195, 247, 0.1)',
-  },
-  boxFilled: {
-    borderColor: 'rgba(79, 195, 247, 0.5)',
   },
   boxDisabled: {
     opacity: 0.5,
@@ -120,6 +120,5 @@ const styles = StyleSheet.create({
   digitText: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: colors.text,
   },
 });
