@@ -26,7 +26,7 @@ export default function VerifyEmailScreen() {
   const [isResending, setIsResending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { user, submitEmailVerification, resendEmailVerification, logout } = useAuth();
+  const { pendingEmail, submitRegisterOtp, resendRegisterOtp, logout } = useAuth();
   const { colors, isDark } = useTheme();
   const toast = useToast();
 
@@ -42,8 +42,8 @@ export default function VerifyEmailScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
     try {
-      await submitEmailVerification(code);
-      toast.success('تم تأكيد البريد الإلكتروني بنجاح! أهلاً بك في أي-فت 🎉');
+      await submitRegisterOtp(code);
+      toast.success('تم تأكيد البريد الإلكتروني وإنشاء الحساب بنجاح! أهلاً بك في أي-فت 🎉');
     } catch (err: any) {
       const msg = err?.message || 'رمز التحقق غير صحيح أو منتهي الصلاحية';
       setErrorMessage(msg);
@@ -61,7 +61,7 @@ export default function VerifyEmailScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
     try {
-      await resendEmailVerification();
+      await resendRegisterOtp();
       toast.success('تم إرسال رمز تفعيل جديد إلى بريدك الإلكتروني');
       setCode('');
     } catch (err: any) {
@@ -90,7 +90,7 @@ export default function VerifyEmailScreen() {
           >
             <AuthHeader
               title="تأكيد البريد الإلكتروني ✉️"
-              subtitle={`أرسلنا رمز التفعيل المكوّن من 6 أرقام إلى\n${user?.email || 'بريدك الإلكتروني'}`}
+              subtitle={`أرسلنا رمز التفعيل المكوّن من 6 أرقام إلى\n${pendingEmail || 'بريدك الإلكتروني'}`}
             />
 
             <View

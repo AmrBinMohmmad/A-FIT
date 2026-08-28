@@ -12,6 +12,7 @@ export interface UserProfile {
 const STORAGE_KEYS = {
   AUTH_TOKEN: '@afit_auth_token',
   AUTH_USER: '@afit_auth_user',
+  PENDING_EMAIL: '@afit_pending_email',
 };
 
 export const authStorage = {
@@ -50,11 +51,36 @@ export const authStorage = {
     }
   },
 
+  async getPendingEmail(): Promise<string | null> {
+    try {
+      return await AsyncStorage.getItem(STORAGE_KEYS.PENDING_EMAIL);
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async setPendingEmail(email: string): Promise<void> {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.PENDING_EMAIL, email);
+    } catch (e) {
+      console.error('Failed to save pending email to storage', e);
+    }
+  },
+
+  async clearPendingEmail(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEYS.PENDING_EMAIL);
+    } catch (e) {
+      console.error('Failed to clear pending email from storage', e);
+    }
+  },
+
   async clear(): Promise<void> {
     try {
       await AsyncStorage.multiRemove([
         STORAGE_KEYS.AUTH_TOKEN,
         STORAGE_KEYS.AUTH_USER,
+        STORAGE_KEYS.PENDING_EMAIL,
       ]);
     } catch (e) {
       console.error('Failed to clear auth storage', e);
