@@ -5,14 +5,16 @@ import { authService, AuthResponse } from '@/services/authService';
 interface AuthContextType {
   user: UserProfile | null;
   token: string | null;
+  pendingEmail: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   isEmailVerified: boolean;
   requestLoginOtp: (email: string) => Promise<void>;
   submitLoginOtp: (email: string, code: string) => Promise<void>;
   registerUser: (name: string, email: string) => Promise<void>;
-  submitEmailVerification: (code: string) => Promise<void>;
-  resendEmailVerification: () => Promise<void>;
+  submitRegisterOtp: (code: string) => Promise<void>;
+  resendRegisterOtp: () => Promise<void>;
+  setPendingEmailState: (email: string | null) => void;
   logout: () => Promise<void>;
 }
 
@@ -21,20 +23,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Restore saved session on app launch
   useEffect(() => {
     async function restoreSession() {
       try {
-        const [savedToken, savedUser] = await Promise.all([
+        const [savedToken, savedUser, savedPendingEmail] = await Promise.all([
           authStorage.getToken(),
           authStorage.getUser(),
+          authStorage.getPendingEmail(),
         ]);
 
         if (savedToken && savedUser) {
           setToken(savedToken);
           setUser(savedUser);
+        }
+        if (savedPendingEmail) {
+          setPendingEmail(savedPendingEmail);
         }
       } catch (error) {
         console.error('Failed to restore auth session', error);
@@ -49,10 +56,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const saveAuthSession = async (authData: AuthResponse) => {
     setToken(authData.token);
     setUser(authData.user);
+    setPendingEmail(null);
     await Promise.all([
       authStorage.setToken(authData.token),
       authStorage.setUser(authData.user),
+      authStorage.clearPendingEmail(),
     ]);
+  };
+
+  const setPendingEmailState = async (email: string | null) => {
+    setPendingEmail(email);
+    if (email) {
+      await authStorage.setPendingEmail(email);
+    } else {
+      await authStorage.clearPendingEmail();
+    }
+  };
+
+  const registerUser = async (name: string, email: string) => {
+    await authService.register(name, email);
+    await setPendingEmailState(email);
+  };
+
+  const submitRegisterOtp = async (code: string) => {
+    if (!pendingEmail) {
+      throw new Error('لم يتم العثور على البريد الإلكتروني للتسجيل');
+    }
+    const response = await authService.verifyRegister(pendingEmail, code);
+    await saveAuthSession(response);
+  };
+
+  const resendRegisterOtp = async () => {
+    if (!pendingEmail) {
+      throw new Error('لم يتم العثور على البريد الإلكتروني للتسجيل');
+    }
+    await authService.resendRegisterCode(pendingEmail);
   };
 
   const requestLoginOtp = async (email: string) => {
@@ -62,30 +100,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const submitLoginOtp = async (email: string, code: string) => {
     const response = await authService.verifyLoginCode(email, code);
     await saveAuthSession(response);
-  };
-
-  const registerUser = async (name: string, email: string) => {
-    const response = await authService.register(name, email);
-    await saveAuthSession(response);
-  };
-
-  const submitEmailVerification = async (code: string) => {
-    const response = await authService.verifyEmailCode(code);
-    if (response.user) {
-      setUser(response.user);
-      await authStorage.setUser(response.user);
-    } else if (user) {
-      const updatedUser: UserProfile = {
-        ...user,
-        email_verified_at: new Date().toISOString(),
-      };
-      setUser(updatedUser);
-      await authStorage.setUser(updatedUser);
-    }
-  };
-
-  const resendEmailVerification = async () => {
-    await authService.resendVerificationCode();
   };
 
   const logout = async () => {
@@ -98,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setUser(null);
       setToken(null);
+      setPendingEmail(null);
       await authStorage.clear();
     }
   };
@@ -110,14 +125,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         token,
+        pendingEmail,
         isLoading,
         isAuthenticated,
         isEmailVerified,
         requestLoginOtp,
         submitLoginOtp,
         registerUser,
-        submitEmailVerification,
-        resendEmailVerification,
+        submitRegisterOtp,
+        resendRegisterOtp,
+        setPendingEmailState,
         logout,
       }}
     >
