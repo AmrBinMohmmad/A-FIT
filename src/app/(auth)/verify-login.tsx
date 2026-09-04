@@ -56,6 +56,7 @@ export default function VerifyLoginScreen() {
     try {
       await submitLoginOtp(email || '', code);
       toast.success('تم تسجيل الدخول بنجاح 👋');
+      router.replace('/(tabs)');
     } catch (err: any) {
       const msg = err?.message || 'رمز الدخول غير صحيح، حاول مرة أخرى';
       setErrorMessage(msg);
