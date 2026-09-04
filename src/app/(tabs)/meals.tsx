@@ -200,6 +200,7 @@ export default function MealsScreen() {
                   protein={meal.protein}
                   carbs={meal.carbs}
                   fat={meal.fat}
+                  meal_type={meal.meal_type}
                   onDelete={loadMeals}
                   onUpdate={loadMeals}
                 />

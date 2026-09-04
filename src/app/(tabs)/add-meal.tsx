@@ -20,12 +20,23 @@ import { addMeal } from '@/storage/meals';
 import { useTheme } from '@/context/ThemeContext';
 import { useToast } from '@/context/ToastContext';
 
+type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'other';
+
+const MEAL_TYPES: { key: MealType; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { key: 'breakfast', label: 'إفطار', icon: 'sunny-outline' },
+  { key: 'lunch', label: 'غداء', icon: 'restaurant-outline' },
+  { key: 'dinner', label: 'عشاء', icon: 'moon-outline' },
+  { key: 'snack', label: 'سناك', icon: 'cafe-outline' },
+  { key: 'other', label: 'أخرى', icon: 'ellipsis-horizontal-outline' },
+];
+
 export default function AddMealScreen() {
   const [name, setName] = useState('');
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [mealType, setMealType] = useState<MealType>('lunch');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { colors, isDark } = useTheme();
@@ -51,10 +62,11 @@ export default function AddMealScreen() {
     try {
       await addMeal({
         name: trimmedName,
-        calories: parsedCalories,
-        protein: Number(protein) || 0,
-        carbs: Number(carbs) || 0,
-        fat: Number(fat) || 0,
+        calories: Math.round(parsedCalories),
+        protein: Math.round(Number(protein) || 0),
+        carbs: Math.round(Number(carbs) || 0),
+        fat: Math.round(Number(fat) || 0),
+        meal_type: mealType,
       });
 
       setName('');
@@ -62,6 +74,7 @@ export default function AddMealScreen() {
       setProtein('');
       setCarbs('');
       setFat('');
+      setMealType('lunch');
 
       toast.success('تمت إضافة الوجبة بنجاح ✅');
       router.push('/(tabs)');
@@ -156,6 +169,63 @@ export default function AddMealScreen() {
                     textAlign="right"
                   />
                 </View>
+              </View>
+            </View>
+
+            {/* Meal Type Category Card */}
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Text style={[styles.cardTitle, { color: colors.text }]}>نوع الوجبة</Text>
+              <View style={styles.categoryRow}>
+                {MEAL_TYPES.map((t) => {
+                  const isSelected = mealType === t.key;
+                  return (
+                    <TouchableOpacity
+                      key={t.key}
+                      style={[
+                        styles.categoryChip,
+                        {
+                          backgroundColor: isSelected
+                            ? colors.primary
+                            : isDark
+                            ? colors.surfaceElevated
+                            : '#F1F5F9',
+                          borderColor: isSelected ? colors.primary : colors.border,
+                        },
+                      ]}
+                      onPress={() => {
+                        Haptics.selectionAsync().catch(() => {});
+                        setMealType(t.key);
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <Ionicons
+                        name={t.icon}
+                        size={15}
+                        color={isSelected ? '#0D1117' : colors.textSecondary}
+                        style={{ marginLeft: 4 }}
+                      />
+                      <Text
+                        style={[
+                          styles.categoryChipText,
+                          {
+                            color: isSelected ? '#0D1117' : colors.text,
+                            fontWeight: isSelected ? '800' : '600',
+                          },
+                        ]}
+                      >
+                        {t.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 
@@ -375,6 +445,23 @@ const styles = StyleSheet.create({
     color: '#0D1117',
     fontSize: 16,
     fontWeight: '900',
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    direction: 'rtl',
+  },
+  categoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  categoryChipText: {
+    fontSize: 13,
   },
   btnDisabled: {
     opacity: 0.6,

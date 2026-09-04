@@ -71,5 +71,12 @@ export const mealService = {
   async deleteMeal(id: number | string): Promise<void> {
     await apiClient.delete(`/meal/deleteMeal/${id}`);
   },
+
+  /**
+   * Clear all meals belonging to the authenticated user
+   */
+  async clearUserMeals(): Promise<void> {
+    await apiClient.delete('/meal/clearUserMeals');
+  },
 };
 

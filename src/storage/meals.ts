@@ -161,10 +161,16 @@ export const deleteMeal = async (id: string): Promise<void> => {
 };
 
 /**
- * Clear all meals for the currently active user.
+ * Clear all meals for the currently active user (both backend and local cache).
  */
 export const clearAllMeals = async (): Promise<void> => {
+  const token = await authStorage.getToken();
   const key = await getMealsKey();
+
+  if (token) {
+    await mealService.clearUserMeals();
+  }
+
   await AsyncStorage.removeItem(key);
   await AsyncStorage.removeItem(LEGACY_GLOBAL_MEALS_KEY).catch(() => {});
 };
