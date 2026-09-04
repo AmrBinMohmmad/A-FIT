@@ -102,6 +102,45 @@ export const addMeal = async (
 };
 
 /**
+ * Update an existing meal on the backend and sync with local cache.
+ */
+export const updateMeal = async (
+  id: string,
+  meal: Partial<Omit<Meal, 'id' | 'createdAt'>>,
+): Promise<Meal> => {
+  const token = await authStorage.getToken();
+  let updatedMeal: Meal;
+
+  if (token) {
+    try {
+      const backendRes = await mealService.updateMeal(id, meal);
+      updatedMeal = mapBackendMeal(backendRes);
+    } catch (e) {
+      console.warn('Backend meal update failed, saving locally:', e);
+      const currentMeals = await getLocalMeals();
+      const existing = currentMeals.find((m) => m.id === id);
+      updatedMeal = {
+        ...(existing || { id, name: '', calories: 0, protein: 0, carbs: 0, fat: 0, createdAt: new Date().toISOString() }),
+        ...meal,
+      };
+    }
+  } else {
+    const currentMeals = await getLocalMeals();
+    const existing = currentMeals.find((m) => m.id === id);
+    updatedMeal = {
+      ...(existing || { id, name: '', calories: 0, protein: 0, carbs: 0, fat: 0, createdAt: new Date().toISOString() }),
+      ...meal,
+    };
+  }
+
+  const currentMeals = await getLocalMeals();
+  const updated = currentMeals.map((m) => (m.id === id ? updatedMeal : m));
+  await AsyncStorage.setItem(MEALS_KEY, JSON.stringify(updated));
+
+  return updatedMeal;
+};
+
+/**
  * Delete a meal from backend and local cache.
  */
 export const deleteMeal = async (id: string): Promise<void> => {

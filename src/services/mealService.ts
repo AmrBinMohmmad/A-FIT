@@ -61,7 +61,7 @@ export const mealService = {
    * Update an existing meal
    */
   async updateMeal(id: number | string, input: Partial<CreateMealInput>): Promise<BackendMeal> {
-    const res = await apiClient.put<any>(`/meal/${id}`, input);
+    const res = await apiClient.put<any>(`/meal/editMeal/${id}`, input);
     return res?.data || res?.meal || res;
   },
 
@@ -69,7 +69,7 @@ export const mealService = {
    * Delete a meal by ID
    */
   async deleteMeal(id: number | string): Promise<void> {
-    await apiClient.delete(`/meal/${id}`);
+    await apiClient.delete(`/meal/deleteMeal/${id}`);
   },
 };
 
