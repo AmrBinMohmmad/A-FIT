@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react';
 import {
-  Alert,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -19,10 +18,13 @@ import MealItem from '@/components/MealItem';
 import { clearAllMeals, getMeals, Meal } from '@/storage/meals';
 import { useTheme } from '@/context/ThemeContext';
 import { useToast } from '@/context/ToastContext';
+import CustomConfirmDialog from '@/components/CustomConfirmDialog';
 
 export default function MealsScreen() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [showClearAllDialog, setShowClearAllDialog] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const { colors, isDark } = useTheme();
   const toast = useToast();
@@ -41,25 +43,23 @@ export default function MealsScreen() {
 
   const handleClearAll = () => {
     if (meals.length === 0) return;
-
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
-    Alert.alert(
-      'مسح جميع الوجبات',
-      'هل أنت متأكد من رغبتك في حذف كل وجبات اليوم؟ لا يمكن التراجع عن هذا الإجراء.',
-      [
-        { text: 'إلغاء', style: 'cancel' },
-        {
-          text: 'مسح الكل',
-          style: 'destructive',
-          onPress: async () => {
-            await clearAllMeals();
-            await loadMeals();
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-            toast.success('تم مسح جميع الوجبات بنجاح');
-          },
-        },
-      ]
-    );
+    setShowClearAllDialog(true);
+  };
+
+  const handleConfirmClearAll = async () => {
+    setIsClearing(true);
+    try {
+      await clearAllMeals();
+      await loadMeals();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      toast.success('تم مسح جميع الوجبات بنجاح');
+      setShowClearAllDialog(false);
+    } catch (err: any) {
+      toast.error(err?.message || 'تعذر مسح الوجبات');
+    } finally {
+      setIsClearing(false);
+    }
   };
 
   useFocusEffect(
@@ -204,6 +204,19 @@ export default function MealsScreen() {
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
+
+      <CustomConfirmDialog
+        visible={showClearAllDialog}
+        title="مسح جميع الوجبات"
+        message="هل أنت متأكد من رغبتك في حذف كل وجبات اليوم؟ لا يمكن التراجع عن هذا الإجراء."
+        confirmText="مسح الكل"
+        cancelText="إلغاء"
+        icon="trash"
+        isDestructive={true}
+        isLoading={isClearing}
+        onConfirm={handleConfirmClearAll}
+        onCancel={() => setShowClearAllDialog(false)}
+      />
     </SafeAreaView>
   );
 }

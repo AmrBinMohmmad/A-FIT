@@ -48,7 +48,6 @@ export default function MealActionModal({
   const [fat, setFat] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Sync inputs when meal changes or modal opens
   useEffect(() => {
     if (meal) {
       setName(meal.name || '');
@@ -124,7 +123,12 @@ export default function MealActionModal({
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.overlay}>
+        <View
+          style={[
+            styles.overlay,
+            { backgroundColor: isDark ? 'rgba(0, 0, 0, 0.72)' : 'rgba(15, 23, 42, 0.45)' },
+          ]}
+        >
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={styles.keyboardView}
@@ -134,15 +138,26 @@ export default function MealActionModal({
                 styles.modalCard,
                 {
                   backgroundColor: colors.surface,
-                  borderColor: colors.border,
+                  borderColor: isDark ? colors.border : '#E2E8F0',
+                  shadowColor: isDark ? '#000000' : '#0F172A',
+                  shadowOpacity: isDark ? 0.45 : 0.12,
                 },
               ]}
             >
-              {/* STEP 1: OPTIONS SHEET */}
+              {/* STEP 1: OPTIONS MENU */}
               {step === 'options' && (
                 <View style={styles.content}>
                   <View style={styles.mealHeader}>
-                    <View style={styles.mealIconCircle}>
+                    <View
+                      style={[
+                        styles.mealIconCircle,
+                        {
+                          backgroundColor: isDark
+                            ? 'rgba(16, 185, 129, 0.15)'
+                            : 'rgba(5, 150, 105, 0.1)',
+                        },
+                      ]}
+                    >
                       <Ionicons name="restaurant" size={24} color={colors.primary} />
                     </View>
                     <Text style={[styles.mealTitle, { color: colors.text }]} numberOfLines={1}>
@@ -151,7 +166,11 @@ export default function MealActionModal({
                     <View
                       style={[
                         styles.calorieBadge,
-                        { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.12)' : 'rgba(5, 150, 105, 0.1)' },
+                        {
+                          backgroundColor: isDark
+                            ? 'rgba(16, 185, 129, 0.12)'
+                            : 'rgba(5, 150, 105, 0.1)',
+                        },
                       ]}
                     >
                       <Ionicons name="flame" size={14} color={colors.primary} />
@@ -161,11 +180,22 @@ export default function MealActionModal({
                     </View>
                   </View>
 
-                  <View style={[styles.divider, { backgroundColor: colors.border }]} />
+                  <View
+                    style={[
+                      styles.divider,
+                      { backgroundColor: isDark ? colors.border : '#F1F5F9' },
+                    ]}
+                  />
 
                   {/* Edit Option Button */}
                   <TouchableOpacity
-                    style={[styles.actionRow, { backgroundColor: isDark ? colors.surfaceElevated : colors.surfaceElevated }]}
+                    style={[
+                      styles.actionRow,
+                      {
+                        backgroundColor: isDark ? colors.surfaceElevated : '#F8FAFC',
+                        borderColor: isDark ? colors.border : '#E2E8F0',
+                      },
+                    ]}
                     onPress={() => {
                       Haptics.selectionAsync().catch(() => {});
                       setStep('edit');
@@ -173,8 +203,17 @@ export default function MealActionModal({
                     activeOpacity={0.8}
                   >
                     <View style={styles.actionRight}>
-                      <View style={[styles.iconWrap, { backgroundColor: 'rgba(59, 130, 246, 0.12)' }]}>
-                        <Ionicons name="pencil" size={18} color="#3B82F6" />
+                      <View
+                        style={[
+                          styles.iconWrap,
+                          {
+                            backgroundColor: isDark
+                              ? 'rgba(59, 130, 246, 0.12)'
+                              : 'rgba(37, 99, 235, 0.08)',
+                          },
+                        ]}
+                      >
+                        <Ionicons name="pencil" size={18} color={isDark ? '#3B82F6' : '#2563EB'} />
                       </View>
                       <View>
                         <Text style={[styles.actionTitle, { color: colors.text }]}>تعديل الوجبة</Text>
@@ -191,7 +230,12 @@ export default function MealActionModal({
                     style={[
                       styles.actionRow,
                       {
-                        backgroundColor: isDark ? 'rgba(239, 68, 68, 0.08)' : 'rgba(220, 38, 38, 0.06)',
+                        backgroundColor: isDark
+                          ? 'rgba(239, 68, 68, 0.08)'
+                          : 'rgba(220, 38, 38, 0.05)',
+                        borderColor: isDark
+                          ? 'rgba(239, 68, 68, 0.15)'
+                          : 'rgba(220, 38, 38, 0.12)',
                         marginTop: 10,
                       },
                     ]}
@@ -202,7 +246,16 @@ export default function MealActionModal({
                     activeOpacity={0.8}
                   >
                     <View style={styles.actionRight}>
-                      <View style={[styles.iconWrap, { backgroundColor: 'rgba(239, 68, 68, 0.14)' }]}>
+                      <View
+                        style={[
+                          styles.iconWrap,
+                          {
+                            backgroundColor: isDark
+                              ? 'rgba(239, 68, 68, 0.14)'
+                              : 'rgba(220, 38, 38, 0.1)',
+                          },
+                        ]}
+                      >
                         <Ionicons name="trash-outline" size={18} color={colors.danger} />
                       </View>
                       <View>
@@ -217,7 +270,13 @@ export default function MealActionModal({
 
                   {/* Cancel Button */}
                   <TouchableOpacity
-                    style={[styles.cancelBtn, { borderColor: colors.border }]}
+                    style={[
+                      styles.cancelBtn,
+                      {
+                        backgroundColor: isDark ? 'transparent' : '#F1F5F9',
+                        borderColor: isDark ? colors.border : '#E2E8F0',
+                      },
+                    ]}
                     onPress={onClose}
                     activeOpacity={0.7}
                   >
@@ -252,7 +311,7 @@ export default function MealActionModal({
                         styles.input,
                         {
                           backgroundColor: colors.surfaceElevated,
-                          borderColor: colors.border,
+                          borderColor: isDark ? colors.border : '#E2E8F0',
                           color: colors.text,
                         },
                       ]}
@@ -272,7 +331,7 @@ export default function MealActionModal({
                         styles.input,
                         {
                           backgroundColor: colors.surfaceElevated,
-                          borderColor: colors.border,
+                          borderColor: isDark ? colors.border : '#E2E8F0',
                           color: colors.text,
                         },
                       ]}
@@ -294,7 +353,7 @@ export default function MealActionModal({
                           styles.macroInput,
                           {
                             backgroundColor: colors.surfaceElevated,
-                            borderColor: colors.border,
+                            borderColor: isDark ? colors.border : '#E2E8F0',
                             color: colors.text,
                           },
                         ]}
@@ -314,7 +373,7 @@ export default function MealActionModal({
                           styles.macroInput,
                           {
                             backgroundColor: colors.surfaceElevated,
-                            borderColor: colors.border,
+                            borderColor: isDark ? colors.border : '#E2E8F0',
                             color: colors.text,
                           },
                         ]}
@@ -334,7 +393,7 @@ export default function MealActionModal({
                           styles.macroInput,
                           {
                             backgroundColor: colors.surfaceElevated,
-                            borderColor: colors.border,
+                            borderColor: isDark ? colors.border : '#E2E8F0',
                             color: colors.text,
                           },
                         ]}
@@ -360,15 +419,28 @@ export default function MealActionModal({
                     activeOpacity={0.85}
                   >
                     {isLoading ? (
-                      <ActivityIndicator color="#0D1117" />
+                      <ActivityIndicator color={isDark ? '#0D1117' : '#FFFFFF'} />
                     ) : (
-                      <Text style={styles.primaryBtnText}>حفظ التعديلات</Text>
+                      <Text
+                        style={[
+                          styles.primaryBtnText,
+                          { color: isDark ? '#0D1117' : '#FFFFFF' },
+                        ]}
+                      >
+                        حفظ التعديلات
+                      </Text>
                     )}
                   </TouchableOpacity>
 
                   {/* Cancel Button */}
                   <TouchableOpacity
-                    style={[styles.cancelBtn, { borderColor: colors.border }]}
+                    style={[
+                      styles.cancelBtn,
+                      {
+                        backgroundColor: isDark ? 'transparent' : '#F1F5F9',
+                        borderColor: isDark ? colors.border : '#E2E8F0',
+                      },
+                    ]}
                     onPress={() => setStep('options')}
                     activeOpacity={0.7}
                   >
@@ -380,8 +452,17 @@ export default function MealActionModal({
               {/* STEP 3: CUSTOM DELETE CONFIRMATION */}
               {step === 'delete_confirm' && (
                 <View style={styles.deleteConfirmContainer}>
-                  <View style={[styles.deleteIconCircle, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
-                    <Ionicons name="trash" size={32} color={colors.danger} />
+                  <View
+                    style={[
+                      styles.deleteIconCircle,
+                      {
+                        backgroundColor: isDark
+                          ? 'rgba(239, 68, 68, 0.15)'
+                          : 'rgba(220, 38, 38, 0.1)',
+                      },
+                    ]}
+                  >
+                    <Ionicons name="trash" size={30} color={colors.danger} />
                   </View>
 
                   <Text style={[styles.deleteTitle, { color: colors.text }]}>حذف الوجبة</Text>
@@ -407,7 +488,13 @@ export default function MealActionModal({
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={[styles.cancelBtn, { borderColor: colors.border }]}
+                    style={[
+                      styles.cancelBtn,
+                      {
+                        backgroundColor: isDark ? 'transparent' : '#F1F5F9',
+                        borderColor: isDark ? colors.border : '#E2E8F0',
+                      },
+                    ]}
                     onPress={() => setStep('options')}
                     activeOpacity={0.7}
                   >
@@ -426,7 +513,6 @@ export default function MealActionModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.72)',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -439,9 +525,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     padding: 22,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 8 },
     shadowRadius: 20,
     elevation: 8,
   },
@@ -456,7 +540,6 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
@@ -492,6 +575,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 14,
     borderRadius: 16,
+    borderWidth: 1,
   },
   actionRight: {
     flexDirection: 'row-reverse',
@@ -584,7 +668,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   primaryBtnText: {
-    color: '#0D1117',
     fontSize: 15,
     fontWeight: '800',
     fontFamily: FONTS.bold,
@@ -594,9 +677,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   deleteIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 14,
