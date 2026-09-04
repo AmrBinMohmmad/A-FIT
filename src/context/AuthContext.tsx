@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authStorage, UserProfile } from '@/storage/authStorage';
 import { authService, AuthResponse } from '@/services/authService';
+import { updateApiClientToken, setSessionExpiredHandler } from '@/services/api';
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -27,6 +28,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Synchronous session teardown callback
+  const clearSession = useCallback(() => {
+    updateApiClientToken(null);
+    setUser(null);
+    setToken(null);
+    setPendingEmail(null);
+    authStorage.clearAll();
+    AsyncStorage.removeItem('meals').catch(() => {});
+  }, []);
+
+  // Register session expired handler (Sanad Mobile pattern for handling 401 anywhere in the app)
+  useEffect(() => {
+    setSessionExpiredHandler(clearSession);
+    return () => setSessionExpiredHandler(null);
+  }, [clearSession]);
+
   // Restore saved session on app launch
   useEffect(() => {
     async function restoreSession() {
@@ -38,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ]);
 
         if (savedToken && savedUser) {
+          // Push to in-memory API client immediately so initial requests are signed
+          updateApiClientToken(savedToken);
           setToken(savedToken);
           setUser(savedUser);
         }
@@ -55,9 +74,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const saveAuthSession = async (authData: AuthResponse) => {
+    // Memory-first (Sanad Mobile pattern): immediately attach token for all following requests
+    updateApiClientToken(authData.token);
     setToken(authData.token);
     setUser(authData.user);
     setPendingEmail(null);
+
+    // Persist to storage backup
     await Promise.all([
       authStorage.setToken(authData.token),
       authStorage.setUser(authData.user),
@@ -111,11 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       console.error('Failed to logout on backend', e);
     } finally {
-      setUser(null);
-      setToken(null);
-      setPendingEmail(null);
-      await authStorage.clear();
-      await AsyncStorage.removeItem('meals').catch(() => {});
+      clearSession();
     }
   };
 
