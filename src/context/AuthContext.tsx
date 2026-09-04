@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authStorage, UserProfile } from '@/storage/authStorage';
 import { authService, AuthResponse } from '@/services/authService';
 
@@ -114,6 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(null);
       setPendingEmail(null);
       await authStorage.clear();
+      await AsyncStorage.removeItem('meals').catch(() => {});
     }
   };
 

@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mealService, BackendMeal } from '@/services/mealService';
 import { authStorage } from '@/storage/authStorage';
 
-const MEALS_KEY = 'meals';
+const LEGACY_GLOBAL_MEALS_KEY = 'meals';
 
 export type Meal = {
   id: string;
@@ -13,6 +13,22 @@ export type Meal = {
   fat: number;
   meal_type?: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'other';
   createdAt: string;
+};
+
+/**
+ * Generate a dynamic storage key scoped to the currently logged in user ID.
+ * Prevents account cross-contamination.
+ */
+const getMealsKey = async (): Promise<string> => {
+  try {
+    const user = await authStorage.getUser();
+    if (user?.id) {
+      return `meals_user_${user.id}`;
+    }
+  } catch (e) {
+    console.error('Failed to get user for meals key', e);
+  }
+  return 'meals_guest';
 };
 
 function mapBackendMeal(b: BackendMeal): Meal {
@@ -30,7 +46,11 @@ function mapBackendMeal(b: BackendMeal): Meal {
 
 const getLocalMeals = async (): Promise<Meal[]> => {
   try {
-    const data = await AsyncStorage.getItem(MEALS_KEY);
+    // Purge obsolete un-scoped global key if still present
+    await AsyncStorage.removeItem(LEGACY_GLOBAL_MEALS_KEY).catch(() => {});
+
+    const key = await getMealsKey();
+    const data = await AsyncStorage.getItem(key);
     return data ? JSON.parse(data) : [];
   } catch {
     return [];
@@ -38,17 +58,18 @@ const getLocalMeals = async (): Promise<Meal[]> => {
 };
 
 /**
- * Fetch meals with cloud-sync: pulls latest from backend when authenticated,
- * and falls back to local storage when offline.
+ * Fetch meals with cloud-sync: pulls latest from backend for the authenticated user,
+ * and falls back to user-scoped local storage when offline.
  */
 export const getMeals = async (): Promise<Meal[]> => {
   const token = await authStorage.getToken();
+  const key = await getMealsKey();
 
   if (token) {
     try {
       const backendMeals = await mealService.getUserMeals();
       const mapped = backendMeals.map(mapBackendMeal);
-      await AsyncStorage.setItem(MEALS_KEY, JSON.stringify(mapped));
+      await AsyncStorage.setItem(key, JSON.stringify(mapped));
       return mapped;
     } catch (e) {
       console.log('Falling back to local cached meals:', e);
@@ -59,12 +80,13 @@ export const getMeals = async (): Promise<Meal[]> => {
 };
 
 /**
- * Add a new meal: syncs with backend when online, caches to local storage.
+ * Add a new meal: syncs with backend when online, caches to user-scoped storage.
  */
 export const addMeal = async (
   meal: Omit<Meal, 'id' | 'createdAt'>,
 ): Promise<Meal> => {
   const token = await authStorage.getToken();
+  const key = await getMealsKey();
   let createdMeal: Meal;
 
   if (token) {
@@ -96,19 +118,20 @@ export const addMeal = async (
 
   const currentMeals = await getLocalMeals();
   const updated = [createdMeal, ...currentMeals.filter((m) => m.id !== createdMeal.id)];
-  await AsyncStorage.setItem(MEALS_KEY, JSON.stringify(updated));
+  await AsyncStorage.setItem(key, JSON.stringify(updated));
 
   return createdMeal;
 };
 
 /**
- * Update an existing meal on the backend and sync with local cache.
+ * Update an existing meal on the backend and sync with user-scoped cache.
  */
 export const updateMeal = async (
   id: string,
   meal: Partial<Omit<Meal, 'id' | 'createdAt'>>,
 ): Promise<Meal> => {
   const token = await authStorage.getToken();
+  const key = await getMealsKey();
   let updatedMeal: Meal;
 
   if (token) {
@@ -135,16 +158,17 @@ export const updateMeal = async (
 
   const currentMeals = await getLocalMeals();
   const updated = currentMeals.map((m) => (m.id === id ? updatedMeal : m));
-  await AsyncStorage.setItem(MEALS_KEY, JSON.stringify(updated));
+  await AsyncStorage.setItem(key, JSON.stringify(updated));
 
   return updatedMeal;
 };
 
 /**
- * Delete a meal from backend and local cache.
+ * Delete a meal from backend and user-scoped cache.
  */
 export const deleteMeal = async (id: string): Promise<void> => {
   const token = await authStorage.getToken();
+  const key = await getMealsKey();
 
   if (token) {
     try {
@@ -156,12 +180,14 @@ export const deleteMeal = async (id: string): Promise<void> => {
 
   const meals = await getLocalMeals();
   const filtered = meals.filter((meal) => meal.id !== id);
-  await AsyncStorage.setItem(MEALS_KEY, JSON.stringify(filtered));
+  await AsyncStorage.setItem(key, JSON.stringify(filtered));
 };
 
 /**
- * Clear all meals locally.
+ * Clear all meals for the currently active user.
  */
 export const clearAllMeals = async (): Promise<void> => {
-  await AsyncStorage.removeItem(MEALS_KEY);
+  const key = await getMealsKey();
+  await AsyncStorage.removeItem(key);
+  await AsyncStorage.removeItem(LEGACY_GLOBAL_MEALS_KEY).catch(() => {});
 };
