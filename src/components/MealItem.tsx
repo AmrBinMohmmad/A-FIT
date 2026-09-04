@@ -1,11 +1,10 @@
-import React from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { deleteMeal } from '@/storage/meals';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
-import { useToast } from '@/context/ToastContext';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { FONTS } from '@/styles/global';
+import MealActionModal from './MealActionModal';
 
 interface MealItemProps {
   id: string;
@@ -15,6 +14,7 @@ interface MealItemProps {
   carbs: number;
   fat: number;
   onDelete: () => void;
+  onUpdate?: () => void;
 }
 
 export default function MealItem({
@@ -25,91 +25,107 @@ export default function MealItem({
   carbs,
   fat,
   onDelete,
+  onUpdate,
 }: MealItemProps) {
   const { colors, isDark } = useTheme();
-  const toast = useToast();
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const handleLongPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
-    Alert.alert('حذف وجبة', `هل أنت متأكد من حذف وجبة "${name}"؟`, [
-      { text: 'إلغاء', style: 'cancel' },
-      {
-        text: 'حذف',
-        style: 'destructive',
-        onPress: async () => {
-          await deleteMeal(id);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-          toast.success(`تم حذف وجبة "${name}"`);
-          onDelete();
-        },
-      },
-    ]);
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    setIsModalVisible(true);
+  };
+
+  const handleRefresh = () => {
+    if (onUpdate) {
+      onUpdate();
+    } else {
+      onDelete();
+    }
   };
 
   return (
-    <TouchableOpacity
-      style={[
-        styles.container,
-        {
-          backgroundColor: isDark ? colors.surface : colors.surface,
-          borderColor: colors.border,
-        },
-      ]}
-      onLongPress={handleLongPress}
-      activeOpacity={0.85}
-    >
-      <View style={styles.topRow}>
-        <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
-          {name}
-        </Text>
-        <View
-          style={[
-            styles.calorieBadge,
-            { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.12)' : 'rgba(5, 150, 105, 0.1)' },
-          ]}
-        >
-          <Ionicons name="flame" size={13} color={colors.primary} />
-          <Text style={[styles.calorieText, { color: colors.primary }]}>
-            {calories} سعرة
+    <>
+      <TouchableOpacity
+        style={[
+          styles.container,
+          {
+            backgroundColor: isDark ? colors.surface : colors.surface,
+            borderColor: colors.border,
+          },
+        ]}
+        onPress={handlePress}
+        onLongPress={handlePress}
+        activeOpacity={0.85}
+      >
+        <View style={styles.topRow}>
+          <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+            {name}
           </Text>
-        </View>
-      </View>
-
-      <View style={styles.macrosRow}>
-        <View
-          style={[
-            styles.macroPill,
-            { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.1)' : 'rgba(37, 99, 235, 0.08)' },
-          ]}
-        >
-          <Text style={[styles.macroPillText, { color: colors.protein }]}>
-            بروتين: {protein}غ
-          </Text>
+          <View
+            style={[
+              styles.calorieBadge,
+              { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.12)' : 'rgba(5, 150, 105, 0.1)' },
+            ]}
+          >
+            <Ionicons name="flame" size={13} color={colors.primary} />
+            <Text style={[styles.calorieText, { color: colors.primary }]}>
+              {calories} سعرة
+            </Text>
+          </View>
         </View>
 
-        <View
-          style={[
-            styles.macroPill,
-            { backgroundColor: isDark ? 'rgba(245, 158, 11, 0.1)' : 'rgba(217, 119, 6, 0.08)' },
-          ]}
-        >
-          <Text style={[styles.macroPillText, { color: colors.carbs }]}>
-            كارب: {carbs}غ
-          </Text>
-        </View>
+        <View style={styles.macrosRow}>
+          <View
+            style={[
+              styles.macroPill,
+              { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.1)' : 'rgba(37, 99, 235, 0.08)' },
+            ]}
+          >
+            <Text style={[styles.macroPillText, { color: colors.protein }]}>
+              بروتين: {protein}غ
+            </Text>
+          </View>
 
-        <View
-          style={[
-            styles.macroPill,
-            { backgroundColor: isDark ? 'rgba(239, 68, 68, 0.1)' : 'rgba(220, 38, 38, 0.08)' },
-          ]}
-        >
-          <Text style={[styles.macroPillText, { color: colors.fat }]}>
-            دهون: {fat}غ
-          </Text>
+          <View
+            style={[
+              styles.macroPill,
+              { backgroundColor: isDark ? 'rgba(245, 158, 11, 0.1)' : 'rgba(217, 119, 6, 0.08)' },
+            ]}
+          >
+            <Text style={[styles.macroPillText, { color: colors.carbs }]}>
+              كارب: {carbs}غ
+            </Text>
+          </View>
+
+          <View
+            style={[
+              styles.macroPill,
+              { backgroundColor: isDark ? 'rgba(239, 68, 68, 0.1)' : 'rgba(220, 38, 38, 0.08)' },
+            ]}
+          >
+            <Text style={[styles.macroPillText, { color: colors.fat }]}>
+              دهون: {fat}غ
+            </Text>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+
+      <MealActionModal
+        visible={isModalVisible}
+        meal={{
+          id,
+          name,
+          calories,
+          protein,
+          carbs,
+          fat,
+          createdAt: '',
+        }}
+        onClose={() => setIsModalVisible(false)}
+        onUpdated={handleRefresh}
+        onDeleted={onDelete}
+      />
+    </>
   );
 }
 
