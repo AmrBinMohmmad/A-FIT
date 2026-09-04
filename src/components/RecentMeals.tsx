@@ -68,6 +68,7 @@ export default function RecentMeals({ meals, onDelete }: RecentMealsProps) {
               carbs={meal.carbs}
               fat={meal.fat}
               onDelete={onDelete}
+              onUpdate={onDelete}
             />
           ))
       )}

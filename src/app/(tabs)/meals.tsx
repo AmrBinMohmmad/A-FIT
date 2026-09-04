@@ -197,6 +197,7 @@ export default function MealsScreen() {
                   carbs={meal.carbs}
                   fat={meal.fat}
                   onDelete={loadMeals}
+                  onUpdate={loadMeals}
                 />
               ))
             )}
