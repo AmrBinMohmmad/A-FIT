@@ -42,6 +42,11 @@ export default function AddMealScreen() {
       return;
     }
 
+    if (trimmedName.length < 2) {
+      toast.warning('اسم الوجبة يجب أن يتكون من حرفين على الأقل');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await addMeal({

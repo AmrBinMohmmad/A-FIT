@@ -72,6 +72,11 @@ export default function MealActionModal({
       return;
     }
 
+    if (trimmedName.length < 2) {
+      toast.warning('اسم الوجبة يجب أن يتكون من حرفين على الأقل');
+      return;
+    }
+
     if (Number.isNaN(parsedCalories) || parsedCalories < 0) {
       toast.warning('يرجى إدخال عدد سعرات صالح');
       return;
