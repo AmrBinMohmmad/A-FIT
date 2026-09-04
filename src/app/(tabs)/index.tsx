@@ -8,9 +8,11 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import HomeHeader from '@/components/HomeHeader';
 import CalorieRing from '@/components/CalorieRing';
 import MacroGrid from '@/components/MacroGrid';
@@ -19,9 +21,13 @@ import ShareButton from '@/components/ShareButton';
 import { getMeals, Meal } from '@/storage/meals';
 import { useTheme } from '@/context/ThemeContext';
 import { filterMealsByDay } from '@/utils/date';
+import { profileService } from '@/services/profileService';
+import { UserProfile } from '@/storage/profileStorage';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [meals, setMeals] = useState<Meal[]>([]);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const { colors } = useTheme();
   const tabBarHeight = useBottomTabBarHeight();
@@ -31,15 +37,21 @@ export default function HomeScreen() {
     setMeals(data);
   };
 
+  const loadProfile = async () => {
+    const p = await profileService.getProfile();
+    setProfile(p);
+  };
+
   useFocusEffect(
     useCallback(() => {
       loadMeals();
+      loadProfile();
     }, [])
   );
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadMeals();
+    await Promise.all([loadMeals(), loadProfile()]);
     setRefreshing(false);
   };
 
@@ -90,13 +102,36 @@ export default function HomeScreen() {
           <HomeHeader />
 
           {/* Hero Calorie Ring */}
-          <CalorieRing currentCalories={totalCalories} goalCalories={2000} />
+          <CalorieRing
+            currentCalories={totalCalories}
+            goalCalories={profile?.daily_calories || 2000}
+          />
 
           {/* Macro Breakdown Bars */}
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>توزيع المغذيات الكبرى</Text>
+            <TouchableOpacity
+              onPress={() => router.push('/onboarding')}
+              style={[styles.planBadge, { backgroundColor: colors.primaryLight }]}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="options-outline" size={13} color={colors.primary} style={{ marginLeft: 4 }} />
+              <Text style={[styles.planBadgeText, { color: colors.primary }]}>تعديل الخطة</Text>
+            </TouchableOpacity>
           </View>
-          <MacroGrid meals={todayMeals} />
+          <MacroGrid
+            meals={todayMeals}
+            goals={
+              profile
+                ? {
+                    calories: profile.daily_calories,
+                    protein: profile.daily_protein,
+                    carbs: profile.daily_carbs,
+                    fat: profile.daily_fat,
+                  }
+                : undefined
+            }
+          />
 
           {/* Today's Meals Section */}
           <RecentMeals meals={todayMeals} onDelete={loadMeals} />
@@ -143,11 +178,25 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 17,
     fontWeight: '800',
     textAlign: 'left',
+  },
+  planBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+  },
+  planBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
 });
