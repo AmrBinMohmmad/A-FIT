@@ -76,3 +76,4 @@ export function formatDateArabic(date: Date): string {
   const dayName = days[date.getDay()];
   return `${dayName}، ${dayNumber} ${monthName}`;
 }
+
