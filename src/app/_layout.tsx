@@ -11,6 +11,7 @@ import {
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { ToastProvider } from '@/context/ToastContext';
+import { AlertProvider } from '@/context/AlertContext';
 
 // Force RTL at startup for native components
 if (!I18nManager.isRTL) {
@@ -96,7 +97,9 @@ export default function RootLayout() {
       <AuthProvider>
         <ThemeProvider>
           <ToastProvider>
-            <RootNavigation />
+            <AlertProvider>
+              <RootNavigation />
+            </AlertProvider>
           </ToastProvider>
         </ThemeProvider>
       </AuthProvider>
