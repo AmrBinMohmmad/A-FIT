@@ -9,59 +9,71 @@ export interface UserProfile {
   updated_at?: string;
 }
 
-const STORAGE_KEYS = {
-  AUTH_TOKEN: '@afit_auth_token',
-  AUTH_USER: '@afit_auth_user',
-  PENDING_EMAIL: '@afit_pending_email',
-};
+const TOKEN_KEY = 'auth.token';
+const USER_KEY = 'auth.user';
+const PENDING_EMAIL_KEY = 'auth.pending_email';
 
 export const authStorage = {
   async getToken(): Promise<string | null> {
     try {
-      return await AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+      return await AsyncStorage.getItem(TOKEN_KEY);
     } catch (e) {
-      console.error('Failed to get auth token from storage', e);
+      console.error('Failed to get token from storage', e);
       return null;
     }
   },
 
-  async setToken(token: string): Promise<void> {
+  async setToken(token: string | null): Promise<void> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+      if (!token) {
+        await AsyncStorage.removeItem(TOKEN_KEY);
+      } else {
+        await AsyncStorage.setItem(TOKEN_KEY, token);
+      }
     } catch (e) {
-      console.error('Failed to save auth token to storage', e);
+      console.error('Failed to save token to storage', e);
     }
   },
 
   async getUser(): Promise<UserProfile | null> {
     try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEYS.AUTH_USER);
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      console.error('Failed to get auth user from storage', e);
+      const raw = await AsyncStorage.getItem(USER_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      // Corrupted entry — drop it instead of throwing
+      await AsyncStorage.removeItem(USER_KEY).catch(() => {});
       return null;
     }
   },
 
-  async setUser(user: UserProfile): Promise<void> {
+  async setUser(user: UserProfile | null): Promise<void> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(user));
+      if (!user) {
+        await AsyncStorage.removeItem(USER_KEY);
+      } else {
+        await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
+      }
     } catch (e) {
-      console.error('Failed to save auth user to storage', e);
+      console.error('Failed to save user to storage', e);
     }
   },
 
   async getPendingEmail(): Promise<string | null> {
     try {
-      return await AsyncStorage.getItem(STORAGE_KEYS.PENDING_EMAIL);
-    } catch (e) {
+      return await AsyncStorage.getItem(PENDING_EMAIL_KEY);
+    } catch {
       return null;
     }
   },
 
-  async setPendingEmail(email: string): Promise<void> {
+  async setPendingEmail(email: string | null): Promise<void> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.PENDING_EMAIL, email);
+      if (!email) {
+        await AsyncStorage.removeItem(PENDING_EMAIL_KEY);
+      } else {
+        await AsyncStorage.setItem(PENDING_EMAIL_KEY, email);
+      }
     } catch (e) {
       console.error('Failed to save pending email to storage', e);
     }
@@ -69,21 +81,25 @@ export const authStorage = {
 
   async clearPendingEmail(): Promise<void> {
     try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.PENDING_EMAIL);
-    } catch (e) {
-      console.error('Failed to clear pending email from storage', e);
-    }
+      await AsyncStorage.removeItem(PENDING_EMAIL_KEY);
+    } catch {}
   },
 
-  async clear(): Promise<void> {
+  async isAuthenticated(): Promise<boolean> {
+    const token = await this.getToken();
+    return Boolean(token);
+  },
+
+  async clearAll(): Promise<void> {
     try {
-      await AsyncStorage.multiRemove([
-        STORAGE_KEYS.AUTH_TOKEN,
-        STORAGE_KEYS.AUTH_USER,
-        STORAGE_KEYS.PENDING_EMAIL,
-      ]);
+      await AsyncStorage.multiRemove([TOKEN_KEY, USER_KEY, PENDING_EMAIL_KEY]);
     } catch (e) {
       console.error('Failed to clear auth storage', e);
     }
+  },
+
+  // Alias for backward compatibility
+  async clear(): Promise<void> {
+    return this.clearAll();
   },
 };
