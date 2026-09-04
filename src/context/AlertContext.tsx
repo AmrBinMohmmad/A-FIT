@@ -30,7 +30,7 @@ const CLOSE_ANIMATION_TIME = 250;
 export const AlertProvider = ({ children }: { children: ReactNode }) => {
   const queueRef = useRef<AlertItem[]>([]);
   const isShowing = useRef(false);
-  const nextTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const nextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [current, setCurrent] = useState<AlertItem | null>(null);
   const [visible, setVisible] = useState(false);
 

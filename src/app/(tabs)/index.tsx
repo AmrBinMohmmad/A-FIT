@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   ScrollView,
   Text,
@@ -18,6 +18,7 @@ import RecentMeals from '@/components/RecentMeals';
 import ShareButton from '@/components/ShareButton';
 import { getMeals, Meal } from '@/storage/meals';
 import { useTheme } from '@/context/ThemeContext';
+import { filterMealsByDay } from '@/utils/date';
 
 export default function HomeScreen() {
   const [meals, setMeals] = useState<Meal[]>([]);
@@ -42,7 +43,14 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
-  const totalCalories = meals.reduce((sum, m) => sum + (m.calories || 0), 0);
+  // Filter meals strictly for today (resets at Midnight 00:00)
+  const todayMeals = useMemo(() => filterMealsByDay(meals, new Date()), [meals]);
+
+  // Calculate calories strictly for today
+  const totalCalories = useMemo(
+    () => todayMeals.reduce((sum, m) => sum + (m.calories || 0), 0),
+    [todayMeals]
+  );
 
   return (
     <SafeAreaView
@@ -75,7 +83,7 @@ export default function HomeScreen() {
                 <Text style={[styles.tagText, { color: colors.primary }]}>صحة وتغذية</Text>
               </View>
             </View>
-            <ShareButton meals={meals} />
+            <ShareButton meals={todayMeals} />
           </View>
 
           {/* User Greeting & Header Actions */}
@@ -88,10 +96,10 @@ export default function HomeScreen() {
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>توزيع المغذيات الكبرى</Text>
           </View>
-          <MacroGrid meals={meals} />
+          <MacroGrid meals={todayMeals} />
 
-          {/* Recent Meals Section */}
-          <RecentMeals meals={meals} onDelete={loadMeals} />
+          {/* Today's Meals Section */}
+          <RecentMeals meals={todayMeals} onDelete={loadMeals} />
         </ScrollView>
       </TouchableWithoutFeedback>
     </SafeAreaView>

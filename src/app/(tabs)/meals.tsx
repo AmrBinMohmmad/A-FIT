@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   ScrollView,
   Text,
@@ -19,9 +19,11 @@ import { clearAllMeals, getMeals, Meal } from '@/storage/meals';
 import { useTheme } from '@/context/ThemeContext';
 import { useToast } from '@/context/ToastContext';
 import { useAlert } from '@/context/AlertContext';
+import { filterMealsByDay, formatDateArabic, isToday } from '@/utils/date';
 
 export default function MealsScreen() {
   const [meals, setMeals] = useState<Meal[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [refreshing, setRefreshing] = useState(false);
 
   const { colors, isDark } = useTheme();
@@ -40,12 +42,44 @@ export default function MealsScreen() {
     setRefreshing(false);
   };
 
+  const isCurrentDay = isToday(selectedDate);
+
+  const filteredMeals = useMemo(
+    () => filterMealsByDay(meals, selectedDate),
+    [meals, selectedDate]
+  );
+
+  const handlePrevDay = () => {
+    Haptics.selectionAsync().catch(() => {});
+    setSelectedDate((prev) => {
+      const next = new Date(prev);
+      next.setDate(next.getDate() - 1);
+      return next;
+    });
+  };
+
+  const handleNextDay = () => {
+    if (isCurrentDay) return;
+    Haptics.selectionAsync().catch(() => {});
+    setSelectedDate((prev) => {
+      const next = new Date(prev);
+      next.setDate(next.getDate() + 1);
+      return next;
+    });
+  };
+
+  const handleResetToToday = () => {
+    if (isCurrentDay) return;
+    Haptics.selectionAsync().catch(() => {});
+    setSelectedDate(new Date());
+  };
+
   const handleClearAll = () => {
     if (meals.length === 0) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
     showAlert(
       'مسح جميع الوجبات',
-      'هل أنت متأكد من رغبتك في حذف كل وجبات اليوم؟ لا يمكن التراجع عن هذا الإجراء.',
+      'هل أنت متأكد من رغبتك في حذف كل الوجبات المسجلة؟ لا يمكن التراجع عن هذا الإجراء.',
       [
         { text: 'إلغاء', style: 'cancel' },
         {
@@ -72,14 +106,18 @@ export default function MealsScreen() {
     }, [])
   );
 
-  const totals = meals.reduce(
-    (acc, m) => ({
-      calories: acc.calories + (m.calories || 0),
-      protein: acc.protein + (m.protein || 0),
-      carbs: acc.carbs + (m.carbs || 0),
-      fat: acc.fat + (m.fat || 0),
-    }),
-    { calories: 0, protein: 0, carbs: 0, fat: 0 }
+  const totals = useMemo(
+    () =>
+      filteredMeals.reduce(
+        (acc, m) => ({
+          calories: acc.calories + (m.calories || 0),
+          protein: acc.protein + (m.protein || 0),
+          carbs: acc.carbs + (m.carbs || 0),
+          fat: acc.fat + (m.fat || 0),
+        }),
+        { calories: 0, protein: 0, carbs: 0, fat: 0 }
+      ),
+    [filteredMeals]
   );
 
   return (
@@ -110,7 +148,7 @@ export default function MealsScreen() {
             <View>
               <Text style={[styles.title, { color: colors.text }]}>سجل الوجبات</Text>
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                {meals.length} {meals.length === 1 ? 'وجبة مسجلة' : 'وجبات مسجلة'} اليوم
+                {filteredMeals.length} {filteredMeals.length === 1 ? 'وجبة مسجلة' : 'وجبات مسجلة'} {isCurrentDay ? 'اليوم' : ''}
               </Text>
             </View>
 
@@ -132,8 +170,69 @@ export default function MealsScreen() {
             ) : null}
           </View>
 
+          {/* Date Navigator Bar */}
+          <View
+            style={[
+              styles.dateBar,
+              {
+                backgroundColor: isDark ? colors.surface : colors.surface,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            {/* Previous Day (Backwards in time) */}
+            <TouchableOpacity
+              onPress={handlePrevDay}
+              style={[
+                styles.dateNavBtn,
+                { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+              ]}
+              activeOpacity={0.7}
+              accessibilityLabel="اليوم السابق"
+            >
+              <Ionicons name="chevron-forward" size={18} color={colors.text} />
+            </TouchableOpacity>
+
+            {/* Selected Date Indicator & Reset Button */}
+            <TouchableOpacity
+              onPress={handleResetToToday}
+              style={styles.dateCenterBtn}
+              activeOpacity={0.7}
+              disabled={isCurrentDay}
+            >
+              <Ionicons name="calendar-outline" size={16} color={colors.primary} style={{ marginLeft: 6 }} />
+              <Text style={[styles.dateLabel, { color: colors.text }]}>
+                {formatDateArabic(selectedDate)}
+              </Text>
+              {!isCurrentDay && (
+                <View style={[styles.todayBadge, { backgroundColor: colors.primaryLight }]}>
+                  <Text style={[styles.todayBadgeText, { color: colors.primary }]}>اليوم</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            {/* Next Day (Forward in time - disabled if today) */}
+            <TouchableOpacity
+              onPress={handleNextDay}
+              disabled={isCurrentDay}
+              style={[
+                styles.dateNavBtn,
+                { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+                isCurrentDay && { opacity: 0.3 },
+              ]}
+              activeOpacity={0.7}
+              accessibilityLabel="اليوم التالي"
+            >
+              <Ionicons
+                name="chevron-back"
+                size={18}
+                color={isCurrentDay ? colors.textMuted : colors.text}
+              />
+            </TouchableOpacity>
+          </View>
+
           {/* Daily Summary Pill Card */}
-          {meals.length > 0 ? (
+          {filteredMeals.length > 0 ? (
             <View
               style={[
                 styles.summaryCard,
@@ -167,7 +266,7 @@ export default function MealsScreen() {
 
           {/* Meals List */}
           <View style={styles.listContainer}>
-            {meals.length === 0 ? (
+            {filteredMeals.length === 0 ? (
               <View
                 style={[
                   styles.emptyCard,
@@ -184,14 +283,18 @@ export default function MealsScreen() {
                   style={{ marginBottom: 12 }}
                 />
                 <Text style={[styles.emptyTitle, { color: colors.text }]}>
-                  لم تسجل أي وجبة حتى الآن
+                  {isCurrentDay
+                    ? 'لم تسجل أي وجبة حتى الآن اليوم'
+                    : 'لا توجد وجبات مسجلة في هذا اليوم'}
                 </Text>
                 <Text style={[styles.emptySub, { color: colors.textSecondary }]}>
-                  اضغط على تبويب "أضف وجبة" لتتبع سعراتك ومغذياتك بسهولة
+                  {isCurrentDay
+                    ? 'اضغط على تبويب "أضف وجبة" لتتبع سعراتك ومغذياتك بسهولة'
+                    : 'يمكنك اختيار يوم آخر أو العودة لتسجيل وجبات اليوم'}
                 </Text>
               </View>
             ) : (
-              meals.map((meal) => (
+              filteredMeals.map((meal) => (
                 <MealItem
                   key={meal.id}
                   id={meal.id}
@@ -303,5 +406,41 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
     maxWidth: 260,
+  },
+  dateBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  dateNavBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dateCenterBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dateLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  todayBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginRight: 6,
+  },
+  todayBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
   },
 });
