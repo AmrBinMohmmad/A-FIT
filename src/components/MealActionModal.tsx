@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/context/ThemeContext';
 import { useToast } from '@/context/ToastContext';
+import { useAlert } from '@/context/AlertContext';
 import { updateMeal, deleteMeal, Meal } from '@/storage/meals';
 import { FONTS } from '@/styles/global';
 
@@ -39,6 +40,7 @@ export default function MealActionModal({
 }: MealActionModalProps) {
   const { colors, isDark } = useTheme();
   const toast = useToast();
+  const { showAlert } = useAlert();
 
   const [step, setStep] = useState<ModalStep>('options');
   const [name, setName] = useState('');
@@ -241,7 +243,28 @@ export default function MealActionModal({
                     ]}
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-                      setStep('delete_confirm');
+                      onClose();
+                      showAlert(
+                        'حذف الوجبة',
+                        `هل أنت متأكد من رغبتك في حذف وجبة "${meal.name}"؟`,
+                        [
+                          { text: 'إلغاء', style: 'cancel' },
+                          {
+                            text: 'حذف الوجبة',
+                            style: 'destructive',
+                            onPress: async () => {
+                              try {
+                                await deleteMeal(meal.id);
+                                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+                                toast.success(`تم حذف وجبة "${meal.name}"`);
+                                onDeleted();
+                              } catch (err: any) {
+                                toast.error(err?.message || 'تعذر حذف الوجبة');
+                              }
+                            },
+                          },
+                        ]
+                      );
                     }}
                     activeOpacity={0.8}
                   >
@@ -447,60 +470,6 @@ export default function MealActionModal({
                     <Text style={[styles.cancelBtnText, { color: colors.textSecondary }]}>إلغاء</Text>
                   </TouchableOpacity>
                 </ScrollView>
-              )}
-
-              {/* STEP 3: CUSTOM DELETE CONFIRMATION */}
-              {step === 'delete_confirm' && (
-                <View style={styles.deleteConfirmContainer}>
-                  <View
-                    style={[
-                      styles.deleteIconCircle,
-                      {
-                        backgroundColor: isDark
-                          ? 'rgba(239, 68, 68, 0.15)'
-                          : 'rgba(220, 38, 38, 0.1)',
-                      },
-                    ]}
-                  >
-                    <Ionicons name="trash" size={30} color={colors.danger} />
-                  </View>
-
-                  <Text style={[styles.deleteTitle, { color: colors.text }]}>حذف الوجبة</Text>
-                  <Text style={[styles.deleteMessage, { color: colors.textSecondary }]}>
-                    هل أنت متأكد من رغبتك في حذف وجبة "{meal.name}"؟ لا يمكن التراجع عن هذا الإجراء.
-                  </Text>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.deleteBtn,
-                      { backgroundColor: colors.danger },
-                      isLoading && styles.btnDisabled,
-                    ]}
-                    onPress={handleDelete}
-                    disabled={isLoading}
-                    activeOpacity={0.85}
-                  >
-                    {isLoading ? (
-                      <ActivityIndicator color="#FFFFFF" />
-                    ) : (
-                      <Text style={styles.deleteBtnText}>تأكيد الحذف</Text>
-                    )}
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.cancelBtn,
-                      {
-                        backgroundColor: isDark ? 'transparent' : '#F1F5F9',
-                        borderColor: isDark ? colors.border : '#E2E8F0',
-                      },
-                    ]}
-                    onPress={() => setStep('options')}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.cancelBtnText, { color: colors.textSecondary }]}>تراجع</Text>
-                  </TouchableOpacity>
-                </View>
               )}
             </View>
           </KeyboardAvoidingView>

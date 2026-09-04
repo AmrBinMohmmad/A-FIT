@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useAlert } from '@/context/AlertContext';
 import { FONTS } from '@/styles/global';
-import CustomConfirmDialog from './CustomConfirmDialog';
 
 export default function HomeHeader() {
   const { user, logout } = useAuth();
   const { colors, isDark, toggleTheme } = useTheme();
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const { showAlert } = useAlert();
 
   const currentDate = new Date().toLocaleDateString('ar-SA', {
     weekday: 'long',
@@ -20,13 +20,17 @@ export default function HomeHeader() {
 
   const handleLogoutPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
-    setShowLogoutDialog(true);
-  };
-
-  const handleConfirmLogout = () => {
-    setShowLogoutDialog(false);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    logout();
+    showAlert('تسجيل الخروج', 'هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك؟', [
+      { text: 'إلغاء', style: 'cancel' },
+      {
+        text: 'تسجيل الخروج',
+        style: 'destructive',
+        onPress: () => {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+          logout();
+        },
+      },
+    ]);
   };
 
   const handleThemeToggle = () => {
@@ -89,18 +93,6 @@ export default function HomeHeader() {
           <Ionicons name="log-out-outline" size={20} color={colors.danger} />
         </TouchableOpacity>
       </View>
-
-      <CustomConfirmDialog
-        visible={showLogoutDialog}
-        title="تسجيل الخروج"
-        message="هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك؟"
-        confirmText="تسجيل الخروج"
-        cancelText="إلغاء"
-        icon="log-out-outline"
-        isDestructive={true}
-        onConfirm={handleConfirmLogout}
-        onCancel={() => setShowLogoutDialog(false)}
-      />
     </View>
   );
 }
