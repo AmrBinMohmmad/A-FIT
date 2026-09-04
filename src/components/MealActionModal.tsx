@@ -29,6 +29,16 @@ interface MealActionModalProps {
   onDeleted: () => void;
 }
 
+type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'other';
+
+const MEAL_TYPES: { key: MealType; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { key: 'breakfast', label: 'إفطار', icon: 'sunny-outline' },
+  { key: 'lunch', label: 'غداء', icon: 'restaurant-outline' },
+  { key: 'dinner', label: 'عشاء', icon: 'moon-outline' },
+  { key: 'snack', label: 'سناك', icon: 'cafe-outline' },
+  { key: 'other', label: 'أخرى', icon: 'ellipsis-horizontal-outline' },
+];
+
 type ModalStep = 'options' | 'edit' | 'delete_confirm';
 
 export default function MealActionModal({
@@ -48,6 +58,7 @@ export default function MealActionModal({
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [mealType, setMealType] = useState<MealType>('other');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -57,6 +68,7 @@ export default function MealActionModal({
       setProtein(meal.protein ? String(meal.protein) : '');
       setCarbs(meal.carbs ? String(meal.carbs) : '');
       setFat(meal.fat ? String(meal.fat) : '');
+      setMealType(meal.meal_type || 'other');
       setStep('options');
     }
   }, [meal, visible]);
@@ -72,6 +84,11 @@ export default function MealActionModal({
       return;
     }
 
+    if (trimmedName.length < 2) {
+      toast.warning('اسم الوجبة يجب أن يتكون من حرفين على الأقل');
+      return;
+    }
+
     if (Number.isNaN(parsedCalories) || parsedCalories < 0) {
       toast.warning('يرجى إدخال عدد سعرات صالح');
       return;
@@ -83,10 +100,11 @@ export default function MealActionModal({
     try {
       await updateMeal(meal.id, {
         name: trimmedName,
-        calories: parsedCalories,
-        protein: Number(protein) || 0,
-        carbs: Number(carbs) || 0,
-        fat: Number(fat) || 0,
+        calories: Math.round(parsedCalories),
+        protein: Math.round(Number(protein) || 0),
+        carbs: Math.round(Number(carbs) || 0),
+        fat: Math.round(Number(fat) || 0),
+        meal_type: mealType,
       });
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
@@ -430,6 +448,55 @@ export default function MealActionModal({
                     </View>
                   </View>
 
+                  {/* Meal Type Category */}
+                  <View style={styles.inputGroup}>
+                    <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>نوع الوجبة</Text>
+                    <View style={styles.categoryRow}>
+                      {MEAL_TYPES.map((t) => {
+                        const isSelected = mealType === t.key;
+                        return (
+                          <TouchableOpacity
+                            key={t.key}
+                            style={[
+                              styles.categoryChip,
+                              {
+                                backgroundColor: isSelected
+                                  ? colors.primary
+                                  : isDark
+                                  ? colors.surfaceElevated
+                                  : '#F1F5F9',
+                                borderColor: isSelected ? colors.primary : (isDark ? colors.border : '#E2E8F0'),
+                              },
+                            ]}
+                            onPress={() => {
+                              Haptics.selectionAsync().catch(() => {});
+                              setMealType(t.key);
+                            }}
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons
+                              name={t.icon}
+                              size={14}
+                              color={isSelected ? '#0D1117' : colors.textSecondary}
+                              style={{ marginLeft: 4 }}
+                            />
+                            <Text
+                              style={[
+                                styles.categoryChipText,
+                                {
+                                  color: isSelected ? '#0D1117' : colors.text,
+                                  fontWeight: isSelected ? '800' : '600',
+                                },
+                              ]}
+                            >
+                              {t.label}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+
                   {/* Save Button */}
                   <TouchableOpacity
                     style={[
@@ -694,6 +761,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     fontFamily: FONTS.bold,
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    direction: 'rtl',
+    marginTop: 4,
+  },
+  categoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  categoryChipText: {
+    fontSize: 12,
   },
   btnDisabled: {
     opacity: 0.6,

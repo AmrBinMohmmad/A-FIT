@@ -13,6 +13,7 @@ interface MealItemProps {
   protein: number;
   carbs: number;
   fat: number;
+  meal_type?: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'other';
   onDelete: () => void;
   onUpdate?: () => void;
 }
@@ -24,6 +25,7 @@ export default function MealItem({
   protein,
   carbs,
   fat,
+  meal_type,
   onDelete,
   onUpdate,
 }: MealItemProps) {
@@ -119,6 +121,7 @@ export default function MealItem({
           protein,
           carbs,
           fat,
+          meal_type,
           createdAt: '',
         }}
         onClose={() => setIsModalVisible(false)}

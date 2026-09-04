@@ -90,24 +90,15 @@ export const addMeal = async (
   let createdMeal: Meal;
 
   if (token) {
-    try {
-      const backendRes = await mealService.createMeal({
-        name: meal.name,
-        calories: meal.calories,
-        protein: meal.protein,
-        carbs: meal.carbs,
-        fat: meal.fat,
-        meal_type: meal.meal_type || 'other',
-      });
-      createdMeal = mapBackendMeal(backendRes);
-    } catch (e) {
-      console.warn('Backend meal creation failed, saving locally:', e);
-      createdMeal = {
-        ...meal,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-      };
-    }
+    const backendRes = await mealService.createMeal({
+      name: meal.name,
+      calories: meal.calories,
+      protein: meal.protein,
+      carbs: meal.carbs,
+      fat: meal.fat,
+      meal_type: meal.meal_type || 'other',
+    });
+    createdMeal = mapBackendMeal(backendRes);
   } else {
     createdMeal = {
       ...meal,
@@ -135,18 +126,8 @@ export const updateMeal = async (
   let updatedMeal: Meal;
 
   if (token) {
-    try {
-      const backendRes = await mealService.updateMeal(id, meal);
-      updatedMeal = mapBackendMeal(backendRes);
-    } catch (e) {
-      console.warn('Backend meal update failed, saving locally:', e);
-      const currentMeals = await getLocalMeals();
-      const existing = currentMeals.find((m) => m.id === id);
-      updatedMeal = {
-        ...(existing || { id, name: '', calories: 0, protein: 0, carbs: 0, fat: 0, createdAt: new Date().toISOString() }),
-        ...meal,
-      };
-    }
+    const backendRes = await mealService.updateMeal(id, meal);
+    updatedMeal = mapBackendMeal(backendRes);
   } else {
     const currentMeals = await getLocalMeals();
     const existing = currentMeals.find((m) => m.id === id);
@@ -171,11 +152,7 @@ export const deleteMeal = async (id: string): Promise<void> => {
   const key = await getMealsKey();
 
   if (token) {
-    try {
-      await mealService.deleteMeal(id);
-    } catch (e) {
-      console.warn('Backend meal deletion failed:', e);
-    }
+    await mealService.deleteMeal(id);
   }
 
   const meals = await getLocalMeals();
@@ -184,10 +161,16 @@ export const deleteMeal = async (id: string): Promise<void> => {
 };
 
 /**
- * Clear all meals for the currently active user.
+ * Clear all meals for the currently active user (both backend and local cache).
  */
 export const clearAllMeals = async (): Promise<void> => {
+  const token = await authStorage.getToken();
   const key = await getMealsKey();
+
+  if (token) {
+    await mealService.clearUserMeals();
+  }
+
   await AsyncStorage.removeItem(key);
   await AsyncStorage.removeItem(LEGACY_GLOBAL_MEALS_KEY).catch(() => {});
 };
