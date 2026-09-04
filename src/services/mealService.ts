@@ -24,10 +24,13 @@ export interface CreateMealInput {
 
 export const mealService = {
   /**
-   * Fetch all meals belonging to the authenticated user
+   * Fetch all meals belonging to the authenticated user, optionally filtered by date (YYYY-MM-DD)
    */
-  async getUserMeals(): Promise<BackendMeal[]> {
-    const res = await apiClient.get<any>('/meal/getUserMeals');
+  async getUserMeals(date?: string): Promise<BackendMeal[]> {
+    const endpoint = date
+      ? `/meal/getUserMeals?date=${encodeURIComponent(date)}`
+      : '/meal/getUserMeals';
+    const res = await apiClient.get<any>(endpoint);
     // Handle ApiResponse format or direct array
     if (res?.data && Array.isArray(res.data)) {
       return res.data;
