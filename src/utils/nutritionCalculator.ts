@@ -100,16 +100,26 @@ export function calculateNutritionPlan(input: PhysicalProfileInput): CalculatedN
   const minSafeCalories = gender === 'female' ? 1200 : 1500;
   const dailyCalories = Math.max(minSafeCalories, Math.round(tdee + calorieAdjustment));
 
-  // 4. Macro Splits
-  // Protein: 2.0g per kg of bodyweight
-  const proteinGrams = Math.round(currentWeight * 2.0);
+  // 4. Balanced, Realistic Macro Splits (Clinical Nutrition Standard)
+  // Base protein on Target Weight rather than total current overweight mass.
+  // 1.5g/kg for women, 1.7g/kg for men (higher if active/extra_active).
+  let proteinMultiplier = gender === 'female' ? 1.5 : 1.7;
+  if (activityLevel === 'active' || activityLevel === 'extra_active') {
+    proteinMultiplier += 0.2;
+  }
+  let proteinGrams = Math.round(targetWeight * proteinMultiplier);
+
+  // Guardrail: Keep protein between 20% and 30% of total daily calories
+  const maxProteinGrams = Math.round((dailyCalories * 0.30) / 4);
+  const minProteinGrams = Math.round((dailyCalories * 0.20) / 4);
+  proteinGrams = Math.max(minProteinGrams, Math.min(maxProteinGrams, proteinGrams));
   const proteinCalories = proteinGrams * 4;
 
-  // Fat: 25% of total target calories
-  const fatGrams = Math.round((dailyCalories * 0.25) / 9);
+  // Healthy Fats: 28% of total calories (critical for hormone balance & satiety)
+  const fatGrams = Math.round((dailyCalories * 0.28) / 9);
   const fatCalories = fatGrams * 9;
 
-  // Carbs: Remaining calories
+  // Carbohydrates: Remaining calories (~45-50% for sustainable daily energy)
   const remainingCalories = Math.max(0, dailyCalories - (proteinCalories + fatCalories));
   const carbsGrams = Math.round(remainingCalories / 4);
 
