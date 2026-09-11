@@ -13,6 +13,8 @@ import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { AlertProvider } from '@/context/AlertContext';
 
+import { profileStorage } from '@/storage/profileStorage';
+
 // Force RTL at startup for native components
 if (!I18nManager.isRTL) {
   try {
@@ -46,10 +48,19 @@ function RootNavigation() {
         router.replace('/(auth)/verify-email');
       }
     } else {
-      // User is fully authenticated & verified: redirect away from auth screens
-      if (inAuthGroup) {
-        router.replace('/(tabs)');
-      }
+      // User is fully authenticated & verified: check if onboarding profile is completed
+      profileStorage.hasProfile().then((hasProfile) => {
+        const onOnboarding = segments[0] === 'onboarding';
+        if (!hasProfile) {
+          if (!onOnboarding) {
+            router.replace('/onboarding');
+          }
+        } else {
+          if (inAuthGroup || onOnboarding) {
+            router.replace('/(tabs)');
+          }
+        }
+      });
     }
   }, [isAuthenticated, isEmailVerified, isLoading, segments]);
 
@@ -72,6 +83,7 @@ function RootNavigation() {
         }}
       >
         <Stack.Screen name="(auth)" />
+        <Stack.Screen name="onboarding" />
         <Stack.Screen name="(tabs)" />
       </Stack>
     </>
