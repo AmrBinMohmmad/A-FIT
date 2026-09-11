@@ -14,8 +14,7 @@ import {
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { addMeal } from '@/storage/meals';
 import { useTheme } from '@/context/ThemeContext';
 import { useToast } from '@/context/ToastContext';
@@ -42,7 +41,8 @@ export default function AddMealScreen() {
   const { colors, isDark } = useTheme();
   const toast = useToast();
   const router = useRouter();
-  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = 56 + insets.bottom;
 
   const handleAddMeal = async () => {
     const trimmedName = name.trim();

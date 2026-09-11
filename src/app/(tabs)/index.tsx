@@ -9,8 +9,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import HomeHeader from '@/components/HomeHeader';
@@ -26,11 +25,12 @@ import { UserProfile } from '@/storage/profileStorage';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const { colors } = useTheme();
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarHeight = 56 + insets.bottom;
 
   const loadMeals = async () => {
     const data = await getMeals();

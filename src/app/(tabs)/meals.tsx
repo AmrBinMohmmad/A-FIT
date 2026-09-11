@@ -10,8 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import MealItem from '@/components/MealItem';
@@ -22,6 +21,7 @@ import { useAlert } from '@/context/AlertContext';
 import { filterMealsByDay, formatDateArabic, isToday } from '@/utils/date';
 
 export default function MealsScreen() {
+  const insets = useSafeAreaInsets();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [refreshing, setRefreshing] = useState(false);
@@ -29,7 +29,7 @@ export default function MealsScreen() {
   const { colors, isDark } = useTheme();
   const toast = useToast();
   const { showAlert } = useAlert();
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarHeight = 56 + insets.bottom;
 
   const loadMeals = async () => {
     const data = await getMeals();
