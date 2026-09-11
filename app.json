@@ -7,11 +7,6 @@
     "icon": "./assets/images/A-FIT.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/A-FIT.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#121624"
-    },
     "ios": {
       "icon": "./assets/expo.icon"
     },
@@ -41,7 +36,10 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

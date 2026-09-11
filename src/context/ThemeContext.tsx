@@ -32,7 +32,11 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const activeScheme: 'light' | 'dark' =
-    preference === 'system' ? systemScheme || 'dark' : preference;
+    preference === 'system'
+      ? systemScheme === 'light'
+        ? 'light'
+        : 'dark'
+      : preference;
   const colors = activeScheme === 'light' ? lightColors : darkColors;
 
   const setThemePreference = async (value: ThemePreference) => {
