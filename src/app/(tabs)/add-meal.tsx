@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,13 +11,14 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { addMeal } from '@/storage/meals';
 import { useTheme } from '@/context/ThemeContext';
 import { useToast } from '@/context/ToastContext';
+import { formatDateArabic, isToday, isYesterday } from '@/utils/date';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'other';
 
@@ -30,13 +31,30 @@ const MEAL_TYPES: { key: MealType; label: string; icon: keyof typeof Ionicons.gl
 ];
 
 export default function AddMealScreen() {
+  const params = useLocalSearchParams<{ date?: string }>();
   const [name, setName] = useState('');
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
   const [mealType, setMealType] = useState<MealType>('lunch');
+  const [mealDate, setMealDate] = useState<Date>(() => {
+    if (params.date) {
+      const parsed = new Date(params.date);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return new Date();
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (params.date) {
+      const parsed = new Date(params.date);
+      if (!isNaN(parsed.getTime())) {
+        setMealDate(parsed);
+      }
+    }
+  }, [params.date]);
 
   const { colors, isDark } = useTheme();
   const toast = useToast();
@@ -67,6 +85,7 @@ export default function AddMealScreen() {
         carbs: Math.round(Number(carbs) || 0),
         fat: Math.round(Number(fat) || 0),
         meal_type: mealType,
+        createdAt: mealDate.toISOString(),
       });
 
       setName('');
@@ -77,7 +96,7 @@ export default function AddMealScreen() {
       setMealType('lunch');
 
       toast.success('تمت إضافة الوجبة بنجاح ✅');
-      router.push('/(tabs)');
+      router.push('/(tabs)/meals');
     } catch (err: any) {
       toast.error(err?.message || 'تعذر حفظ الوجبة. حاول مرة أخرى');
     } finally {
@@ -108,6 +127,144 @@ export default function AddMealScreen() {
               <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
                 سجّل تفاصيل وجبتك وتوزيع المغذيات الكبرى بدقة
               </Text>
+            </View>
+
+            {/* Target Day Selector Card */}
+            <View
+              style={[
+                styles.dateCard,
+                {
+                  backgroundColor: isDark ? colors.surface : colors.surface,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <View style={styles.dateCardHeader}>
+                <Ionicons name="calendar-outline" size={16} color={colors.primary} />
+                <Text style={[styles.dateCardTitle, { color: colors.textSecondary }]}>
+                  تاريخ تسجيل الوجبة:
+                </Text>
+                <Text style={[styles.dateCardVal, { color: colors.primary }]}>
+                  {formatDateArabic(mealDate)}
+                </Text>
+              </View>
+
+              <View style={styles.dateChipRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.dateChip,
+                    {
+                      backgroundColor: isToday(mealDate)
+                        ? colors.primary
+                        : isDark
+                        ? colors.surfaceElevated
+                        : '#F1F5F9',
+                      borderColor: isToday(mealDate) ? colors.primary : (isDark ? colors.border : '#E2E8F0'),
+                    },
+                  ]}
+                  onPress={() => {
+                    Haptics.selectionAsync().catch(() => {});
+                    setMealDate(new Date());
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons
+                    name="today-outline"
+                    size={14}
+                    color={isToday(mealDate) ? '#0D1117' : colors.textSecondary}
+                    style={{ marginLeft: 4 }}
+                  />
+                  <Text
+                    style={[
+                      styles.dateChipText,
+                      {
+                        color: isToday(mealDate) ? '#0D1117' : colors.text,
+                        fontWeight: isToday(mealDate) ? '800' : '600',
+                      },
+                    ]}
+                  >
+                    اليوم
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.dateChip,
+                    {
+                      backgroundColor: isYesterday(mealDate)
+                        ? colors.primary
+                        : isDark
+                        ? colors.surfaceElevated
+                        : '#F1F5F9',
+                      borderColor: isYesterday(mealDate) ? colors.primary : (isDark ? colors.border : '#E2E8F0'),
+                    },
+                  ]}
+                  onPress={() => {
+                    Haptics.selectionAsync().catch(() => {});
+                    const y = new Date();
+                    y.setDate(y.getDate() - 1);
+                    setMealDate(y);
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons
+                    name="time-outline"
+                    size={14}
+                    color={isYesterday(mealDate) ? '#0D1117' : colors.textSecondary}
+                    style={{ marginLeft: 4 }}
+                  />
+                  <Text
+                    style={[
+                      styles.dateChipText,
+                      {
+                        color: isYesterday(mealDate) ? '#0D1117' : colors.text,
+                        fontWeight: isYesterday(mealDate) ? '800' : '600',
+                      },
+                    ]}
+                  >
+                    أمس
+                  </Text>
+                </TouchableOpacity>
+
+                {!isToday(mealDate) && !isYesterday(mealDate) && (
+                  <View
+                    style={[
+                      styles.dateChip,
+                      {
+                        backgroundColor: colors.primary,
+                        borderColor: colors.primary,
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name="calendar-outline"
+                      size={14}
+                      color="#0D1117"
+                      style={{ marginLeft: 4 }}
+                    />
+                    <Text style={[styles.dateChipText, { color: '#0D1117', fontWeight: '800' }]}>
+                      {formatDateArabic(mealDate)}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              {!isToday(mealDate) && (
+                <View
+                  style={[
+                    styles.pastDateAlert,
+                    {
+                      backgroundColor: isDark ? 'rgba(245, 158, 11, 0.12)' : 'rgba(217, 119, 6, 0.08)',
+                      borderColor: isDark ? 'rgba(245, 158, 11, 0.25)' : 'rgba(217, 119, 6, 0.2)',
+                    },
+                  ]}
+                >
+                  <Ionicons name="information-circle-outline" size={15} color={colors.warning} />
+                  <Text style={[styles.pastDateAlertText, { color: colors.warning }]}>
+                    سيتم إضافة هذه الوجبة إلى سجل {formatDateArabic(mealDate)}
+                  </Text>
+                </View>
+              )}
             </View>
 
             {/* Meal Info Card */}
@@ -465,5 +622,56 @@ const styles = StyleSheet.create({
   },
   btnDisabled: {
     opacity: 0.6,
+  },
+  dateCard: {
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 16,
+    marginBottom: 16,
+  },
+  dateCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 12,
+  },
+  dateCardTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  dateCardVal: {
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  dateChipRow: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  dateChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  dateChipText: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  pastDateAlert: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  pastDateAlertText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
 });

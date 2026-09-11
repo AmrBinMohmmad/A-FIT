@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mealService, BackendMeal } from '@/services/mealService';
 import { authStorage } from '@/storage/authStorage';
+import { isSameDay, toDateString } from '@/utils/date';
 
 const LEGACY_GLOBAL_MEALS_KEY = 'meals';
 
@@ -83,11 +84,12 @@ export const getMeals = async (): Promise<Meal[]> => {
  * Add a new meal: syncs with backend when online, caches to user-scoped storage.
  */
 export const addMeal = async (
-  meal: Omit<Meal, 'id' | 'createdAt'>,
+  meal: Omit<Meal, 'id' | 'createdAt'> & { createdAt?: string },
 ): Promise<Meal> => {
   const token = await authStorage.getToken();
   const key = await getMealsKey();
   let createdMeal: Meal;
+  const mealDate = meal.createdAt || new Date().toISOString();
 
   if (token) {
     const backendRes = await mealService.createMeal({
@@ -97,13 +99,14 @@ export const addMeal = async (
       carbs: meal.carbs,
       fat: meal.fat,
       meal_type: meal.meal_type || 'other',
+      created_at: mealDate,
     });
     createdMeal = mapBackendMeal(backendRes);
   } else {
     createdMeal = {
       ...meal,
       id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
+      createdAt: mealDate,
     };
   }
 
@@ -119,14 +122,18 @@ export const addMeal = async (
  */
 export const updateMeal = async (
   id: string,
-  meal: Partial<Omit<Meal, 'id' | 'createdAt'>>,
+  meal: Partial<Omit<Meal, 'id'>>,
 ): Promise<Meal> => {
   const token = await authStorage.getToken();
   const key = await getMealsKey();
   let updatedMeal: Meal;
 
   if (token) {
-    const backendRes = await mealService.updateMeal(id, meal);
+    const backendPayload: any = { ...meal };
+    if (meal.createdAt) {
+      backendPayload.created_at = meal.createdAt;
+    }
+    const backendRes = await mealService.updateMeal(id, backendPayload);
     updatedMeal = mapBackendMeal(backendRes);
   } else {
     const currentMeals = await getLocalMeals();
@@ -158,6 +165,28 @@ export const deleteMeal = async (id: string): Promise<void> => {
   const meals = await getLocalMeals();
   const filtered = meals.filter((meal) => meal.id !== id);
   await AsyncStorage.setItem(key, JSON.stringify(filtered));
+};
+
+/**
+ * Clear meals belonging to a specific calendar day (both backend and local cache).
+ */
+export const clearMealsForDay = async (targetDate: Date | string): Promise<void> => {
+  const token = await authStorage.getToken();
+  const key = await getMealsKey();
+  const dateObj = typeof targetDate === 'string' ? new Date(targetDate) : targetDate;
+  const dateString = toDateString(dateObj);
+
+  if (token) {
+    try {
+      await mealService.clearUserMeals(dateString);
+    } catch (e) {
+      console.warn('Failed to clear meals for day on backend:', e);
+    }
+  }
+
+  const currentMeals = await getLocalMeals();
+  const remaining = currentMeals.filter((m) => !isSameDay(m.createdAt, dateObj));
+  await AsyncStorage.setItem(key, JSON.stringify(remaining));
 };
 
 /**

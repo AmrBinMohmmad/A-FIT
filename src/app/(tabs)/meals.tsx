@@ -9,12 +9,12 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import MealItem from '@/components/MealItem';
-import { clearAllMeals, getMeals, Meal } from '@/storage/meals';
+import { clearMealsForDay, getMeals, Meal } from '@/storage/meals';
 import { useTheme } from '@/context/ThemeContext';
 import { useToast } from '@/context/ToastContext';
 import { useAlert } from '@/context/AlertContext';
@@ -29,6 +29,7 @@ export default function MealsScreen() {
   const { colors, isDark } = useTheme();
   const toast = useToast();
   const { showAlert } = useAlert();
+  const router = useRouter();
   const tabBarHeight = 56 + insets.bottom;
 
   const loadMeals = async () => {
@@ -74,25 +75,26 @@ export default function MealsScreen() {
     setSelectedDate(new Date());
   };
 
-  const handleClearAll = () => {
-    if (meals.length === 0) return;
+  const handleClearDayMeals = () => {
+    if (filteredMeals.length === 0) return;
+    const formattedDate = formatDateArabic(selectedDate);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
     showAlert(
-      'مسح جميع الوجبات',
-      'هل أنت متأكد من رغبتك في حذف كل الوجبات المسجلة؟ لا يمكن التراجع عن هذا الإجراء.',
+      `مسح وجبات ${formattedDate}`,
+      `هل أنت متأكد من رغبتك في حذف وجبات هذا اليوم فقط (${filteredMeals.length} ${filteredMeals.length === 1 ? 'وجبة' : 'وجبات'})؟ لن تتأثر وجبات باقي الأيام.`,
       [
         { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'مسح الكل',
+          text: 'حذف وجبات اليوم',
           style: 'destructive',
           onPress: async () => {
             try {
-              await clearAllMeals();
+              await clearMealsForDay(selectedDate);
               await loadMeals();
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-              toast.success('تم مسح جميع الوجبات بنجاح');
+              toast.success(`تم مسح وجبات ${formattedDate} بنجاح`);
             } catch (err: any) {
-              toast.error(err?.message || 'تعذر مسح الوجبات');
+              toast.error(err?.message || 'تعذر مسح وجبات هذا اليوم');
             }
           },
         },
@@ -152,22 +154,27 @@ export default function MealsScreen() {
               </Text>
             </View>
 
-            {meals.length > 0 ? (
-              <TouchableOpacity
-                style={[
-                  styles.clearBtn,
-                  {
-                    backgroundColor: isDark ? 'rgba(248, 81, 73, 0.12)' : 'rgba(220, 38, 38, 0.1)',
-                    borderColor: isDark ? 'rgba(248, 81, 73, 0.25)' : 'rgba(220, 38, 38, 0.2)',
-                  },
-                ]}
-                onPress={handleClearAll}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="trash-outline" size={16} color={colors.danger} />
-                <Text style={[styles.clearBtnText, { color: colors.danger }]}>مسح الكل</Text>
-              </TouchableOpacity>
-            ) : null}
+            <TouchableOpacity
+              style={[
+                styles.addMealHeaderBtn,
+                {
+                  backgroundColor: colors.primary,
+                },
+              ]}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+                router.push({
+                  pathname: '/(tabs)/add-meal',
+                  params: { date: selectedDate.toISOString() },
+                });
+              }}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="add" size={18} color="#0D1117" />
+              <Text style={styles.addMealHeaderBtnText}>
+                {isCurrentDay ? 'أضف وجبة' : 'إضافة وجبة'}
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Date Navigator Bar */}
@@ -264,6 +271,28 @@ export default function MealsScreen() {
             </View>
           ) : null}
 
+          {/* Day Actions / Clear day meals */}
+          {filteredMeals.length > 0 && (
+            <View style={styles.dayActionsRow}>
+              <TouchableOpacity
+                style={[
+                  styles.clearDayBtn,
+                  {
+                    backgroundColor: isDark ? 'rgba(248, 81, 73, 0.08)' : 'rgba(220, 38, 38, 0.06)',
+                    borderColor: isDark ? 'rgba(248, 81, 73, 0.2)' : 'rgba(220, 38, 38, 0.15)',
+                  },
+                ]}
+                onPress={handleClearDayMeals}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="trash-outline" size={13} color={colors.danger} />
+                <Text style={[styles.clearDayBtnText, { color: colors.danger }]}>
+                  مسح وجبات هذا اليوم
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Meals List */}
           <View style={styles.listContainer}>
             {filteredMeals.length === 0 ? (
@@ -285,13 +314,29 @@ export default function MealsScreen() {
                 <Text style={[styles.emptyTitle, { color: colors.text }]}>
                   {isCurrentDay
                     ? 'لم تسجل أي وجبة حتى الآن اليوم'
-                    : 'لا توجد وجبات مسجلة في هذا اليوم'}
+                    : `لا توجد وجبات مسجلة في ${formatDateArabic(selectedDate)}`}
                 </Text>
                 <Text style={[styles.emptySub, { color: colors.textSecondary }]}>
                   {isCurrentDay
-                    ? 'اضغط على تبويب "أضف وجبة" لتتبع سعراتك ومغذياتك بسهولة'
-                    : 'يمكنك اختيار يوم آخر أو العودة لتسجيل وجبات اليوم'}
+                    ? 'اضغط على زر الإضافة لتتبع وجباتك وسعراتك بدقة'
+                    : 'هل نسيت تسجيل وجبة في هذا اليوم؟ يمكنك إضافتها الآن بسهولة'}
                 </Text>
+                <TouchableOpacity
+                  style={[styles.emptyActionBtn, { backgroundColor: colors.primary }]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+                    router.push({
+                      pathname: '/(tabs)/add-meal',
+                      params: { date: selectedDate.toISOString() },
+                    });
+                  }}
+                  activeOpacity={0.85}
+                >
+                  <Ionicons name="add-circle" size={18} color="#0D1117" />
+                  <Text style={styles.emptyActionBtnText}>
+                    {isCurrentDay ? 'تسجيل أول وجبة اليوم' : '+ إضافة وجبة لهذا اليوم'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             ) : (
               filteredMeals.map((meal) => (
@@ -343,18 +388,50 @@ const styles = StyleSheet.create({
     marginTop: 2,
     textAlign: 'right',
   },
-  clearBtn: {
+  addMealHeaderBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 14,
+  },
+  addMealHeaderBtnText: {
+    color: '#0D1117',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  dayActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginBottom: 12,
+  },
+  clearDayBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
     borderWidth: 1,
   },
-  clearBtnText: {
-    fontSize: 13,
+  clearDayBtnText: {
+    fontSize: 12,
     fontWeight: '700',
+  },
+  emptyActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    marginTop: 16,
+  },
+  emptyActionBtnText: {
+    color: '#0D1117',
+    fontSize: 14,
+    fontWeight: '800',
   },
   summaryCard: {
     flexDirection: 'row',

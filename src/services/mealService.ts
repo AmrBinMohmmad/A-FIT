@@ -20,6 +20,7 @@ export interface CreateMealInput {
   carbs?: number;
   fat?: number;
   meal_type?: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'other';
+  created_at?: string;
 }
 
 export const mealService = {
@@ -76,10 +77,13 @@ export const mealService = {
   },
 
   /**
-   * Clear all meals belonging to the authenticated user
+   * Clear all meals belonging to the authenticated user, optionally filtered by date (YYYY-MM-DD)
    */
-  async clearUserMeals(): Promise<void> {
-    await apiClient.delete('/meal/clearUserMeals');
+  async clearUserMeals(date?: string): Promise<void> {
+    const endpoint = date
+      ? `/meal/clearUserMeals?date=${encodeURIComponent(date)}`
+      : '/meal/clearUserMeals';
+    await apiClient.delete(endpoint);
   },
 };
 

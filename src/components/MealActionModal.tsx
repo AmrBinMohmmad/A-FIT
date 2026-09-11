@@ -20,6 +20,7 @@ import { useToast } from '@/context/ToastContext';
 import { useAlert } from '@/context/AlertContext';
 import { updateMeal, deleteMeal, Meal } from '@/storage/meals';
 import { FONTS } from '@/styles/global';
+import { formatDateArabic, isToday, isYesterday } from '@/utils/date';
 
 interface MealActionModalProps {
   visible: boolean;
@@ -59,6 +60,7 @@ export default function MealActionModal({
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
   const [mealType, setMealType] = useState<MealType>('other');
+  const [mealDate, setMealDate] = useState<Date>(new Date());
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -69,6 +71,7 @@ export default function MealActionModal({
       setCarbs(meal.carbs ? String(meal.carbs) : '');
       setFat(meal.fat ? String(meal.fat) : '');
       setMealType(meal.meal_type || 'other');
+      setMealDate(meal.createdAt ? new Date(meal.createdAt) : new Date());
       setStep('options');
     }
   }, [meal, visible]);
@@ -105,6 +108,7 @@ export default function MealActionModal({
         carbs: Math.round(Number(carbs) || 0),
         fat: Math.round(Number(fat) || 0),
         meal_type: mealType,
+        createdAt: mealDate.toISOString(),
       });
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
@@ -494,6 +498,118 @@ export default function MealActionModal({
                           </TouchableOpacity>
                         );
                       })}
+                    </View>
+                  </View>
+
+                  {/* Meal Date Selector */}
+                  <View style={styles.inputGroup}>
+                    <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>تاريخ تسجيل الوجبة</Text>
+                    <View style={styles.categoryRow}>
+                      <TouchableOpacity
+                        style={[
+                          styles.categoryChip,
+                          {
+                            backgroundColor: isToday(mealDate)
+                              ? colors.primary
+                              : isDark
+                              ? colors.surfaceElevated
+                              : '#F1F5F9',
+                            borderColor: isToday(mealDate) ? colors.primary : (isDark ? colors.border : '#E2E8F0'),
+                          },
+                        ]}
+                        onPress={() => {
+                          Haptics.selectionAsync().catch(() => {});
+                          setMealDate(new Date());
+                        }}
+                        activeOpacity={0.8}
+                      >
+                        <Ionicons
+                          name="today-outline"
+                          size={14}
+                          color={isToday(mealDate) ? '#0D1117' : colors.textSecondary}
+                          style={{ marginLeft: 4 }}
+                        />
+                        <Text
+                          style={[
+                            styles.categoryChipText,
+                            {
+                              color: isToday(mealDate) ? '#0D1117' : colors.text,
+                              fontWeight: isToday(mealDate) ? '800' : '600',
+                            },
+                          ]}
+                        >
+                          اليوم
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[
+                          styles.categoryChip,
+                          {
+                            backgroundColor: isYesterday(mealDate)
+                              ? colors.primary
+                              : isDark
+                              ? colors.surfaceElevated
+                              : '#F1F5F9',
+                            borderColor: isYesterday(mealDate) ? colors.primary : (isDark ? colors.border : '#E2E8F0'),
+                          },
+                        ]}
+                        onPress={() => {
+                          Haptics.selectionAsync().catch(() => {});
+                          const y = new Date();
+                          y.setDate(y.getDate() - 1);
+                          setMealDate(y);
+                        }}
+                        activeOpacity={0.8}
+                      >
+                        <Ionicons
+                          name="time-outline"
+                          size={14}
+                          color={isYesterday(mealDate) ? '#0D1117' : colors.textSecondary}
+                          style={{ marginLeft: 4 }}
+                        />
+                        <Text
+                          style={[
+                            styles.categoryChipText,
+                            {
+                              color: isYesterday(mealDate) ? '#0D1117' : colors.text,
+                              fontWeight: isYesterday(mealDate) ? '800' : '600',
+                            },
+                          ]}
+                        >
+                          أمس
+                        </Text>
+                      </TouchableOpacity>
+
+                      {!isToday(mealDate) && !isYesterday(mealDate) && (
+                        <View
+                          style={[
+                            styles.categoryChip,
+                            {
+                              backgroundColor: colors.primary,
+                              borderColor: colors.primary,
+                            },
+                          ]}
+                        >
+                          <Ionicons
+                            name="calendar-outline"
+                            size={14}
+                            color="#0D1117"
+                            style={{ marginLeft: 4 }}
+                          />
+                          <Text
+                            style={[
+                              styles.categoryChipText,
+                              {
+                                color: '#0D1117',
+                                fontWeight: '800',
+                              },
+                            ]}
+                          >
+                            {formatDateArabic(mealDate)}
+                          </Text>
+                        </View>
+                      )}
                     </View>
                   </View>
 

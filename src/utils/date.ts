@@ -25,6 +25,15 @@ export function isToday(date: Date | string): boolean {
 }
 
 /**
+ * Checks if a date string or object corresponds to yesterday.
+ */
+export function isYesterday(date: Date | string): boolean {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return isSameDay(date, yesterday);
+}
+
+/**
  * Filters a list of meals to only those created on the given target date.
  */
 export function filterMealsByDay(meals: Meal[], targetDate: Date = new Date()): Meal[] {
