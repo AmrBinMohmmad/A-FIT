@@ -7,6 +7,7 @@ import { ListState } from "@/components/ListState";
 import { SignPanel } from "@/components/line/SignPanel";
 import { RText } from "@/components/RText";
 import { Screen } from "@/components/Screen";
+import { EMOJI } from "@/constants/emoji";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -112,7 +113,7 @@ export default function StepsScreen() {
         error={history.isError ? history.error : undefined}
         onRetry={() => void history.refetch()}
         empty={total === 0}
-        emptyIcon="footsteps-outline"
+        emptyEmoji={EMOJI.steps}
         emptyBody={t("steps.empty")}>
         <View style={{ gap: theme.spacing.lg }}>
           <SignPanel

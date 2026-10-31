@@ -1,5 +1,6 @@
 import { Pressable, View } from "react-native";
 
+import { Avatar } from "@/components/Avatar";
 import { CodeChip } from "@/components/line/CodeChip";
 import { RText } from "@/components/RText";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
@@ -44,6 +45,7 @@ export function StandingRow({ standing, max, youLabel, ownerLabel, onLongPress, 
   const content = (
     <>
       <CodeChip code={standing.rank} tone={tone} />
+      <Avatar uri={standing.avatar_url} name={standing.name} size={32} tone={tone} />
       <View style={styles.body}>
         <View style={styles.nameRow}>
           <RText

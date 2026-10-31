@@ -9,6 +9,7 @@ import { ExitRow } from "@/components/line/ExitRow";
 import { SignPanel } from "@/components/line/SignPanel";
 import { RTextInput } from "@/components/RTextInput";
 import { Screen } from "@/components/Screen";
+import { EMOJI } from "@/constants/emoji";
 import { useAlert } from "@/contexts/AlertContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -103,7 +104,7 @@ export default function WeightScreen() {
         error={history.isError ? history.error : undefined}
         onRetry={() => void history.refetch()}
         empty={entries.length === 0}
-        emptyIcon="scale-outline"
+        emptyEmoji={EMOJI.weight}
         emptyTitle={t("weight.empty")}
         emptyBody={t("weight.emptyBody")}>
         <View style={{ gap: theme.spacing.lg }}>

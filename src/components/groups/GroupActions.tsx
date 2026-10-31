@@ -6,8 +6,11 @@ import { Pressable } from "react-native";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useAlert } from "@/contexts/AlertContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useToast } from "@/contexts/ToastContext";
 import { useDeleteGroup, useLeaveGroup, useRotateInvite } from "@/hooks/groups/useGroups";
+import { useRemoveGroupPhoto, useUploadGroupPhoto } from "@/hooks/photos/usePhotos";
 import type { Group } from "@/types/api";
+import { pickSquarePhoto } from "@/utils/photos";
 
 /** Header action: owner → delete / new code; member → leave. Confirmed through the alert dialog. */
 export function GroupActions({ group }: { group: Group }) {
@@ -18,6 +21,15 @@ export function GroupActions({ group }: { group: Group }) {
   const leave = useLeaveGroup();
   const remove = useDeleteGroup();
   const rotate = useRotateInvite();
+  const uploadPhoto = useUploadGroupPhoto();
+  const removePhoto = useRemoveGroupPhoto();
+  const toast = useToast();
+
+  const onPhoto = async () => {
+    const result = await pickSquarePhoto();
+    if (result.kind === "denied") toast.info(t("me.photoPermission"));
+    if (result.kind === "picked") uploadPhoto.mutate({ groupId: group.id, uri: result.uri });
+  };
   const isOwner = group.my_role === "owner";
 
   const onLeave = async () => {
@@ -60,6 +72,10 @@ export function GroupActions({ group }: { group: Group }) {
               onPress: () =>
                 router.push({ pathname: "/groups/[id]/rename", params: { id: String(group.id) } }),
             },
+            { text: t("groups.changePhoto"), onPress: () => void onPhoto() },
+            ...(group.photo_url
+              ? [{ text: t("groups.removePhoto"), onPress: () => removePhoto.mutate(group.id) }]
+              : []),
             { text: t("groups.rotateCode"), onPress: () => void onRotate() },
             { text: t("groups.deleteGroup"), style: "destructive", onPress: () => void onDelete() },
           ]

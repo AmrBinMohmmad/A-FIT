@@ -2,7 +2,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, View } from "react-native";
 
+import { Avatar } from "@/components/Avatar";
 import { RText } from "@/components/RText";
+import { EMOJI } from "@/constants/emoji";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -39,14 +41,18 @@ export function HomeHeader({ syncedAt, syncing }: { syncedAt: string | null; syn
 
   return (
     <View style={styles.row}>
-      <View style={styles.roundel} accessibilityRole="image" accessibilityLabel={t("common.appName")}>
-        <RText variant="callout" weight="bold" color="onPrimary">
-          {t("common.brandMark")}
-        </RText>
-      </View>
+      {user?.avatar_url ? (
+        <Avatar uri={user.avatar_url} name={user.name} size={40} />
+      ) : (
+        <View style={styles.roundel} accessibilityRole="image" accessibilityLabel={t("common.appName")}>
+          <RText variant="callout" weight="bold" color="onPrimary">
+            {t("common.brandMark")}
+          </RText>
+        </View>
+      )}
       <View style={styles.text}>
         <RText variant="title" numberOfLines={1}>
-          {user?.name ?? t("common.appName")}
+          {user?.name ? `${t("home.hello", { name: user.name })} ${EMOJI.wave}` : t("common.appName")}
         </RText>
         <RText variant="footnote" color="textSecondary">
           {formatLongDate(new Date(), language)}

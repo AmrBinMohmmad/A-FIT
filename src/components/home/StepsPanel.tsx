@@ -1,10 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
+import { Avatar } from "@/components/Avatar";
 import { DayBars } from "@/components/charts/DayBars";
 import { LineDiagram } from "@/components/line/LineDiagram";
 import { SignPanel } from "@/components/line/SignPanel";
 import { RText } from "@/components/RText";
+import { EMOJI } from "@/constants/emoji";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { makeStyles } from "@/hooks/useStyles";
 import type { Dashboard } from "@/types/api";
@@ -23,7 +25,6 @@ const useStyles = makeStyles((theme) => ({
   head: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
   friends: { flexDirection: "row", flexWrap: "wrap", gap: theme.spacing.md, marginTop: theme.spacing.xs },
   friend: { flexDirection: "row", alignItems: "center", gap: theme.spacing.xs },
-  tick: { width: 2, height: 12, backgroundColor: theme.colors.textPrimary },
   week: { marginTop: theme.spacing.sm, gap: theme.spacing.xs },
   weekHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
 }));
@@ -76,7 +77,7 @@ export function StepsPanel({ steps, group }: { steps: Dashboard["steps"]; group:
         />
       ) : (
         <SignPanel
-          label={t("home.goalReached")}
+          label={`${t("home.goalReached")} ${EMOJI.party}`}
           value={`${formatInt(steps.steps)} ${t("common.steps")}`}
           endValue={
             steps.steps > goal ? t("home.pastGoal", { count: formatInt(steps.steps - goal) }) : undefined
@@ -95,7 +96,9 @@ export function StepsPanel({ steps, group }: { steps: Dashboard["steps"]; group:
             color={steps.streak > 0 ? "accent" : "textSecondary"}
             weight="medium"
             tabular>
-            {steps.streak > 0 ? t("home.streak", { count: steps.streak }) : t("home.streakNone")}
+            {steps.streak > 0
+              ? `${EMOJI.streak} ${t("home.streak", { count: steps.streak })}`
+              : t("home.streakNone")}
           </RText>
         </View>
         <DayBars
@@ -115,7 +118,7 @@ export function StepsPanel({ steps, group }: { steps: Dashboard["steps"]; group:
         <View style={styles.friends} accessibilityLabel={t("home.friendsOnLine")}>
           {friends.slice(0, 4).map((f) => (
             <View key={f.user_id} style={styles.friend}>
-              <View style={styles.tick} />
+              <Avatar uri={f.avatar_url} name={f.name} size={20} tone="muted" />
               <RText variant="caption" color="textSecondary" numberOfLines={1}>
                 {f.name}{" "}
                 <RText variant="caption" color="textPrimary" tabular>

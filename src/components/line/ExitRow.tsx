@@ -10,6 +10,8 @@ import { useRTL } from "@/hooks/useRTL";
 
 interface ExitRowProps {
   code: string | number;
+  /** Replaces the code chip, e.g. a group photo. */
+  leading?: React.ReactNode;
   title: string;
   subtitle?: string;
   value?: string;
@@ -40,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
 /** One exit on the station sign: a numbered chip, a title, a quiet subtitle and the live value. */
 export function ExitRow({
   code,
+  leading,
   title,
   subtitle,
   value,
@@ -55,7 +58,7 @@ export function ExitRow({
 
   const content = (
     <>
-      <CodeChip code={code} tone={tone} />
+      {leading ?? <CodeChip code={code} tone={tone} />}
       <View style={styles.text}>
         <RText variant="callout" weight="medium">
           {title}

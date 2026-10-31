@@ -8,6 +8,7 @@ import { SegmentBar } from "@/components/line/SegmentBar";
 import { SignPanel } from "@/components/line/SignPanel";
 import { RText } from "@/components/RText";
 import { Screen } from "@/components/Screen";
+import { EMOJI } from "@/constants/emoji";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useWaterControls } from "@/hooks/body/useWater";
 import { useProfile } from "@/hooks/profile/useProfile";
@@ -34,7 +35,7 @@ export default function WaterScreen() {
   const add = (delta: number) => water.add(delta);
 
   return (
-    <Screen title={t("water.title")} subtitle={t("water.today")} back>
+    <Screen title={`${EMOJI.water} ${t("water.title")}`} subtitle={t("water.today")} back>
       <ListState
         loading={water.query.isPending}
         error={water.query.isError ? water.query.error : undefined}
@@ -50,7 +51,7 @@ export default function WaterScreen() {
           <SegmentBar value={ml} max={goal} segments={Math.max(4, Math.round(goal / 250))} height={14} />
           {ml >= goal ? (
             <RText variant="callout" weight="bold" color="accent">
-              {t("water.goalReached")}
+              {`${EMOJI.water}${EMOJI.party} ${t("water.goalReached")}`}
             </RText>
           ) : (
             <RText variant="footnote" color="textSecondary" tabular>

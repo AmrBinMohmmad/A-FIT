@@ -16,6 +16,8 @@ interface ListStateProps {
   emptyTitle?: string;
   emptyBody?: string;
   emptyIcon?: keyof typeof Ionicons.glyphMap;
+  /** A friendly glyph instead of the stroke icon. */
+  emptyEmoji?: string;
   emptyAction?: React.ReactNode;
   onRetry?: () => void;
   children: React.ReactNode;
@@ -53,6 +55,7 @@ export function ListState({
   emptyTitle,
   emptyBody,
   emptyIcon = "train-outline",
+  emptyEmoji,
   emptyAction,
   onRetry,
   children,
@@ -101,7 +104,11 @@ export function ListState({
     return (
       <View style={styles.box}>
         <View style={styles.icon}>
-          <Ionicons name={emptyIcon} size={28} color={theme.colors.primary} />
+          {emptyEmoji ? (
+            <RText style={{ fontSize: 28, lineHeight: 34 }}>{emptyEmoji}</RText>
+          ) : (
+            <Ionicons name={emptyIcon} size={28} color={theme.colors.primary} />
+          )}
         </View>
         {emptyTitle ? (
           <RText variant="subtitle" align="center">

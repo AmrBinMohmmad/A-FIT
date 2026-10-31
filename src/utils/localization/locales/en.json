@@ -71,7 +71,10 @@
     "signOut": "Sign out",
     "signOutConfirmTitle": "Sign out?",
     "signOutConfirmBody": "Your steps will keep syncing when you sign back in.",
-    "sessionExpired": "Your session has expired. Please sign in again."
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "signOutAll": "Sign out of all devices",
+    "signOutAllTitle": "Sign out everywhere?",
+    "signOutAllBody": "Every phone signed in to this account is signed out, including this one. Use it if you lost a device."
   },
   "onboarding": {
     "step": "Step {{step}} of {{total}}",
@@ -149,7 +152,8 @@
     "weekStrip": "Last 7 days",
     "shareToday": "Share today",
     "shareText": "My A-FIT day: {{steps}} steps, {{kcal}} kcal logged, {{water}} L water. #AFIT",
-    "quickWater": "+250"
+    "quickWater": "+250",
+    "hello": "Hi {{name}}"
   },
   "meals": {
     "title": "Meals",
@@ -228,7 +232,9 @@
     "rename": "Rename",
     "renameTitle": "Rename group",
     "renameLabel": "New name",
-    "removeHint": "Hold a member to remove them"
+    "removeHint": "Hold a member to remove them",
+    "changePhoto": "Change group photo",
+    "removePhoto": "Remove group photo"
   },
   "challenges": {
     "title": "Challenge",
@@ -282,7 +288,11 @@
     "bmi": "BMI {{value}}",
     "toTarget": "{{value}} kg to target",
     "atTarget": "At target weight",
-    "nameSaved": "Name saved"
+    "nameSaved": "Name saved",
+    "photo": "Profile photo",
+    "changePhoto": "Change photo",
+    "removePhoto": "Remove photo",
+    "photoPermission": "Allow photo access in your phone settings to pick a picture."
   },
   "steps": {
     "title": "Step history",

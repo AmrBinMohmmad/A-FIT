@@ -1,23 +1,39 @@
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
+import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/Button";
 import { ExitRow } from "@/components/line/ExitRow";
 import { SignPanel } from "@/components/line/SignPanel";
 import { RText } from "@/components/RText";
 import { Screen } from "@/components/Screen";
+import { EMOJI } from "@/constants/emoji";
 import { useAlert } from "@/contexts/AlertContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useToast } from "@/contexts/ToastContext";
+import { useSignOutEverywhere } from "@/hooks/auth/useSessions";
+import { useRemoveAvatar, useUploadAvatar } from "@/hooks/photos/usePhotos";
 import { useDeleteAccount, useProfile } from "@/hooks/profile/useProfile";
 import { useStepSync } from "@/hooks/steps/useStepSync";
 import { makeStyles } from "@/hooks/useStyles";
 import { formatDecimal, formatInt } from "@/utils/number";
+import { pickSquarePhoto } from "@/utils/photos";
 
 const useStyles = makeStyles((theme) => ({
   section: { gap: theme.spacing.xs },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.lg,
+    padding: theme.spacing.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radii.xl,
+  },
+  cardText: { flex: 1, gap: 2 },
   danger: { gap: theme.spacing.sm, marginTop: theme.spacing.lg },
 }));
 
@@ -27,8 +43,12 @@ export default function MeScreen() {
   const styles = useStyles();
   const router = useRouter();
   const { user, signOut } = useAuth();
-  const { confirm } = useAlert();
+  const { confirm, showAlert } = useAlert();
+  const toast = useToast();
   const profile = useProfile();
+  const uploadAvatar = useUploadAvatar();
+  const removeAvatar = useRemoveAvatar();
+  const signOutEverywhere = useSignOutEverywhere();
   const { health, syncing, syncNow, requestAccess } = useStepSync();
   const deleteAccount = useDeleteAccount();
   const version = Constants.expoConfig?.version ?? "";
@@ -36,6 +56,40 @@ export default function MeScreen() {
   // Display-only arithmetic on stored profile values (the plan itself is computed server-side).
   const bmi = p && p.height > 0 ? p.current_weight / Math.pow(p.height / 100, 2) : null;
   const toTarget = p ? Math.abs(p.current_weight - p.target_weight) : null;
+
+  const choosePhoto = async () => {
+    const result = await pickSquarePhoto();
+    if (result.kind === "denied") toast.info(t("me.photoPermission"));
+    if (result.kind === "picked") uploadAvatar.mutate(result.uri);
+  };
+
+  const onPhoto = () =>
+    showAlert({
+      title: t("me.photo"),
+      buttons: [
+        { text: "__cancel__", style: "cancel" },
+        { text: t("me.changePhoto"), onPress: () => void choosePhoto() },
+        ...(user?.avatar_url
+          ? [
+              {
+                text: t("me.removePhoto"),
+                style: "destructive" as const,
+                onPress: () => removeAvatar.mutate(),
+              },
+            ]
+          : []),
+      ],
+    });
+
+  const onSignOutEverywhere = async () => {
+    const ok = await confirm({
+      title: t("auth.signOutAllTitle"),
+      message: t("auth.signOutAllBody"),
+      confirmText: t("auth.signOutAll"),
+      destructive: true,
+    });
+    if (ok) signOutEverywhere.mutate();
+  };
 
   const onSignOut = async () => {
     const ok = await confirm({
@@ -57,7 +111,27 @@ export default function MeScreen() {
   };
 
   return (
-    <Screen title={user?.name ?? t("me.title")} subtitle={user?.email}>
+    <Screen title={t("me.title")}>
+      <Pressable
+        onPress={onPhoto}
+        style={styles.card}
+        accessibilityRole="button"
+        accessibilityLabel={t("me.changePhoto")}>
+        <Avatar uri={user?.avatar_url} name={user?.name ?? ""} size={64} />
+        <View style={styles.cardText}>
+          <RText variant="subtitle" numberOfLines={1}>
+            {user?.name}
+          </RText>
+          <RText variant="footnote" color="textSecondary" numberOfLines={1}>
+            {user?.email}
+          </RText>
+          <RText variant="caption" color="accent" weight="medium">
+            {uploadAvatar.isPending || removeAvatar.isPending
+              ? t("common.loading")
+              : `${EMOJI.camera} ${t("me.changePhoto")}`}
+          </RText>
+        </View>
+      </Pressable>
       {p && bmi !== null && toTarget !== null ? (
         <SignPanel
           label={t("me.plan")}
@@ -109,6 +183,13 @@ export default function MeScreen() {
           variant="secondary"
           icon="log-out-outline"
           onPress={() => void onSignOut()}
+        />
+        <Button
+          title={t("auth.signOutAll")}
+          variant="ghost"
+          icon="phone-portrait-outline"
+          onPress={() => void onSignOutEverywhere()}
+          loading={signOutEverywhere.isPending}
         />
         <Button
           title={t("me.deleteAccount")}

@@ -10,6 +10,7 @@ import { MacroGrid } from "@/components/MacroGrid";
 import { MealItem } from "@/components/MealItem";
 import { RText } from "@/components/RText";
 import { Screen } from "@/components/Screen";
+import { EMOJI } from "@/constants/emoji";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -137,7 +138,7 @@ export default function MealsScreen() {
         error={meals.isError ? meals.error : undefined}
         onRetry={() => void meals.refetch()}
         empty={(meals.data?.length ?? 0) === 0}
-        emptyIcon="restaurant-outline"
+        emptyEmoji={EMOJI.meals}
         emptyTitle={t("meals.emptyTitle")}
         emptyBody={isToday ? t("meals.emptyToday") : t("meals.emptyBody")}>
         <View style={styles.list}>

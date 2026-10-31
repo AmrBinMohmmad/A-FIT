@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, View } from "react-native";
 
+import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/Button";
 import { ChallengeRow } from "@/components/groups/ChallengeRow";
 import { GroupActions } from "@/components/groups/GroupActions";
@@ -12,6 +13,7 @@ import { Leaderboard } from "@/components/groups/Leaderboard";
 import { ListState } from "@/components/ListState";
 import { RText } from "@/components/RText";
 import { Screen } from "@/components/Screen";
+import { EMOJI } from "@/constants/emoji";
 import { useAlert } from "@/contexts/AlertContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useGroupChallenges } from "@/hooks/challenges/useChallenges";
@@ -59,6 +61,7 @@ export default function GroupScreen() {
       back
       title={g?.name ?? ""}
       subtitle={g ? t("common.members", { count: g.members_count }) : undefined}
+      leading={g ? <Avatar uri={g.photo_url} name={g.name} size={40} emoji={EMOJI.group} /> : undefined}
       action={g ? <GroupActions group={g} /> : undefined}
       refreshControl={
         <RefreshControl
@@ -108,7 +111,7 @@ export default function GroupScreen() {
                 error={challenges.isError ? challenges.error : undefined}
                 onRetry={() => void challenges.refetch()}
                 empty={(challenges.data?.length ?? 0) === 0}
-                emptyIcon="flag-outline"
+                emptyEmoji={EMOJI.challenge}
                 emptyBody={t("groups.noChallenges")}>
                 <View>
                   {(challenges.data ?? []).map((c, i) => (

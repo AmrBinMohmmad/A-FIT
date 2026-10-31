@@ -30,6 +30,7 @@ Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before 
 | secure storage     | expo-secure-store (token only)                                                                                                                                             |
 | i18n               | i18next + react-i18next + expo-localization                                                                                                                                |
 | icons / charts     | @expo/vector-icons (Ionicons) · react-native-svg (`src/components/charts`)                                                                                                 |
+| images / photos    | expo-image (display, cached) · expo-image-picker + expo-image-manipulator (pick, square-crop, 512 px JPEG) behind `src/utils/photos.ts`; upload hooks in `src/hooks/photos/` |
 | health data        | @kingstinct/react-native-healthkit (iOS) · react-native-health-connect (Android) behind `src/utils/steps/healthSource.ts`                                                  |
 | background         | expo-background-task + expo-task-manager (`src/utils/steps/backgroundTask.ts`)                                                                                             |
 | toasts / dialogs   | in-house `ToastContext` / `AlertContext` (kept over react-native-toast-message: stack-first)                                                                               |

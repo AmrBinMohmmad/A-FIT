@@ -21,6 +21,8 @@ interface ScreenProps {
   title?: string;
   subtitle?: string;
   back?: boolean;
+  /** Start-side header element (e.g. a group photo). */
+  leading?: React.ReactNode;
   /** Right-hand (end-side) header action. */
   action?: React.ReactNode;
   scroll?: boolean;
@@ -70,6 +72,7 @@ export function Screen({
   title,
   subtitle,
   back,
+  leading,
   action,
   scroll = true,
   refreshControl,
@@ -103,6 +106,7 @@ export function Screen({
             />
           </Pressable>
         ) : null}
+        {leading}
         <View style={styles.titles}>
           {title ? <RText variant={back ? "title" : "largeTitle"}>{title}</RText> : null}
           {subtitle ? (

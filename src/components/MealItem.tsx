@@ -1,10 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
+import type { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 
 import { RText } from "@/components/RText";
+import { MEAL_TYPE_EMOJI } from "@/constants/emoji";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
-import { useTheme } from "@/contexts/ThemeContext";
 import { makeStyles } from "@/hooks/useStyles";
 import type { Meal, MealType } from "@/types/api";
 import { formatInt } from "@/utils/number";
@@ -44,7 +44,6 @@ const useStyles = makeStyles((theme) => ({
 /** One ledger line: type icon, name, macros in words, calories as the figure. */
 export function MealItem({ meal, onPress, first }: { meal: Meal; onPress: () => void; first?: boolean }) {
   const styles = useStyles();
-  const { theme } = useTheme();
   const { t } = useTranslation();
   return (
     <Pressable
@@ -53,7 +52,7 @@ export function MealItem({ meal, onPress, first }: { meal: Meal; onPress: () => 
       accessibilityRole="button"
       accessibilityLabel={meal.name}>
       <View style={styles.icon}>
-        <Ionicons name={MEAL_TYPE_ICON[meal.meal_type]} size={18} color={theme.colors.primary} />
+        <RText style={{ fontSize: 18, lineHeight: 22 }}>{MEAL_TYPE_EMOJI[meal.meal_type]}</RText>
       </View>
       <View style={styles.body}>
         <RText variant="callout" weight="medium" numberOfLines={1}>

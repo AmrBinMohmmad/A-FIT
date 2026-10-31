@@ -59,6 +59,9 @@ Confirmed capabilities:
   upcoming / active / ended; winner shown when ended.
 - Account deletion from inside the app (store requirement).
 - Light and dark appearance, tri-state (system / light / dark).
+- Profile photo and group photo; emoji as content glyphs (meal types, celebrations, empty
+  states) to keep the tone friendly (owner request 2026-10-31).
+- "Sign out of all devices" for a lost phone; at most ten live sessions per account.
 
 Constraints:
 - Rakaya mobile standard: strict `{flag, data, message}` API envelope, token only in
@@ -67,7 +70,9 @@ Constraints:
 - Health permissions are requested in-context with a plain explanation; a user who declines
   can still use meals, groups and manual weight/water.
 - No push notifications in this release (polled refresh only). Explicitly undecided: push.
-- No social feed, no chat, no photos. Explicitly undecided: friend requests outside groups.
+- Photos are limited to a profile picture and a group photo (owner-set), both square and
+  downsized on the device before upload (owner request 2026-10-31). No meal photos, no feed,
+  no chat. Explicitly undecided: friend requests outside groups.
 
 Terminology (Arabic / English): خطوات / steps, مجموعة / group, تحدي / challenge, وجبة / meal,
 الخطة اليومية / daily plan, سعرة / kcal, بروتين / protein, كارب / carbs, دهون / fat.

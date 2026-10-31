@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import { GroupRow } from "@/components/groups/GroupRow";
 import { ListState } from "@/components/ListState";
 import { Screen } from "@/components/Screen";
+import { EMOJI } from "@/constants/emoji";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useGroups } from "@/hooks/groups/useGroups";
 import { makeStyles } from "@/hooks/useStyles";
@@ -59,7 +60,7 @@ export default function GroupsScreen() {
         error={groups.isError ? groups.error : undefined}
         onRetry={() => void groups.refetch()}
         empty={(groups.data?.length ?? 0) === 0}
-        emptyIcon="people-outline"
+        emptyEmoji={EMOJI.group}
         emptyTitle={t("groups.emptyTitle")}
         emptyBody={t("groups.emptyBody")}>
         <View>

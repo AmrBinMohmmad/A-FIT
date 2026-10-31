@@ -4,6 +4,7 @@ import { Pressable, View } from "react-native";
 import { ListState } from "@/components/ListState";
 import { StandingRow } from "@/components/line/StandingRow";
 import { RText } from "@/components/RText";
+import { EMOJI } from "@/constants/emoji";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { makeStyles } from "@/hooks/useStyles";
 import type { Leaderboard as LeaderboardData, LeaderboardPeriod, Standing } from "@/types/api";
@@ -70,7 +71,7 @@ export function Leaderboard({ period, onPeriod, data, loading, error, onRetry, o
         error={error}
         onRetry={onRetry}
         empty={(data?.standings.length ?? 0) === 0}
-        emptyIcon="footsteps-outline"
+        emptyEmoji={EMOJI.steps}
         emptyBody={t("groups.emptyBoard")}>
         <View>
           {(data?.standings ?? []).map((s, i) => (

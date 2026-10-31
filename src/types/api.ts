@@ -57,6 +57,7 @@ export interface User {
   name: string;
   email: string;
   locale: "ar" | "en";
+  avatar_url: string | null;
   has_profile: boolean | null;
   profile?: UserProfile | null;
   created_at: string | null;
@@ -184,6 +185,7 @@ export interface WeightEntry {
 export interface Group {
   id: number;
   name: string;
+  photo_url: string | null;
   invite_code: string;
   owner_id: number;
   my_role: GroupRole;
@@ -196,6 +198,7 @@ export interface Group {
 export interface Standing {
   user_id: number;
   name: string;
+  avatar_url: string | null;
   role: GroupRole;
   steps: number;
   rank: number;
@@ -268,8 +271,9 @@ export interface Dashboard {
     name: string;
     members_count: number;
     my_rank: number | null;
-    leader: { user_id: number; name: string; steps: number } | null;
-    others: { user_id: number; name: string; steps: number }[];
+    photo_url: string | null;
+    leader: { user_id: number; name: string; avatar_url: string | null; steps: number } | null;
+    others: { user_id: number; name: string; avatar_url: string | null; steps: number }[];
   } | null;
   challenge: {
     id: number;

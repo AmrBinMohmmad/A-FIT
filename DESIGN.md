@@ -355,3 +355,13 @@ Flat, bordered, one height; the orange one is rare and haptic.
 - **Don't** use emoji or glyph-font icons; `@expo/vector-icons` Ionicons outline is the only icon set.
 - **Don't** animate anything except the travelling roundel; signage changes instantly.
 - **Don't** render `Text` or `TextInput` outside `RText` / `RTextInput` (and the sanctioned `OtpInput`).
+
+## Adaptations (2026-10-31, owner request)
+
+- **Emoji as content glyphs.** Allowed where they stand for a thing the user logs or reaches
+  (meal types, 🎉 goal reached, 🔥 streak, 💧 water, empty states, 👋 greeting). Never as a
+  control; controls remain Ionicons stroke icons. Single source: `src/constants/emoji.ts`.
+- **Photos.** `Avatar` (expo-image, `memory-disk` cache, 150 ms fade) with an initials or
+  emoji fallback on `primaryMuted` / `accentMuted` / `surface`. Sizes in use: 20 (home
+  friends), 32 (standings), 40 (header, group rows), 64 (Me card). Square, 512 px, JPEG 0.85,
+  cropped on the device (`src/utils/photos.ts`).

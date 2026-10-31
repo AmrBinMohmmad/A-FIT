@@ -71,7 +71,10 @@
     "signOut": "تسجيل الخروج",
     "signOutConfirmTitle": "تسجيل الخروج؟",
     "signOutConfirmBody": "ستستمر مزامنة خطواتك عند تسجيل دخولك مجدداً.",
-    "sessionExpired": "انتهت صلاحية جلستك، يرجى تسجيل الدخول مرة أخرى."
+    "sessionExpired": "انتهت صلاحية جلستك، يرجى تسجيل الدخول مرة أخرى.",
+    "signOutAll": "تسجيل الخروج من كل الأجهزة",
+    "signOutAllTitle": "الخروج من كل الأجهزة؟",
+    "signOutAllBody": "سيُسجَّل خروج كل هاتف متصل بهذا الحساب، بما فيه هذا الهاتف. استخدمه إذا فقدت جهازاً."
   },
   "onboarding": {
     "step": "الخطوة {{step}} من {{total}}",
@@ -149,7 +152,8 @@
     "weekStrip": "آخر 7 أيام",
     "shareToday": "مشاركة اليوم",
     "shareText": "يومي في أي-فت: {{steps}} خطوة، {{kcal}} سعرة مسجلة، {{water}} ل ماء. #AFIT",
-    "quickWater": "+250"
+    "quickWater": "+250",
+    "hello": "أهلاً {{name}}"
   },
   "meals": {
     "title": "الوجبات",
@@ -228,7 +232,9 @@
     "rename": "إعادة التسمية",
     "renameTitle": "إعادة تسمية المجموعة",
     "renameLabel": "الاسم الجديد",
-    "removeHint": "اضغط مطولاً على عضو لإزالته"
+    "removeHint": "اضغط مطولاً على عضو لإزالته",
+    "changePhoto": "تغيير صورة المجموعة",
+    "removePhoto": "إزالة صورة المجموعة"
   },
   "challenges": {
     "title": "التحدي",
@@ -282,7 +288,11 @@
     "bmi": "مؤشر كتلة الجسم {{value}}",
     "toTarget": "{{value}} كغ إلى الهدف",
     "atTarget": "عند الوزن المستهدف",
-    "nameSaved": "تم حفظ الاسم"
+    "nameSaved": "تم حفظ الاسم",
+    "photo": "صورة الملف",
+    "changePhoto": "تغيير الصورة",
+    "removePhoto": "إزالة الصورة",
+    "photoPermission": "اسمح بالوصول إلى الصور من إعدادات الهاتف لاختيار صورة."
   },
   "steps": {
     "title": "سجل الخطوات",
