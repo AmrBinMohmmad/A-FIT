@@ -6,7 +6,7 @@ import { StandingRow } from "@/components/line/StandingRow";
 import { RText } from "@/components/RText";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { makeStyles } from "@/hooks/useStyles";
-import type { Leaderboard as LeaderboardData, LeaderboardPeriod } from "@/types/api";
+import type { Leaderboard as LeaderboardData, LeaderboardPeriod, Standing } from "@/types/api";
 
 interface LeaderboardProps {
   period: LeaderboardPeriod;
@@ -15,6 +15,8 @@ interface LeaderboardProps {
   loading: boolean;
   error?: unknown;
   onRetry: () => void;
+  /** Owner only: holding a member row removes them (confirmed by the caller). */
+  onRemove?: (standing: Standing) => void;
 }
 
 const PERIODS: LeaderboardPeriod[] = ["today", "week", "month"];
@@ -39,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /** Period switcher (segmented, native-shaped) + ranked standings on one shared scale. */
-export function Leaderboard({ period, onPeriod, data, loading, error, onRetry }: LeaderboardProps) {
+export function Leaderboard({ period, onPeriod, data, loading, error, onRetry, onRemove }: LeaderboardProps) {
   const styles = useStyles();
   const { t } = useTranslation();
   const max = Math.max(...(data?.standings.map((s) => s.steps) ?? [0]), 1);
@@ -79,12 +81,13 @@ export function Leaderboard({ period, onPeriod, data, loading, error, onRetry }:
               youLabel={t("common.you")}
               ownerLabel={t("groups.owner")}
               first={i === 0}
+              onLongPress={onRemove && !s.is_me && s.role !== "owner" ? () => onRemove(s) : undefined}
             />
           ))}
         </View>
       </ListState>
       <RText variant="caption" color="textMuted" style={styles.hint}>
-        {t("groups.refreshHint")}
+        {onRemove ? t("groups.removeHint") : t("groups.refreshHint")}
       </RText>
     </View>
   );

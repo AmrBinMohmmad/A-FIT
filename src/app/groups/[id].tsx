@@ -12,11 +12,12 @@ import { Leaderboard } from "@/components/groups/Leaderboard";
 import { ListState } from "@/components/ListState";
 import { RText } from "@/components/RText";
 import { Screen } from "@/components/Screen";
+import { useAlert } from "@/contexts/AlertContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useGroupChallenges } from "@/hooks/challenges/useChallenges";
-import { useGroup, useLeaderboard } from "@/hooks/groups/useGroups";
+import { useGroup, useLeaderboard, useRemoveMember } from "@/hooks/groups/useGroups";
 import { makeStyles } from "@/hooks/useStyles";
-import type { LeaderboardPeriod } from "@/types/api";
+import type { LeaderboardPeriod, Standing } from "@/types/api";
 import { todayKey } from "@/utils/date";
 
 const useStyles = makeStyles((theme) => ({
@@ -37,6 +38,18 @@ export default function GroupScreen() {
   const group = useGroup(groupId);
   const board = useLeaderboard(groupId, period, date);
   const challenges = useGroupChallenges(groupId);
+  const removeMember = useRemoveMember();
+  const { confirm } = useAlert();
+
+  const onRemove = async (member: Standing) => {
+    const ok = await confirm({
+      title: t("groups.removeConfirmTitle", { name: member.name }),
+      message: t("groups.removeConfirmBody"),
+      confirmText: t("groups.removeMember"),
+      destructive: true,
+    });
+    if (ok) removeMember.mutate({ groupId, userId: member.user_id });
+  };
 
   const refetchAll = () => Promise.all([group.refetch(), board.refetch(), challenges.refetch()]);
   const g = group.data?.group;
@@ -73,6 +86,7 @@ export default function GroupScreen() {
               loading={board.isPending}
               error={board.isError ? board.error : undefined}
               onRetry={() => void board.refetch()}
+              onRemove={g.my_role === "owner" ? (m) => void onRemove(m) : undefined}
             />
 
             <InviteCard group={g} />

@@ -142,7 +142,14 @@
     "noPlanBody": "أجب عن خمسة أسئلة سريعة وتُحسب لك أهداف السعرات والمغذيات اليومية.",
     "setUpPlan": "إعداد خطتي",
     "friendsOnLine": "أصدقاؤك على خطك",
-    "stations": "المحطات"
+    "stations": "المحطات",
+    "streak": "{{count}} أيام متتالية على الهدف",
+    "streak_one": "يوم واحد على الهدف",
+    "streakNone": "ابدأ سلسلتك اليوم",
+    "weekStrip": "آخر 7 أيام",
+    "shareToday": "مشاركة اليوم",
+    "shareText": "يومي في أي-فت: {{steps}} خطوة، {{kcal}} سعرة مسجلة، {{water}} ل ماء. #AFIT",
+    "quickWater": "+250"
   },
   "meals": {
     "title": "الوجبات",
@@ -172,7 +179,9 @@
     "over": "{{count}} زيادة",
     "left": "{{count}} متبقية",
     "macroOf": "{{value}} من {{goal}} غ",
-    "history": "آخر 7 أيام"
+    "history": "آخر 7 أيام",
+    "frequent": "تسجيل مجدداً",
+    "frequentHint": "اضغط لتعبئة النموذج من وجبة تسجلها كثيراً."
   },
   "groups": {
     "title": "المجموعات",
@@ -217,7 +226,9 @@
     "youAreHere": "أنت · {{steps}}",
     "joined": "انضممت إلى المجموعة.",
     "rename": "إعادة التسمية",
-    "renameTitle": "إعادة تسمية المجموعة"
+    "renameTitle": "إعادة تسمية المجموعة",
+    "renameLabel": "الاسم الجديد",
+    "removeHint": "اضغط مطولاً على عضو لإزالته"
   },
   "challenges": {
     "title": "التحدي",
@@ -267,7 +278,11 @@
     "healthGranted": "مسموح",
     "healthNotGranted": "غير مسموح",
     "syncNow": "مزامنة الخطوات الآن",
-    "saved": "تم الحفظ."
+    "saved": "تم الحفظ.",
+    "bmi": "مؤشر كتلة الجسم {{value}}",
+    "toTarget": "{{value}} كغ إلى الهدف",
+    "atTarget": "عند الوزن المستهدف",
+    "nameSaved": "تم حفظ الاسم"
   },
   "steps": {
     "title": "سجل الخطوات",

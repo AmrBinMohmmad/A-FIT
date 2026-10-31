@@ -94,6 +94,10 @@ function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
           name="groups/[id]/challenges/new"
           options={{ presentation: "modal", animation: "slide_from_bottom" }}
         />
+        <Stack.Screen
+          name="groups/[id]/rename"
+          options={{ presentation: "modal", animation: "slide_from_bottom" }}
+        />
         <Stack.Screen name="challenges/[id]" options={{ animation: "slide_from_right" }} />
         <Stack.Screen name="steps" options={{ animation: "slide_from_right" }} />
         <Stack.Screen name="weight" options={{ animation: "slide_from_right" }} />

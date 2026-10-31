@@ -14,7 +14,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useDeleteAccount, useProfile } from "@/hooks/profile/useProfile";
 import { useStepSync } from "@/hooks/steps/useStepSync";
 import { makeStyles } from "@/hooks/useStyles";
-import { formatInt } from "@/utils/number";
+import { formatDecimal, formatInt } from "@/utils/number";
 
 const useStyles = makeStyles((theme) => ({
   section: { gap: theme.spacing.xs },
@@ -32,6 +32,10 @@ export default function MeScreen() {
   const { health, syncing, syncNow, requestAccess } = useStepSync();
   const deleteAccount = useDeleteAccount();
   const version = Constants.expoConfig?.version ?? "";
+  const p = profile.data;
+  // Display-only arithmetic on stored profile values (the plan itself is computed server-side).
+  const bmi = p && p.height > 0 ? p.current_weight / Math.pow(p.height / 100, 2) : null;
+  const toTarget = p ? Math.abs(p.current_weight - p.target_weight) : null;
 
   const onSignOut = async () => {
     const ok = await confirm({
@@ -54,12 +58,14 @@ export default function MeScreen() {
 
   return (
     <Screen title={user?.name ?? t("me.title")} subtitle={user?.email}>
-      {profile.data ? (
+      {p && bmi !== null && toTarget !== null ? (
         <SignPanel
           label={t("me.plan")}
-          value={`${formatInt(profile.data.daily_calories)} ${t("common.kcal")}`}
-          endLabel={t("onboarding.stepsGoal")}
-          endValue={formatInt(profile.data.daily_steps_goal)}
+          value={`${formatInt(p.daily_calories)} ${t("common.kcal")}`}
+          endLabel={t("me.bmi", { value: formatDecimal(bmi, 1) })}
+          endValue={
+            toTarget >= 0.1 ? t("me.toTarget", { value: formatDecimal(toTarget, 1) }) : t("me.atTarget")
+          }
         />
       ) : null}
 
@@ -92,7 +98,7 @@ export default function MeScreen() {
         <ExitRow
           code={6}
           title={t("me.appearance")}
-          subtitle={t("me.language")}
+          subtitle={`${t("me.language")} · ${t("me.name")}`}
           onPress={() => router.push("/settings")}
         />
       </View>

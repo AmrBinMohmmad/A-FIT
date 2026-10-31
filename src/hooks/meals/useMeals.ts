@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import type { ApiEnvelope, DayTotals, Meal, MealPayload, Paginated } from "@/types/api";
+import type { ApiEnvelope, DayTotals, FrequentMeal, Meal, MealPayload, Paginated } from "@/types/api";
 import { api, buildQueryString, fetcher } from "@/utils/api/client";
 import { queryKeys } from "@/utils/api/queryKeys";
 
@@ -17,6 +17,15 @@ export function useMealSummary(from: string, to: string) {
   return useQuery({
     queryKey: queryKeys.meals.summary(from, to),
     queryFn: () => fetcher<DayTotals[]>(`meals/summary${buildQueryString({ from, to })}`),
+  });
+}
+
+/** Most-logged meals (60 days); stale for 10 minutes — it changes slowly. */
+export function useFrequentMeals() {
+  return useQuery({
+    queryKey: queryKeys.meals.frequent,
+    queryFn: () => fetcher<FrequentMeal[]>("meals/frequent"),
+    staleTime: 10 * 60_000,
   });
 }
 

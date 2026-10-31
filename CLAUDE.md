@@ -52,6 +52,9 @@ primary action per screen.
 ### Project rules beyond the kit
 
 - Steps are never typed in: `syncSteps()` pushes only changed days (≤ 31) and is throttled to one
-  automatic sync per 10 minutes; the server limits `PUT steps` to 12/min.
+  automatic sync per 10 minutes and one manual sync (pull-to-refresh, "sync now") per 60 s; the
+  server limits `PUT steps` to 12/min.
+- Burst-prone writes coalesce on the client: water taps update the Query cache instantly and
+  one `PUT water/{date}` carries the final total ~0.9 s after the last tap (`useWaterControls`).
 - One request per screen: Home reads `GET dashboard`; group detail polls the leaderboard every 60 s
   only while mounted; nothing polls in the background except the OS task.

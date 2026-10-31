@@ -1,11 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
+import { DayBars } from "@/components/charts/DayBars";
 import { LineDiagram } from "@/components/line/LineDiagram";
 import { SignPanel } from "@/components/line/SignPanel";
 import { RText } from "@/components/RText";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { makeStyles } from "@/hooks/useStyles";
 import type { Dashboard } from "@/types/api";
+import { formatWeekday, fromDateKey } from "@/utils/date";
 import { formatInt } from "@/utils/number";
 
 const useStyles = makeStyles((theme) => ({
@@ -21,6 +24,8 @@ const useStyles = makeStyles((theme) => ({
   friends: { flexDirection: "row", flexWrap: "wrap", gap: theme.spacing.md, marginTop: theme.spacing.xs },
   friend: { flexDirection: "row", alignItems: "center", gap: theme.spacing.xs },
   tick: { width: 2, height: 12, backgroundColor: theme.colors.textPrimary },
+  week: { marginTop: theme.spacing.sm, gap: theme.spacing.xs },
+  weekHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
 }));
 
 /** Stations at 20/50/80/100 % of the goal; the next station is the first one ahead of you. */
@@ -33,6 +38,7 @@ function nextStation(steps: number, goal: number): number | null {
 export function StepsPanel({ steps, group }: { steps: Dashboard["steps"]; group: Dashboard["group"] }) {
   const styles = useStyles();
   const { t } = useTranslation();
+  const { language } = useLanguage();
   const goal = Math.max(steps.goal, 1);
   const next = nextStation(steps.steps, goal);
   const friends = [
@@ -78,6 +84,32 @@ export function StepsPanel({ steps, group }: { steps: Dashboard["steps"]; group:
           tone="accent"
         />
       )}
+
+      <View style={styles.week}>
+        <View style={styles.weekHead}>
+          <RText variant="caption" color="textSecondary">
+            {t("home.weekStrip")}
+          </RText>
+          <RText
+            variant="caption"
+            color={steps.streak > 0 ? "accent" : "textSecondary"}
+            weight="medium"
+            tabular>
+            {steps.streak > 0 ? t("home.streak", { count: steps.streak }) : t("home.streakNone")}
+          </RText>
+        </View>
+        <DayBars
+          height={44}
+          hideLabels
+          bars={steps.week.map((d) => ({
+            key: d.date,
+            label: formatWeekday(fromDateKey(d.date), language),
+            value: d.steps,
+          }))}
+          goal={goal}
+          highlightKey={steps.week[steps.week.length - 1]?.date}
+        />
+      </View>
 
       {friends.length ? (
         <View style={styles.friends} accessibilityLabel={t("home.friendsOnLine")}>

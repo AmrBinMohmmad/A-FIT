@@ -14,6 +14,7 @@ export const queryKeys = {
     all: ["meals"] as const,
     day: (date: string) => ["meals", { date }] as const,
     summary: (from: string, to: string) => ["meals", "summary", { from, to }] as const,
+    frequent: ["meals", "frequent"] as const,
   },
   steps: {
     all: ["steps"] as const,

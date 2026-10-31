@@ -19,6 +19,8 @@ interface DayBarsProps {
   goalLabel?: string;
   height?: number;
   highlightKey?: string;
+  /** Hide the day labels (compact strip). */
+  hideLabels?: boolean;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -32,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
  * anchored to the baseline, a dashed ink goal line, 2 px gaps, exact magnitude on one
  * shared scale (dataviz skill). Direction-aware: bars read start→end.
  */
-export function DayBars({ bars, goal, goalLabel, height = 140, highlightKey }: DayBarsProps) {
+export function DayBars({ bars, goal, goalLabel, height = 140, highlightKey, hideLabels }: DayBarsProps) {
   const { theme } = useTheme();
   const styles = useStyles();
   const { isRTL } = useRTL();
@@ -87,19 +89,21 @@ export function DayBars({ bars, goal, goalLabel, height = 140, highlightKey }: D
           </>
         ) : null}
       </Svg>
-      <View style={styles.labels}>
-        {bars.map((b) => (
-          <RText
-            key={b.key}
-            variant="caption"
-            color={b.key === highlightKey ? "accent" : "textMuted"}
-            align="center"
-            style={styles.label}
-            numberOfLines={1}>
-            {b.label}
-          </RText>
-        ))}
-      </View>
+      {hideLabels ? null : (
+        <View style={styles.labels}>
+          {bars.map((b) => (
+            <RText
+              key={b.key}
+              variant="caption"
+              color={b.key === highlightKey ? "accent" : "textMuted"}
+              align="center"
+              style={styles.label}
+              numberOfLines={1}>
+              {b.label}
+            </RText>
+          ))}
+        </View>
+      )}
     </View>
   );
 }

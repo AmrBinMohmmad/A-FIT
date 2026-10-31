@@ -122,6 +122,17 @@ export interface MealPayload {
   eaten_on: string;
 }
 
+/** FrequentMealResource (GET meals/frequent) — a template for one-tap logging */
+export interface FrequentMeal {
+  name: string;
+  meal_type: MealType;
+  times: number;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
 /** DayTotalsResource */
 export interface DayTotals {
   date: string;
@@ -234,7 +245,14 @@ export interface ChallengePayload {
 /** DashboardResource (App\Services\DailySummary) */
 export interface Dashboard {
   date: string;
-  steps: { steps: number; goal: number; source: StepSource | null; synced_at: string | null };
+  steps: {
+    steps: number;
+    goal: number;
+    source: StepSource | null;
+    synced_at: string | null;
+    streak: number;
+    week: { date: string; steps: number }[];
+  };
   nutrition: {
     meals_count: number;
     calories: number;

@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 import { Button } from "@/components/Button";
 import { MEAL_TYPE_ICON } from "@/components/MealItem";
+import { CodeChip } from "@/components/line/CodeChip";
 import { ChoiceRow } from "@/components/onboarding/ChoiceRow";
 import { RText } from "@/components/RText";
 import { RTextInput } from "@/components/RTextInput";
+import { useFrequentMeals } from "@/hooks/meals/useMeals";
 import { makeStyles } from "@/hooks/useStyles";
 import { MEAL_TYPES } from "@/constants/enums";
-import type { Meal, MealPayload, MealType } from "@/types/api";
+import type { FrequentMeal, Meal, MealPayload, MealType } from "@/types/api";
 import { parseIntSafe } from "@/utils/number";
 
 interface MealFormProps {
@@ -25,6 +27,18 @@ const useStyles = makeStyles((theme) => ({
   row: { flexDirection: "row", gap: theme.spacing.sm },
   col: { flex: 1 },
   types: { gap: theme.spacing.sm },
+  chips: { gap: theme.spacing.sm, paddingVertical: theme.spacing.xs },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radii.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    minHeight: 44,
+  },
 }));
 
 /** Plain controlled form (Rakaya D9): per-field validation for the two required fields. */
@@ -38,6 +52,17 @@ export function MealForm({ initial, date, submitting, submitLabel, onSubmit }: M
   const [fat, setFat] = useState(initial?.fat ? String(initial.fat) : "");
   const [type, setType] = useState<MealType>(initial?.meal_type ?? "lunch");
   const [errors, setErrors] = useState<{ name?: string; calories?: string }>({});
+  const frequent = useFrequentMeals();
+
+  const applyTemplate = (m: FrequentMeal) => {
+    setName(m.name);
+    setCalories(String(m.calories));
+    setProtein(m.protein ? String(m.protein) : "");
+    setCarbs(m.carbs ? String(m.carbs) : "");
+    setFat(m.fat ? String(m.fat) : "");
+    setType(m.meal_type);
+    setErrors({});
+  };
 
   const submit = () => {
     const next: typeof errors = {};
@@ -60,6 +85,38 @@ export function MealForm({ initial, date, submitting, submitLabel, onSubmit }: M
 
   return (
     <View style={styles.form}>
+      {!initial && (frequent.data?.length ?? 0) > 0 ? (
+        <View style={{ gap: 4 }}>
+          <RText variant="footnote" weight="medium" color="textSecondary">
+            {t("meals.frequent")}
+          </RText>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chips}
+            keyboardShouldPersistTaps="handled">
+            {(frequent.data ?? []).map((m) => (
+              <Pressable
+                key={`${m.name}-${m.meal_type}`}
+                onPress={() => applyTemplate(m)}
+                style={styles.chip}
+                accessibilityRole="button"
+                accessibilityLabel={m.name}>
+                <CodeChip code={m.times} tone="muted" />
+                <RText variant="footnote" weight="medium" numberOfLines={1}>
+                  {m.name}
+                </RText>
+                <RText variant="caption" color="textMuted" tabular>
+                  {m.calories}
+                </RText>
+              </Pressable>
+            ))}
+          </ScrollView>
+          <RText variant="caption" color="textMuted">
+            {t("meals.frequentHint")}
+          </RText>
+        </View>
+      ) : null}
       <RTextInput
         label={t("meals.name")}
         placeholder={t("meals.namePlaceholder")}

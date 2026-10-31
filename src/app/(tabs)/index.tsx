@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshControl, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Pressable, RefreshControl, Share, View } from "react-native";
 
 import { Button } from "@/components/Button";
 import { HealthPrompt } from "@/components/home/HealthPrompt";
@@ -11,10 +12,12 @@ import { PlanPrompt } from "@/components/home/PlanPrompt";
 import { StepsPanel } from "@/components/home/StepsPanel";
 import { ListState } from "@/components/ListState";
 import { Screen } from "@/components/Screen";
+import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useDashboard } from "@/hooks/dashboard/useDashboard";
 import { useStepSync } from "@/hooks/steps/useStepSync";
 import { todayKey } from "@/utils/date";
+import { formatDecimal, formatInt } from "@/utils/number";
 
 /** Home: today's line. One request (dashboard) plus the local step sync; nothing is computed here. */
 export default function HomeScreen() {
@@ -34,8 +37,20 @@ export default function HomeScreen() {
 
   const data = dashboard.data;
 
+  const shareToday = () => {
+    if (!data) return;
+    void Share.share({
+      message: t("home.shareText", {
+        steps: formatInt(data.steps.steps),
+        kcal: formatInt(data.nutrition.calories),
+        water: formatDecimal(data.water.ml / 1000, 2),
+      }),
+    });
+  };
+
   return (
     <Screen
+      insideTabs
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
@@ -43,6 +58,21 @@ export default function HomeScreen() {
           tintColor={theme.colors.primary}
           colors={[theme.colors.primary]}
         />
+      }
+      action={
+        <Pressable
+          onPress={shareToday}
+          disabled={!data}
+          style={{
+            width: MIN_TOUCH_TARGET,
+            height: MIN_TOUCH_TARGET,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={t("home.shareToday")}>
+          <Ionicons name="share-social-outline" size={22} color={theme.colors.textPrimary} />
+        </Pressable>
       }
       bottomInset={theme.spacing.xl}
       footer={

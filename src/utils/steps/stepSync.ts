@@ -19,8 +19,11 @@ export interface SyncOutcome {
   totals: DailyTotal[];
 }
 
-/** Minimum gap between automatic syncs; manual syncs ignore it. */
+/** Minimum gap between automatic syncs. */
 export const MIN_SYNC_GAP_MS = 10 * 60 * 1000;
+
+/** Minimum gap between MANUAL syncs (pull-to-refresh, "sync now"): a tap storm is one request. */
+export const MIN_MANUAL_GAP_MS = 60 * 1000;
 
 /** Days re-read on every sync; the store can back-fill late samples for recent days. */
 export const SYNC_WINDOW_DAYS = 7;
@@ -45,9 +48,10 @@ export async function syncSteps(reason: SyncReason): Promise<SyncOutcome> {
   if (!(await getToken())) return empty;
   if (!(await hasHealthPermission())) return empty;
 
-  if (reason !== "manual" && reason !== "permission") {
+  if (reason !== "permission") {
     const last = await lastSyncedAt();
-    if (last && Date.now() - last < MIN_SYNC_GAP_MS) return empty;
+    const gap = reason === "manual" ? MIN_MANUAL_GAP_MS : MIN_SYNC_GAP_MS;
+    if (last && Date.now() - last < gap) return empty;
   }
 
   const adapter = stepSource();

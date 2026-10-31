@@ -142,7 +142,14 @@
     "noPlanBody": "Answer five quick questions and your daily calorie and macro targets are calculated for you.",
     "setUpPlan": "Set up my plan",
     "friendsOnLine": "Friends on your line",
-    "stations": "Stations"
+    "stations": "Stations",
+    "streak": "{{count}} days on goal in a row",
+    "streak_one": "{{count}} day on goal",
+    "streakNone": "Start a streak today",
+    "weekStrip": "Last 7 days",
+    "shareToday": "Share today",
+    "shareText": "My A-FIT day: {{steps}} steps, {{kcal}} kcal logged, {{water}} L water. #AFIT",
+    "quickWater": "+250"
   },
   "meals": {
     "title": "Meals",
@@ -172,7 +179,9 @@
     "over": "{{count}} over",
     "left": "{{count}} left",
     "macroOf": "{{value}} of {{goal}} g",
-    "history": "Last 7 days"
+    "history": "Last 7 days",
+    "frequent": "Log again",
+    "frequentHint": "Tap to fill the form from a meal you log often."
   },
   "groups": {
     "title": "Groups",
@@ -217,7 +226,9 @@
     "youAreHere": "You · {{steps}}",
     "joined": "You joined the group.",
     "rename": "Rename",
-    "renameTitle": "Rename group"
+    "renameTitle": "Rename group",
+    "renameLabel": "New name",
+    "removeHint": "Hold a member to remove them"
   },
   "challenges": {
     "title": "Challenge",
@@ -267,7 +278,11 @@
     "healthGranted": "Allowed",
     "healthNotGranted": "Not allowed",
     "syncNow": "Sync steps now",
-    "saved": "Saved."
+    "saved": "Saved.",
+    "bmi": "BMI {{value}}",
+    "toTarget": "{{value}} kg to target",
+    "atTarget": "At target weight",
+    "nameSaved": "Name saved"
   },
   "steps": {
     "title": "Step history",

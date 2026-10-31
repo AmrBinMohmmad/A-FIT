@@ -9,7 +9,7 @@ import { SignPanel } from "@/components/line/SignPanel";
 import { RText } from "@/components/RText";
 import { Screen } from "@/components/Screen";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useSetWater, useWater } from "@/hooks/body/useWater";
+import { useWaterControls } from "@/hooks/body/useWater";
 import { useProfile } from "@/hooks/profile/useProfile";
 import { makeStyles } from "@/hooks/useStyles";
 import { todayKey } from "@/utils/date";
@@ -27,19 +27,18 @@ export default function WaterScreen() {
   const styles = useStyles();
   const { date: param } = useLocalSearchParams<{ date?: string }>();
   const date = param ?? todayKey();
-  const water = useWater(date);
+  const water = useWaterControls(date);
   const profile = useProfile();
-  const set = useSetWater(date);
-  const ml = water.data?.ml ?? 0;
+  const ml = water.ml;
   const goal = profile.data?.water_goal_ml ?? 2500;
-  const add = (delta: number) => set.mutate(Math.max(0, Math.min(15000, ml + delta)));
+  const add = (delta: number) => water.add(delta);
 
   return (
     <Screen title={t("water.title")} subtitle={t("water.today")} back>
       <ListState
-        loading={water.isPending}
-        error={water.isError ? water.error : undefined}
-        onRetry={() => void water.refetch()}>
+        loading={water.query.isPending}
+        error={water.query.isError ? water.query.error : undefined}
+        onRetry={() => void water.query.refetch()}>
         <View style={{ gap: theme.spacing.xl }}>
           <SignPanel
             label={t("water.today")}
@@ -76,7 +75,7 @@ export default function WaterScreen() {
               style={styles.btn}
             />
           </View>
-          <Button title={t("water.reset")} variant="ghost" onPress={() => set.mutate(0)} />
+          <Button title={t("water.reset")} variant="ghost" onPress={() => water.set(0)} />
         </View>
       </ListState>
     </Screen>

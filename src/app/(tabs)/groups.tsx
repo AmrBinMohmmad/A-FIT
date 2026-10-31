@@ -43,6 +43,7 @@ export default function GroupsScreen() {
 
   return (
     <Screen
+      insideTabs
       title={t("groups.title")}
       subtitle={t("groups.subtitle")}
       refreshControl={

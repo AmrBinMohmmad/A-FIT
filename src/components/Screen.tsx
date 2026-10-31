@@ -30,6 +30,8 @@ interface ScreenProps {
   bottomInset?: number;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  /** Inside the tab navigator the tab bar already owns the bottom safe area. */
+  insideTabs?: boolean;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -75,6 +77,7 @@ export function Screen({
   bottomInset = 0,
   children,
   footer,
+  insideTabs,
 }: ScreenProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
@@ -136,7 +139,11 @@ export function Screen({
       {header}
       {body}
       {footer ? (
-        <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, theme.spacing.md) }]}>
+        <View
+          style={[
+            styles.footer,
+            { paddingBottom: insideTabs ? theme.spacing.md : Math.max(insets.bottom, theme.spacing.md) },
+          ]}>
           {footer}
         </View>
       ) : null}

@@ -70,6 +70,7 @@ export default function MealsScreen() {
 
   return (
     <Screen
+      insideTabs
       title={t("meals.title")}
       subtitle={t("meals.subtitle", { count: meals.data?.length ?? 0, calories: formatInt(totals.calories) })}
       refreshControl={

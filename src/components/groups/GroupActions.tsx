@@ -55,6 +55,11 @@ export function GroupActions({ group }: { group: Group }) {
       buttons: isOwner
         ? [
             { text: "__cancel__", style: "cancel" },
+            {
+              text: t("groups.rename"),
+              onPress: () =>
+                router.push({ pathname: "/groups/[id]/rename", params: { id: String(group.id) } }),
+            },
             { text: t("groups.rotateCode"), onPress: () => void onRotate() },
             { text: t("groups.deleteGroup"), style: "destructive", onPress: () => void onDelete() },
           ]
