@@ -1,202 +1,76 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import {
-  ScrollView,
-  Text,
-  View,
-  StyleSheet,
-  RefreshControl,
-  Keyboard,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import HomeHeader from '@/components/HomeHeader';
-import CalorieRing from '@/components/CalorieRing';
-import MacroGrid from '@/components/MacroGrid';
-import RecentMeals from '@/components/RecentMeals';
-import ShareButton from '@/components/ShareButton';
-import { getMeals, Meal } from '@/storage/meals';
-import { useTheme } from '@/context/ThemeContext';
-import { filterMealsByDay } from '@/utils/date';
-import { profileService } from '@/services/profileService';
-import { UserProfile } from '@/storage/profileStorage';
+import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { RefreshControl, View } from "react-native";
 
+import { Button } from "@/components/Button";
+import { HealthPrompt } from "@/components/home/HealthPrompt";
+import { HomeExits } from "@/components/home/HomeExits";
+import { HomeHeader } from "@/components/HomeHeader";
+import { PlanPrompt } from "@/components/home/PlanPrompt";
+import { StepsPanel } from "@/components/home/StepsPanel";
+import { ListState } from "@/components/ListState";
+import { Screen } from "@/components/Screen";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useDashboard } from "@/hooks/dashboard/useDashboard";
+import { useStepSync } from "@/hooks/steps/useStepSync";
+import { todayKey } from "@/utils/date";
+
+/** Home: today's line. One request (dashboard) plus the local step sync; nothing is computed here. */
 export default function HomeScreen() {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const [meals, setMeals] = useState<Meal[]>([]);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const date = todayKey();
+  const dashboard = useDashboard(date);
+  const { health, syncing, requestAccess, syncNow } = useStepSync();
   const [refreshing, setRefreshing] = useState(false);
-  const { colors } = useTheme();
-  const tabBarHeight = 56 + insets.bottom;
 
-  const loadMeals = async () => {
-    const data = await getMeals();
-    setMeals(data);
-  };
-
-  const loadProfile = async () => {
-    const p = await profileService.getProfile();
-    setProfile(p);
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      loadMeals();
-      loadProfile();
-    }, [])
-  );
-
-  const onRefresh = async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([loadMeals(), loadProfile()]);
+    await Promise.all([syncNow(), dashboard.refetch()]);
     setRefreshing(false);
-  };
+  }, [syncNow, dashboard]);
 
-  // Filter meals strictly for today (resets at Midnight 00:00)
-  const todayMeals = useMemo(() => filterMealsByDay(meals, new Date()), [meals]);
-
-  // Calculate calories strictly for today
-  const totalCalories = useMemo(
-    () => todayMeals.reduce((sum, m) => sum + (m.calories || 0), 0),
-    [todayMeals]
-  );
+  const data = dashboard.data;
 
   return (
-    <SafeAreaView
-      style={[styles.safeArea, { backgroundColor: colors.background }]}
-      edges={['top', 'left', 'right']}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <ScrollView
-          style={[styles.container, { backgroundColor: colors.background }]}
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingBottom: tabBarHeight + 20 },
-          ]}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={colors.primary}
-              colors={[colors.primary]}
-            />
-          }
-        >
-          {/* Top App Header */}
-          <View style={styles.topBar}>
-            <View style={styles.titleContainer}>
-              <Text style={[styles.appTitle, { color: colors.text }]}>أي-فت</Text>
-              <View style={[styles.tag, { backgroundColor: colors.primaryLight }]}>
-                <Text style={[styles.tagText, { color: colors.primary }]}>صحة وتغذية</Text>
-              </View>
-            </View>
-            <ShareButton meals={todayMeals} />
+    <Screen
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => void onRefresh()}
+          tintColor={theme.colors.primary}
+          colors={[theme.colors.primary]}
+        />
+      }
+      bottomInset={theme.spacing.xl}
+      footer={
+        <Button
+          title={t("home.logMeal")}
+          variant="accent"
+          size="lg"
+          icon="add"
+          onPress={() => router.push("/meals/new")}
+        />
+      }>
+      <HomeHeader syncedAt={data?.steps.synced_at ?? null} syncing={syncing} />
+
+      <ListState
+        loading={dashboard.isPending}
+        error={dashboard.isError ? dashboard.error : undefined}
+        onRetry={() => void dashboard.refetch()}>
+        {data ? (
+          <View style={{ gap: theme.spacing.lg }}>
+            {!data.has_profile ? <PlanPrompt onPress={() => router.push("/onboarding")} /> : null}
+            <StepsPanel steps={data.steps} group={data.group} />
+            {health === "notGranted" || health === "needsUpdate" || health === "unavailable" ? (
+              <HealthPrompt state={health} onAllow={() => void requestAccess()} />
+            ) : null}
+            <HomeExits data={data} date={date} />
           </View>
-
-          {/* User Greeting & Header Actions */}
-          <HomeHeader />
-
-          {/* Hero Calorie Ring */}
-          <CalorieRing
-            currentCalories={totalCalories}
-            goalCalories={profile?.daily_calories || 2000}
-          />
-
-          {/* Macro Breakdown Bars */}
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>توزيع المغذيات الكبرى</Text>
-            <TouchableOpacity
-              onPress={() => router.push('/onboarding')}
-              style={[styles.planBadge, { backgroundColor: colors.primaryLight }]}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="options-outline" size={13} color={colors.primary} style={{ marginLeft: 4 }} />
-              <Text style={[styles.planBadgeText, { color: colors.primary }]}>تعديل الخطة</Text>
-            </TouchableOpacity>
-          </View>
-          <MacroGrid
-            meals={todayMeals}
-            goals={
-              profile
-                ? {
-                    calories: profile.daily_calories,
-                    protein: profile.daily_protein,
-                    carbs: profile.daily_carbs,
-                    fat: profile.daily_fat,
-                  }
-                : undefined
-            }
-          />
-
-          {/* Today's Meals Section */}
-          <RecentMeals meals={todayMeals} onDelete={loadMeals} />
-        </ScrollView>
-      </TouchableWithoutFeedback>
-    </SafeAreaView>
+        ) : null}
+      </ListState>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: 12,
-    paddingHorizontal: 20,
-  },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  appTitle: {
-    fontSize: 26,
-    fontWeight: '900',
-    letterSpacing: -0.5,
-  },
-  tag: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-  },
-  tagText: {
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-    textAlign: 'left',
-  },
-  planBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-  },
-  planBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-});

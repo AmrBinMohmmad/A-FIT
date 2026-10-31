@@ -1,0 +1,154 @@
+[
+  {
+    "input": {
+      "gender": "male",
+      "age": 30,
+      "height": 175,
+      "currentWeight": 80,
+      "targetWeight": 75,
+      "activityLevel": "moderate"
+    },
+    "expected": {
+      "bmr": 1749,
+      "tdee": 2711,
+      "goalType": "lose",
+      "dailyCalories": 2261,
+      "dailyProtein": 128,
+      "dailyCarbs": 280,
+      "dailyFat": 70
+    }
+  },
+  {
+    "input": {
+      "gender": "female",
+      "age": 26,
+      "height": 162,
+      "currentWeight": 60,
+      "targetWeight": 55,
+      "activityLevel": "light"
+    },
+    "expected": {
+      "bmr": 1322,
+      "tdee": 1818,
+      "goalType": "lose",
+      "dailyCalories": 1368,
+      "dailyProtein": 83,
+      "dailyCarbs": 162,
+      "dailyFat": 43
+    }
+  },
+  {
+    "input": {
+      "gender": "male",
+      "age": 45,
+      "height": 180,
+      "currentWeight": 95,
+      "targetWeight": 85,
+      "activityLevel": "sedentary"
+    },
+    "expected": {
+      "bmr": 1855,
+      "tdee": 2226,
+      "goalType": "lose",
+      "dailyCalories": 1776,
+      "dailyProtein": 133,
+      "dailyCarbs": 187,
+      "dailyFat": 55
+    }
+  },
+  {
+    "input": {
+      "gender": "female",
+      "age": 34,
+      "height": 168,
+      "currentWeight": 58,
+      "targetWeight": 62,
+      "activityLevel": "active"
+    },
+    "expected": {
+      "bmr": 1299,
+      "tdee": 2241,
+      "goalType": "gain",
+      "dailyCalories": 2591,
+      "dailyProtein": 130,
+      "dailyCarbs": 336,
+      "dailyFat": 81
+    }
+  },
+  {
+    "input": {
+      "gender": "male",
+      "age": 22,
+      "height": 170,
+      "currentWeight": 65,
+      "targetWeight": 72,
+      "activityLevel": "extra_active"
+    },
+    "expected": {
+      "bmr": 1608,
+      "tdee": 3055,
+      "goalType": "gain",
+      "dailyCalories": 3405,
+      "dailyProtein": 170,
+      "dailyCarbs": 443,
+      "dailyFat": 106
+    }
+  },
+  {
+    "input": {
+      "gender": "female",
+      "age": 50,
+      "height": 155,
+      "currentWeight": 70,
+      "targetWeight": 70,
+      "activityLevel": "moderate"
+    },
+    "expected": {
+      "bmr": 1258,
+      "tdee": 1950,
+      "goalType": "maintain",
+      "dailyCalories": 1950,
+      "dailyProtein": 105,
+      "dailyCarbs": 245,
+      "dailyFat": 61
+    }
+  },
+  {
+    "input": {
+      "gender": "male",
+      "age": 19,
+      "height": 190,
+      "currentWeight": 110,
+      "targetWeight": 90,
+      "activityLevel": "light"
+    },
+    "expected": {
+      "bmr": 2198,
+      "tdee": 3022,
+      "goalType": "lose",
+      "dailyCalories": 2572,
+      "dailyProtein": 153,
+      "dailyCarbs": 310,
+      "dailyFat": 80
+    }
+  },
+  {
+    "input": {
+      "gender": "female",
+      "age": 60,
+      "height": 150,
+      "currentWeight": 45,
+      "targetWeight": 45,
+      "activityLevel": "sedentary"
+    },
+    "expected": {
+      "bmr": 927,
+      "tdee": 1112,
+      "goalType": "maintain",
+      "dailyCalories": 1200,
+      "dailyProtein": 68,
+      "dailyCarbs": 149,
+      "dailyFat": 37
+    }
+  }
+]

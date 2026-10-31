@@ -1,64 +1,49 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import MacroCard from './MacroCard';
-import { Meal } from '@/storage/meals';
-import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from "react-i18next";
+import { View } from "react-native";
 
-interface MacroGridProps {
-  meals: Meal[];
-  goals?: {
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-  };
+import { SegmentBar } from "@/components/line/SegmentBar";
+import { SignPanel } from "@/components/line/SignPanel";
+import { MacroCard } from "@/components/MacroCard";
+import { makeStyles } from "@/hooks/useStyles";
+import type { UserProfile } from "@/types/api";
+import { formatInt } from "@/utils/number";
+
+interface Totals {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
 }
 
-export default function MacroGrid({
-  meals,
-  goals = { calories: 2000, protein: 150, carbs: 250, fat: 65 },
-}: MacroGridProps) {
-  const { colors } = useTheme();
+const useStyles = makeStyles((theme) => ({
+  wrap: { gap: theme.spacing.md },
+  row: { flexDirection: "row", gap: theme.spacing.sm },
+}));
 
-  const totals = meals.reduce(
-    (acc, meal) => ({
-      calories: acc.calories + (meal.calories || 0),
-      protein: acc.protein + (meal.protein || 0),
-      carbs: acc.carbs + (meal.carbs || 0),
-      fat: acc.fat + (meal.fat || 0),
-    }),
-    { calories: 0, protein: 0, carbs: 0, fat: 0 }
-  );
-
+/** The day's calorie budget (fixed measure, strikes when over) and the three macro rows. */
+export function MacroGrid({ totals, targets }: { totals: Totals; targets: UserProfile | null }) {
+  const styles = useStyles();
+  const { t } = useTranslation();
+  if (!targets) return null;
+  const left = targets.daily_calories - totals.calories;
   return (
-    <View style={styles.container}>
-      <MacroCard
-        label="البروتين"
-        value={totals.protein}
-        goal={goals.protein}
-        color={colors.protein}
-        iconName="fitness-outline"
+    <View style={styles.wrap}>
+      <SignPanel
+        label={t("meals.budget")}
+        value={`${formatInt(totals.calories)} / ${formatInt(targets.daily_calories)}`}
+        endValue={
+          left >= 0
+            ? t("meals.left", { count: formatInt(left) })
+            : t("meals.over", { count: formatInt(-left) })
+        }
+        tone={left < 0 ? "accent" : "default"}
       />
-      <MacroCard
-        label="الكاربوهيدرات"
-        value={totals.carbs}
-        goal={goals.carbs}
-        color={colors.carbs}
-        iconName="nutrition-outline"
-      />
-      <MacroCard
-        label="الدهون الصحية"
-        value={totals.fat}
-        goal={goals.fat}
-        color={colors.fat}
-        iconName="water-outline"
-      />
+      <SegmentBar value={totals.calories} max={targets.daily_calories} segments={20} height={8} />
+      <View style={styles.row}>
+        <MacroCard label={t("meals.protein")} value={totals.protein} goal={targets.daily_protein} />
+        <MacroCard label={t("meals.carbs")} value={totals.carbs} goal={targets.daily_carbs} />
+        <MacroCard label={t("meals.fat")} value={totals.fat} goal={targets.daily_fat} />
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-});

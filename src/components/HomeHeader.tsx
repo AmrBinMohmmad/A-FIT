@@ -1,162 +1,69 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import * as Haptics from 'expo-haptics';
-import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
-import { useAlert } from '@/context/AlertContext';
-import { FONTS } from '@/styles/global';
+import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
+import { ActivityIndicator, View } from "react-native";
 
-export default function HomeHeader() {
-  const { user, logout } = useAuth();
-  const { colors, isDark, toggleTheme } = useTheme();
-  const { showAlert } = useAlert();
+import { RText } from "@/components/RText";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { makeStyles } from "@/hooks/useStyles";
+import { formatLongDate, formatTime } from "@/utils/date";
 
-  const currentDate = new Date().toLocaleDateString('ar-SA', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'short',
-  });
+const useStyles = makeStyles((theme) => ({
+  row: { flexDirection: "row", alignItems: "center", gap: theme.spacing.md },
+  roundel: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radii.full,
+    backgroundColor: theme.colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+    borderColor: theme.colors.primaryMuted,
+  },
+  text: { flex: 1 },
+  sync: { flexDirection: "row", alignItems: "center", gap: theme.spacing.xs },
+}));
 
-  const handleLogoutPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
-    showAlert('تسجيل الخروج', 'هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك؟', [
-      { text: 'إلغاء', style: 'cancel' },
-      {
-        text: 'تسجيل الخروج',
-        style: 'destructive',
-        onPress: () => {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-          logout();
-        },
-      },
-    ]);
-  };
-
-  const handleThemeToggle = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-    toggleTheme();
-  };
-
-  const userInitial = user?.name ? user.name.trim().charAt(0).toUpperCase() : 'ب';
+/**
+ * The station-sign header. Contract adaptation (cited in the surface brief): the roundel
+ * carries the brand mark (whose line it is) and the user's name is the station title (where
+ * you are); date and last sync complete the sign.
+ */
+export function HomeHeader({ syncedAt, syncing }: { syncedAt: string | null; syncing: boolean }) {
+  const styles = useStyles();
+  const { theme } = useTheme();
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+  const { user } = useAuth();
 
   return (
-    <View style={styles.container}>
-      <View style={styles.userSection}>
-        <View
-          style={[
-            styles.avatar,
-            { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(5, 150, 105, 0.12)' },
-          ]}
-        >
-          <Text style={[styles.avatarText, { color: colors.primary }]}>{userInitial}</Text>
-        </View>
-        <View style={styles.textContainer}>
-          <Text style={[styles.greeting, { color: colors.textSecondary }]}>مرحباً يا بطل 👋</Text>
-          <Text style={[styles.userName, { color: colors.text }]} numberOfLines={1}>
-            {user?.name || 'مستخدم أي-فت'}
-          </Text>
-          <Text style={[styles.date, { color: colors.textMuted }]}>{currentDate}</Text>
-        </View>
+    <View style={styles.row}>
+      <View style={styles.roundel} accessibilityRole="image" accessibilityLabel={t("common.appName")}>
+        <RText variant="callout" weight="bold" color="onPrimary">
+          {t("common.brandMark")}
+        </RText>
       </View>
-
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={[
-            styles.iconButton,
-            {
-              backgroundColor: isDark ? colors.surfaceElevated : colors.surface,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={handleThemeToggle}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name={isDark ? 'sunny-outline' : 'moon-outline'}
-            size={20}
-            color={isDark ? '#FBBF24' : colors.primary}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.iconButton,
-            {
-              backgroundColor: isDark ? colors.surfaceElevated : colors.surface,
-              borderColor: isDark ? 'rgba(248, 81, 73, 0.2)' : 'rgba(220, 38, 38, 0.2)',
-            },
-          ]}
-          onPress={handleLogoutPress}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="log-out-outline" size={20} color={colors.danger} />
-        </TouchableOpacity>
+      <View style={styles.text}>
+        <RText variant="title" numberOfLines={1}>
+          {user?.name ?? t("common.appName")}
+        </RText>
+        <RText variant="footnote" color="textSecondary">
+          {formatLongDate(new Date(), language)}
+        </RText>
+      </View>
+      <View style={styles.sync} accessibilityLiveRegion="polite">
+        {syncing ? (
+          <ActivityIndicator size="small" color={theme.colors.textMuted} />
+        ) : (
+          <Ionicons name="sync-outline" size={14} color={theme.colors.textMuted} />
+        )}
+        <RText variant="caption" color="textMuted" tabular>
+          {syncedAt
+            ? t("common.lastSync", { time: formatTime(syncedAt, language) })
+            : t("common.neverSynced")}
+        </RText>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-    paddingVertical: 6,
-  },
-  userSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    fontFamily: FONTS.bold,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  greeting: {
-    fontSize: 13,
-    fontWeight: '500',
-    fontFamily: FONTS.regular,
-    marginBottom: 2,
-    writingDirection: 'rtl',
-  },
-  userName: {
-    fontSize: 19,
-    fontWeight: '800',
-    fontFamily: FONTS.bold,
-    marginBottom: 2,
-    writingDirection: 'rtl',
-  },
-  date: {
-    fontSize: 12,
-    fontWeight: '500',
-    fontFamily: FONTS.regular,
-    writingDirection: 'rtl',
-  },
-  actions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

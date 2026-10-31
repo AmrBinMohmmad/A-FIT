@@ -1,1 +1,0 @@
-export { lightColors, darkColors, type ColorTheme } from './global';

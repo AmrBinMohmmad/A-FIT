@@ -1,0 +1,10 @@
+node_modules
+dist
+.expo
+.impeccable
+android
+ios
+assets
+package-lock.json
+PRODUCT.md
+DESIGN.md

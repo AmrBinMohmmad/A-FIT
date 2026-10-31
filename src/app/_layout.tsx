@@ -1,129 +1,105 @@
-import React, { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet, I18nManager } from 'react-native';
-import { Stack, useRouter, useSegments } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import "@/utils/localization/i18n";
+import "@/utils/steps/backgroundTask";
+
 import {
-  useFonts,
   IBMPlexSansArabic_400Regular,
+  IBMPlexSansArabic_500Medium,
   IBMPlexSansArabic_700Bold,
-} from '@expo-google-fonts/ibm-plex-sans-arabic';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { ThemeProvider, useTheme } from '@/context/ThemeContext';
-import { ToastProvider } from '@/context/ToastContext';
-import { AlertProvider } from '@/context/AlertContext';
+  useFonts,
+} from "@expo-google-fonts/ibm-plex-sans-arabic";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { profileStorage } from '@/storage/profileStorage';
+import { AlertProvider } from "@/contexts/AlertContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
+import { QueryProvider } from "@/contexts/QueryProvider";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { ToastProvider } from "@/contexts/ToastContext";
 
-// Force RTL at startup for native components
-if (!I18nManager.isRTL) {
-  try {
-    I18nManager.allowRTL(true);
-    I18nManager.forceRTL(true);
-  } catch (e) {
-    console.log('RTL initialization error', e);
-  }
-}
+void SplashScreen.preventAutoHideAsync();
 
-function RootNavigation() {
-  const { isAuthenticated, isEmailVerified, isLoading } = useAuth();
-  const { colors, isDark } = useTheme();
-  const segments = useSegments();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isLoading) return;
-
-    const inAuthGroup = segments[0] === '(auth)';
-    const currentRoute = segments[1];
-
-    if (!isAuthenticated) {
-      // User is not logged in: send them to login if not already in (auth)
-      if (!inAuthGroup) {
-        router.replace('/(auth)/login');
-      }
-    } else if (!isEmailVerified) {
-      // User is logged in but email is not verified yet
-      if (currentRoute !== 'verify-email') {
-        router.replace('/(auth)/verify-email');
-      }
-    } else {
-      // User is fully authenticated & verified: check if onboarding profile is completed
-      profileStorage.hasProfile().then((hasProfile) => {
-        const onOnboarding = segments[0] === 'onboarding';
-        if (!hasProfile) {
-          if (!onOnboarding) {
-            router.replace('/onboarding');
-          }
-        } else {
-          if (inAuthGroup || onOnboarding) {
-            router.replace('/(tabs)');
-          }
-        }
-      });
-    }
-  }, [isAuthenticated, isEmailVerified, isLoading, segments]);
-
-  if (isLoading) {
-    return (
-      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
-  return (
-    <>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
-          animation: 'fade',
-        }}
-      >
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </>
-  );
-}
-
+/**
+ * Provider order (Rakaya mobile track): Gesture → SafeArea → Theme → Language → Query →
+ * Auth → Toast/Alert. Auth sits inside Query because it clears the cache on sign-out. The
+ * splash stays until fonts, theme, language/direction and the session have resolved.
+ */
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     IBMPlexSansArabic_400Regular,
+    IBMPlexSansArabic_500Medium,
     IBMPlexSansArabic_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10B981" />
-      </View>
-    );
-  }
-
   return (
-    <GestureHandlerRootView style={{ flex: 1, direction: 'rtl' }}>
-      <AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
         <ThemeProvider>
-          <ToastProvider>
-            <AlertProvider>
-              <RootNavigation />
-            </AlertProvider>
-          </ToastProvider>
+          <LanguageProvider>
+            <QueryProvider>
+              <ToastProvider>
+                <AuthProvider>
+                  <AlertProvider>
+                    <Root fontsLoaded={fontsLoaded} />
+                  </AlertProvider>
+                </AuthProvider>
+              </ToastProvider>
+            </QueryProvider>
+          </LanguageProvider>
         </ThemeProvider>
-      </AuthProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
 
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    backgroundColor: '#0D1117',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
+  const { theme, isDark, ready: themeReady } = useTheme();
+  const { ready: languageReady } = useLanguage();
+  const { status } = useAuth();
+
+  const ready = fontsLoaded && themeReady && languageReady && status !== "booting";
+
+  useEffect(() => {
+    if (ready) void SplashScreen.hideAsync();
+  }, [ready]);
+
+  if (!ready) return null;
+
+  return (
+    <>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: theme.colors.background },
+          animation: "fade",
+        }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="meals/new" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
+        <Stack.Screen name="meals/[id]" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
+        <Stack.Screen name="groups/new" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
+        <Stack.Screen
+          name="groups/join"
+          options={{ presentation: "modal", animation: "slide_from_bottom" }}
+        />
+        <Stack.Screen name="groups/[id]" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen
+          name="groups/[id]/challenges/new"
+          options={{ presentation: "modal", animation: "slide_from_bottom" }}
+        />
+        <Stack.Screen name="challenges/[id]" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="steps" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="weight" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="water" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="settings" options={{ animation: "slide_from_right" }} />
+      </Stack>
+    </>
+  );
+}

@@ -1,0 +1,33 @@
+# Rakaya kit v4.3.0 — MOBILE quality gate (D10.21). Steps are EXACTLY the members of
+# `npm run verify`, plus an `expo export` bundle. Any EAS build job must `needs: quality`.
+name: mobile-quality
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Types (npm run typecheck)
+        run: npm run typecheck
+      - name: Lint at zero warnings (npm run lint)
+        run: npm run lint
+      - name: Folder contract (npm run check:structure)
+        run: npm run check:structure
+      - name: Format (npm run format:check)
+        run: npm run format:check
+      - name: Tests incl. i18n parity + nutrition mirror (npm test)
+        run: npm test -- --ci
+      - name: Bundle (Metro export, both platforms)
+        run: npx expo export --platform ios --platform android --output-dir dist
+        env:
+          EXPO_PUBLIC_API_URL: https://ci.invalid/api/v1

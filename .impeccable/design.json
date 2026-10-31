@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T00:00:00Z",
+  "title": "Design System: A-FIT",
+  "source": {
+    "tokens": ["src/constants/colors.ts", "src/constants/tokens.ts", "src/constants/shadows.ts", "src/constants/theme.ts"],
+    "primitives": ["src/components/RText.tsx", "src/components/RTextInput.tsx", "src/components/Button.tsx", "src/components/Screen.tsx", "src/components/ListState.tsx"],
+    "world": ["src/components/line/LineDiagram.tsx", "src/components/line/SignPanel.tsx", "src/components/line/ExitRow.tsx", "src/components/line/CodeChip.tsx", "src/components/line/SegmentBar.tsx", "src/components/line/StandingRow.tsx"],
+    "note": "Frontmatter values are the light palette; `colorMeta.<key>.dark` carries the dark palette from darkColors (identical keys). Sizes are React Native points; the frontmatter writes them as px for portability."
+  },
+  "extensions": {
+    "colorMeta": {
+      "primary":        { "role": "primary",  "displayName": "Line Teal",      "canonical": "#1F7A8C", "dark": "#4FB3C6", "tonalRamp": ["oklch(20% 0.04 210)", "oklch(30% 0.06 210)", "oklch(40% 0.08 210)", "oklch(52% 0.08 210)", "oklch(62% 0.08 210)", "oklch(74% 0.07 210)", "oklch(86% 0.05 210)", "oklch(95% 0.02 210)"] },
+      "primaryMuted":   { "role": "primary",  "displayName": "Teal Tint",      "canonical": "#DCEFF2", "dark": "#163840" },
+      "onPrimary":      { "role": "primary",  "displayName": "On Teal",        "canonical": "#FFFFFF", "dark": "#06212A" },
+      "accent":         { "role": "secondary","displayName": "Signal Orange",  "canonical": "#C8451F", "dark": "#FF7A4D", "tonalRamp": ["oklch(20% 0.07 35)", "oklch(30% 0.11 35)", "oklch(42% 0.15 35)", "oklch(55% 0.17 35)", "oklch(65% 0.17 35)", "oklch(76% 0.13 35)", "oklch(87% 0.08 35)", "oklch(95% 0.03 35)"] },
+      "accentMuted":    { "role": "secondary","displayName": "Orange Tint",    "canonical": "#FBE3DC", "dark": "#3B2017" },
+      "onAccent":       { "role": "secondary","displayName": "On Orange",      "canonical": "#FFFFFF", "dark": "#1A0E09" },
+      "background":     { "role": "neutral",  "displayName": "Signage White",  "canonical": "#FFFFFF", "dark": "#0B1420" },
+      "surface":        { "role": "neutral",  "displayName": "Platform Grey",  "canonical": "#F4F6F8", "dark": "#121D2B", "tonalRamp": ["oklch(18% 0.02 240)", "oklch(28% 0.02 240)", "oklch(40% 0.015 240)", "oklch(55% 0.012 240)", "oklch(70% 0.01 240)", "oklch(84% 0.008 240)", "oklch(92% 0.006 240)", "oklch(97% 0.004 240)"] },
+      "elevated":       { "role": "neutral",  "displayName": "Elevated",       "canonical": "#FFFFFF", "dark": "#182536" },
+      "border":         { "role": "neutral",  "displayName": "Hairline",       "canonical": "#D7DCE2", "dark": "#2A3A4E" },
+      "divider":        { "role": "neutral",  "displayName": "Divider",        "canonical": "#E6EAEE", "dark": "#1F2D3E" },
+      "track":          { "role": "neutral",  "displayName": "Unreached Line", "canonical": "#D7DCE2", "dark": "#2A3A4E" },
+      "textPrimary":    { "role": "neutral",  "displayName": "Ink Navy",       "canonical": "#0E1B2B", "dark": "#F2F5F8", "tonalRamp": ["oklch(15% 0.035 250)", "oklch(22% 0.035 250)", "oklch(32% 0.035 250)", "oklch(45% 0.03 250)", "oklch(58% 0.025 250)", "oklch(72% 0.02 250)", "oklch(86% 0.012 250)", "oklch(95% 0.006 250)"] },
+      "textSecondary":  { "role": "neutral",  "displayName": "Second Ink",     "canonical": "#5B6878", "dark": "#B8C3D0" },
+      "textMuted":      { "role": "neutral",  "displayName": "Second Ink (alias)", "canonical": "#5B6878", "dark": "#B8C3D0" },
+      "textInverted":   { "role": "neutral",  "displayName": "Inverted Ink",   "canonical": "#FFFFFF", "dark": "#0E1B2B" },
+      "signPanel":      { "role": "neutral",  "displayName": "Sign Panel Navy","canonical": "#0E1B2B", "dark": "#193352" },
+      "onSignPanel":    { "role": "neutral",  "displayName": "On Sign",        "canonical": "#FFFFFF", "dark": "#FFFFFF" },
+      "signPanelMuted": { "role": "neutral",  "displayName": "Sign Muted",     "canonical": "#B9C3CF", "dark": "#A9BBD0" },
+      "success":        { "role": "tertiary", "displayName": "Success",        "canonical": "#157A4F", "dark": "#4CD08A" },
+      "successBg":      { "role": "tertiary", "displayName": "Success Tint",   "canonical": "#E3F5EC", "dark": "#0E2A1C" },
+      "warning":        { "role": "tertiary", "displayName": "Warning",        "canonical": "#9A6200", "dark": "#F2B04B" },
+      "warningBg":      { "role": "tertiary", "displayName": "Warning Tint",   "canonical": "#FBF0D9", "dark": "#2A1F08" },
+      "danger":         { "role": "tertiary", "displayName": "Danger",         "canonical": "#B3261E", "dark": "#FF7B72" },
+      "dangerBg":       { "role": "tertiary", "displayName": "Danger Tint",    "canonical": "#FCE8E6", "dark": "#2E1413" },
+      "info":           { "role": "tertiary", "displayName": "Info",           "canonical": "#1F5FA8", "dark": "#6FB1FF" },
+      "infoBg":         { "role": "tertiary", "displayName": "Info Tint",      "canonical": "#E4EEFA", "dark": "#0E2238" },
+      "inputBackground":{ "role": "neutral",  "displayName": "Input Ground",   "canonical": "#FFFFFF", "dark": "#182536" },
+      "inputBorder":    { "role": "neutral",  "displayName": "Input Hairline", "canonical": "#D7DCE2", "dark": "#2A3A4E" },
+      "inputFocusBorder":{ "role": "primary", "displayName": "Focus Teal",     "canonical": "#1F7A8C", "dark": "#4FB3C6" },
+      "placeholder":    { "role": "neutral",  "displayName": "Second Ink (alias)", "canonical": "#5B6878", "dark": "#B8C3D0" },
+      "tabBar":         { "role": "neutral",  "displayName": "Tab Bar Ground", "canonical": "#FFFFFF", "dark": "#121D2B" },
+      "tabBarActive":   { "role": "primary",  "displayName": "Tab Active Teal","canonical": "#1F7A8C", "dark": "#4FB3C6" },
+      "tabBarInactive": { "role": "neutral",  "displayName": "Second Ink (alias)", "canonical": "#5B6878", "dark": "#B8C3D0" },
+      "overlay":        { "role": "neutral",  "displayName": "Scrim",          "canonical": "rgba(14,27,43,0.5)", "dark": "rgba(0,0,0,0.6)" },
+      "skeleton":       { "role": "neutral",  "displayName": "Skeleton",       "canonical": "#E6EAEE", "dark": "#1F2D3E" }
+    },
+    "typographyMeta": {
+      "display":    { "displayName": "Display",     "purpose": "Reserved (44/48, 700); not yet placed on a shipped screen." },
+      "largeTitle": { "displayName": "Large Title", "purpose": "Station-sign header on root screens; the figure input mode." },
+      "title":      { "displayName": "Title",       "purpose": "User's name in the Home header; pushed-screen titles." },
+      "subtitle":   { "displayName": "Subtitle",    "purpose": "Sign panel value (tabular); empty/error-state titles." },
+      "callout":    { "displayName": "Callout",     "purpose": "Row titles (500), button labels and values (700), input text (400)." },
+      "body":       { "displayName": "Body",        "purpose": "Running prose." },
+      "footnote":   { "displayName": "Footnote",    "purpose": "Subtitles, input labels, panel heads; the roundel flag at 700." },
+      "caption":    { "displayName": "Caption",     "purpose": "Code chips (700), station labels, sign labels, tab labels, helper/error text." }
+    },
+    "fontFiles": { "regular": "IBMPlexSansArabic_400Regular", "medium": "IBMPlexSansArabic_500Medium", "bold": "IBMPlexSansArabic_700Bold" },
+    "shadows": [
+      { "name": "card", "value": "0 1px 2px rgba(14,27,43,0.05)", "android": { "elevation": 1 }, "purpose": "Defined in shadows.ts; currently unreferenced by any component." },
+      { "name": "sm",   "value": "0 2px 4px rgba(14,27,43,0.08)", "android": { "elevation": 2 }, "purpose": "The travelling \"you\" roundel on the LineDiagram." },
+      { "name": "md",   "value": "0 6px 12px rgba(14,27,43,0.12)", "android": { "elevation": 6 }, "purpose": "Floating sign panels: Toast and AlertDialog." }
+    ],
+    "motion": [
+      { "name": "fast",   "value": "150ms", "purpose": "duration.fast" },
+      { "name": "base",   "value": "200ms", "purpose": "duration.base" },
+      { "name": "slow",   "value": "250ms", "purpose": "duration.slow" },
+      { "name": "travel", "value": "600ms cubic-bezier(0.33, 1, 0.68, 1)", "purpose": "The \"you\" roundel sliding to its new position (Easing.out(Easing.cubic)); jumps under Reduce Motion. The only authored motion." }
+    ],
+    "touch": { "minTouchTarget": { "ios": "44pt", "android": "48dp" }, "hitSlop": "8pt" },
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button", "kind": "button", "refersTo": "button-primary",
+      "description": "Line-teal filled button; the default verb on a screen.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">السماح بقراءة الخطوات</button>",
+      "css": ".ds-btn { font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 16px; line-height: 24px; font-weight: 700; min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: opacity 150ms; } .ds-btn:active { opacity: 0.85; } .ds-btn:disabled { opacity: 0.5; } .ds-btn:focus-visible { outline: 2px solid #1F7A8C; outline-offset: 2px; } .ds-btn-primary { background: #1F7A8C; border-color: #1F7A8C; color: #FFFFFF; }"
+    },
+    {
+      "name": "Accent Button", "kind": "button", "refersTo": "button-accent-lg",
+      "description": "Signal-orange primary action; at most one per screen (Home footer: log a meal). 52px in the lg size.",
+      "html": "<button class=\"ds-btn ds-btn-accent\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>تسجيل وجبة</button>",
+      "css": ".ds-btn { font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 16px; line-height: 24px; font-weight: 700; min-height: 52px; padding: 0 16px; border-radius: 10px; border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: opacity 150ms; } .ds-btn:active { opacity: 0.85; } .ds-btn:disabled { opacity: 0.5; } .ds-btn:focus-visible { outline: 2px solid #C8451F; outline-offset: 2px; } .ds-btn-accent { background: #C8451F; border-color: #C8451F; color: #FFFFFF; }"
+    },
+    {
+      "name": "Secondary Button", "kind": "button", "refersTo": "button-secondary",
+      "description": "Platform-grey button with a hairline; retry, cancel, neutral choices.",
+      "html": "<button class=\"ds-btn ds-btn-secondary\">إعادة المحاولة</button>",
+      "css": ".ds-btn { font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 16px; line-height: 24px; font-weight: 700; min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: opacity 150ms; } .ds-btn:active { opacity: 0.85; } .ds-btn:focus-visible { outline: 2px solid #1F7A8C; outline-offset: 2px; } .ds-btn-secondary { background: #F4F6F8; border-color: #D7DCE2; color: #0E1B2B; }"
+    },
+    {
+      "name": "Ghost Button", "kind": "button", "refersTo": "button-ghost",
+      "description": "Transparent, teal text; tertiary links.",
+      "html": "<button class=\"ds-btn ds-btn-ghost\">فتح الإعدادات</button>",
+      "css": ".ds-btn { font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 16px; line-height: 24px; font-weight: 700; min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: opacity 150ms; } .ds-btn:active { opacity: 0.85; } .ds-btn:focus-visible { outline: 2px solid #1F7A8C; outline-offset: 2px; } .ds-btn-ghost { background: transparent; border-color: transparent; color: #1F7A8C; }"
+    },
+    {
+      "name": "Text Input", "kind": "input", "refersTo": "input",
+      "description": "Hairline field with a footnote label above; border turns teal on focus and danger on error.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">البريد الإلكتروني</span><span class=\"ds-field-box\"><input class=\"ds-input\" type=\"email\" dir=\"ltr\" placeholder=\"name@example.com\"></span></label>",
+      "css": ".ds-field { display: block; font-family: 'IBM Plex Sans Arabic', sans-serif; } .ds-field-label { display: block; font-size: 13px; line-height: 18px; color: #5B6878; margin-bottom: 4px; } .ds-field-box { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 12px; border: 1px solid #D7DCE2; border-radius: 10px; background: #FFFFFF; transition: border-color 150ms; } .ds-field-box:focus-within { border-color: #1F7A8C; } .ds-input { flex: 1; border: 0; outline: 0; background: transparent; padding: 12px 0; font: inherit; font-size: 16px; line-height: 24px; color: #0E1B2B; } .ds-input::placeholder { color: #5B6878; }"
+    },
+    {
+      "name": "Code Chip", "kind": "chip", "refersTo": "code-chip",
+      "description": "The numbered exit code on a station sign; tone encodes identity (accent = you, primary = leader, muted = others).",
+      "html": "<span class=\"ds-chip ds-chip-primary\">1</span> <span class=\"ds-chip ds-chip-accent\">2</span> <span class=\"ds-chip ds-chip-muted\">3</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 6px; border-radius: 6px; font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 11px; line-height: 16px; font-weight: 700; font-variant-numeric: tabular-nums; } .ds-chip-primary { background: #1F7A8C; color: #FFFFFF; } .ds-chip-accent { background: #C8451F; color: #FFFFFF; } .ds-chip-muted { background: #F4F6F8; color: #5B6878; border: 1px solid #D7DCE2; }"
+    },
+    {
+      "name": "Sign Panel", "kind": "card", "refersTo": "sign-panel",
+      "description": "The dark station sign carrying the one fact that matters; the end value may take the accent tone.",
+      "html": "<div class=\"ds-sign\" dir=\"rtl\"><div class=\"ds-sign-col\"><span class=\"ds-sign-label\">المحطة القادمة</span><span class=\"ds-sign-value\">8,000 خطوة</span></div><div class=\"ds-sign-col ds-sign-end\"><span class=\"ds-sign-label\">المتبقي</span><span class=\"ds-sign-value ds-sign-accent\">518</span></div></div>",
+      "css": ".ds-sign { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; border-radius: 12px; background: #0E1B2B; font-family: 'IBM Plex Sans Arabic', sans-serif; } .ds-sign-col { display: flex; flex-direction: column; gap: 2px; } .ds-sign-end { align-items: flex-end; } .ds-sign-label { font-size: 11px; line-height: 16px; font-weight: 500; color: #B9C3CF; } .ds-sign-value { font-size: 18px; line-height: 26px; font-weight: 700; color: #FFFFFF; font-variant-numeric: tabular-nums; } .ds-sign-accent { color: #C8451F; }"
+    },
+    {
+      "name": "Exit Row", "kind": "custom", "refersTo": "code-chip",
+      "description": "One exit on the station sign: code chip, title, quiet subtitle, tabular value, 1px top divider; chevron flips with direction.",
+      "html": "<div class=\"ds-exit\" dir=\"rtl\"><span class=\"ds-exit-chip\">1</span><span class=\"ds-exit-text\"><span class=\"ds-exit-title\">الوجبات</span><span class=\"ds-exit-sub\">3 وجبات اليوم</span></span><span class=\"ds-exit-value\">1,420</span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#5B6878\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M15 18l-6-6 6-6\"/></svg></div>",
+      "css": ".ds-exit { display: flex; align-items: center; gap: 12px; padding: 12px 0; min-height: 56px; border-top: 1px solid #E6EAEE; font-family: 'IBM Plex Sans Arabic', sans-serif; color: #0E1B2B; cursor: pointer; } .ds-exit:active { opacity: 0.7; } .ds-exit-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 6px; border-radius: 6px; background: #1F7A8C; color: #FFFFFF; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; } .ds-exit-text { flex: 1; display: flex; flex-direction: column; gap: 1px; } .ds-exit-title { font-size: 16px; line-height: 24px; font-weight: 500; } .ds-exit-sub { font-size: 13px; line-height: 18px; color: #5B6878; } .ds-exit-value { font-size: 16px; line-height: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Line Diagram", "kind": "custom", "refersTo": "line-panel",
+      "description": "The journey line inside a hairline panel: 6px track, teal progress, ring stations, ink friend ticks, the orange \"you\" roundel with its flag.",
+      "html": "<div class=\"ds-line-panel\" dir=\"rtl\"><div class=\"ds-line\"><div class=\"ds-track\"></div><div class=\"ds-progress\" style=\"width:74.8%\"></div><span class=\"ds-station ds-on\" style=\"inset-inline-start:0\"></span><span class=\"ds-station ds-on\" style=\"inset-inline-start:20%\"></span><span class=\"ds-station ds-on\" style=\"inset-inline-start:50%\"></span><span class=\"ds-station\" style=\"inset-inline-start:80%\"></span><span class=\"ds-station\" style=\"inset-inline-start:100%\"></span><span class=\"ds-tick\" style=\"inset-inline-start:41%\"></span><span class=\"ds-tick\" style=\"inset-inline-start:63%\"></span><span class=\"ds-you\" style=\"inset-inline-start:74.8%\"><span class=\"ds-flag\">أنت · 7,482</span></span></div><div class=\"ds-labels\"><span>0</span><span>2k</span><span>5k</span><span>8k</span><span>10k</span></div></div>",
+      "css": ".ds-line-panel { border: 1px solid #D7DCE2; border-radius: 16px; padding: 16px; background: #FFFFFF; font-family: 'IBM Plex Sans Arabic', sans-serif; } .ds-line { position: relative; height: 28px; margin: 30px 0 22px; display: flex; align-items: center; } .ds-track { position: absolute; inset-inline: 0; height: 6px; border-radius: 3px; background: #D7DCE2; } .ds-progress { position: absolute; inset-inline-start: 0; height: 6px; border-radius: 3px; background: #1F7A8C; transition: width 600ms cubic-bezier(0.33, 1, 0.68, 1); } .ds-station { position: absolute; width: 20px; height: 20px; border-radius: 50%; border: 4px solid #D7DCE2; background: #FFFFFF; margin-inline-start: -10px; box-sizing: border-box; } .ds-station.ds-on { border-color: #1F7A8C; } .ds-tick { position: absolute; top: -1px; width: 2px; height: 30px; background: #0E1B2B; margin-inline-start: -1px; } .ds-you { position: absolute; width: 28px; height: 28px; border-radius: 50%; background: #C8451F; border: 4px solid #FFFFFF; margin-inline-start: -14px; box-sizing: border-box; box-shadow: 0 2px 4px rgba(14,27,43,0.08); display: flex; justify-content: center; transition: inset-inline-start 600ms cubic-bezier(0.33, 1, 0.68, 1); } .ds-flag { position: absolute; top: -32px; white-space: nowrap; background: #C8451F; color: #FFFFFF; border-radius: 6px; padding: 2px 8px; font-size: 13px; line-height: 18px; font-weight: 700; font-variant-numeric: tabular-nums; } .ds-labels { display: flex; justify-content: space-between; font-size: 11px; line-height: 16px; font-weight: 500; color: #5B6878; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Segment Bar", "kind": "custom", "refersTo": "line-panel",
+      "description": "Fixed-measure budget bar of discrete blocks; the last block is painted danger when over budget.",
+      "html": "<div class=\"ds-segbar\" dir=\"rtl\"><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i></i><i></i><i></i></div><div class=\"ds-segbar\" dir=\"rtl\" style=\"margin-top:8px\"><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-on\"></i><i class=\"ds-over\"></i></div>",
+      "css": ".ds-segbar { display: flex; gap: 2px; width: 200px; } .ds-segbar i { flex: 1; height: 6px; border-radius: 2px; background: #D7DCE2; } .ds-segbar .ds-on { background: #1F7A8C; } .ds-segbar .ds-over { background: #B3261E; }"
+    },
+    {
+      "name": "Tab Bar", "kind": "nav", "refersTo": "tab-bar",
+      "description": "Four tabs on a hairline-topped ground; caption labels, stroke icons filling when active, teal active and second-ink inactive.",
+      "html": "<nav class=\"ds-tabs\" dir=\"rtl\"><a class=\"ds-tab ds-active\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z\"/></svg>الرئيسية</a><a class=\"ds-tab\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 2-2 6-2 9h4v9M15 12V3\"/></svg>الوجبات</a><a class=\"ds-tab\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2 20a7 7 0 0 1 14 0M16 5a3.5 3.5 0 0 1 0 7M22 20a6 6 0 0 0-5-6\"/></svg>المجموعات</a><a class=\"ds-tab\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21a8 8 0 0 1 16 0\"/></svg>أنا</a></nav>",
+      "css": ".ds-tabs { display: flex; height: 56px; padding-top: 6px; background: #FFFFFF; border-top: 1px solid #D7DCE2; font-family: 'IBM Plex Sans Arabic', sans-serif; } .ds-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 11px; line-height: 16px; font-weight: 500; color: #5B6878; } .ds-tab.ds-active { color: #1F7A8C; } .ds-tab:focus-visible { outline: 2px solid #1F7A8C; outline-offset: -2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Metro Line Wayfinding",
+    "overview": "A-FIT reads like a metro station sign. Each day is a journey along a line: stations are milestones at fixed shares of the step goal, the orange roundel is where you are, and friends are thin ink ticks on the same track. The system refuses the card-and-ring fitness dashboard and the bare percentage; progress is distance travelled toward a named next station, and the one fact that matters is printed on a dark sign panel in white.\n\nThe material is signage, not paper: a flat white (or ink-navy, in dark) ground, hairline rules instead of boxes, one line colour (teal) for the journey, and one signal colour (orange) that is spent only on \"you\" and on the single primary action a screen offers. There are exactly two text inks plus the signal; muted, placeholder and inactive-tab roles are aliases of the second ink, not a third one. One typeface, IBM Plex Sans Arabic, carries both Arabic and Latin at three weights; figures that must line up are set in tabular numerals.\n\nDensity is operational: short bursts of use, one-handed, often outdoors. Rows meet the platform touch minimum (44pt iOS / 48dp Android), every string is an i18n key in both `ar` and `en`, and all layout is written in logical direction so the line starts on the right in Arabic and on the left in English.",
+    "keyCharacteristics": [
+      "Line-first: `LineDiagram` + `SignPanel` is the hero of every progress surface, never a ring or a percentage alone.",
+      "Two inks + one line colour + one signal colour; everything else is a hairline or a tint.",
+      "Border-first depth; shadow only on the travelling roundel and floating sign panels (toast, dialog).",
+      "Tight signage radii (6–16pt); the roundel is the only circle.",
+      "Stroke icons (Ionicons outline) in one weight; no emoji, no glyph fonts beyond that set.",
+      "One authored motion: the \"you\" roundel travels 600 ms ease-out; everything else changes instantly."
+    ],
+    "rules": [
+      { "name": "The Two-Ink Rule", "body": "Text uses `textPrimary` or `textSecondary`. `textMuted` and `placeholder` are aliases of the second ink, not a third tone; a new grey is a defect.", "section": "colors" },
+      { "name": "The Signal Rule", "body": "Orange means \"you\" or \"the one thing to do here\". At most one `accent` button per screen; no orange on decoration, status, or other people.", "section": "colors" },
+      { "name": "The One Line Rule", "body": "Teal is the only line colour. Progress, reached stations, active tabs and focus share it; nothing else introduces a hue.", "section": "colors" },
+      { "name": "The No-Hex Rule", "body": "Components read `theme.colors.*`; a hex literal outside `src/constants/colors.ts` fails lint.", "section": "colors" },
+      { "name": "The Tabular Figure Rule", "body": "Any number that can change or sit beside another number is set with `tabular`; the sign value, exit values, standings, station labels and sync time all are.", "section": "typography" },
+      { "name": "The No-Kicker Rule", "body": "Labels are set in sentence case at `caption` or `footnote` in the second ink. No tracked uppercase eyebrows; the one tracked string in the build is the invite code (`letterSpacing: 2`), a code, not a label.", "section": "typography" },
+      { "name": "The Direction Rule", "body": "`RText` sets no `textAlign`; text follows the writing direction. Inputs flip `textAlign` and `writingDirection` to RTL only for Arabic non-numeric fields.", "section": "typography" },
+      { "name": "The Border-First Rule", "body": "A surface at rest is separated by a hairline, never a shadow. Shadow appears only on an element that is physically above the sign (roundel, toast, dialog).", "section": "elevation" }
+    ],
+    "dos": [
+      "Do express progress as a `LineDiagram` + `SignPanel` pair naming the next station and the remaining distance.",
+      "Do keep orange to \"you\" (roundel, flag, your row, your bar, today) and one `variant=\"accent\"` button per screen.",
+      "Do use only `textPrimary` and `textSecondary` (and their aliases) for text; the Two-Ink Rule.",
+      "Do separate rows and planes with 1pt hairlines (`divider` / `border`) on a flat ground.",
+      "Do set every changing number with `tabular` and format it through `formatInt` / `formatCompact`.",
+      "Do write offsets in logical properties (`marginInlineStart`, `insetInlineStart`) and flip chevrons with `useRTL`.",
+      "Do keep every visible string a key in both `ar.json` and `en.json`; enum labels via `t(\"enums.<x>.<value>\")`.",
+      "Do meet `MIN_TOUCH_TARGET` on every pressable and use stroke Ionicons at 18–24pt in one weight.",
+      "Do use fixed-measure `SegmentBar`s where a budget is fixed; one shared scale for bars that compare people or days."
+    ],
+    "donts": [
+      "Don't draw rings, donuts or a bare percentage as the primary progress read.",
+      "Don't nest a card inside a panel; inside a hairline box, content is flat.",
+      "Don't introduce gradients, a second hue, a third grey, or a hex literal outside `src/constants/colors.ts`.",
+      "Don't add shadow to a resting surface; shadow is for the roundel, toast and dialog only.",
+      "Don't set tracked uppercase labels, kickers or eyebrows; labels are sentence-case caption/footnote in the second ink.",
+      "Don't use emoji or glyph-font icons; `@expo/vector-icons` Ionicons outline is the only icon set.",
+      "Don't animate anything except the travelling roundel; signage changes instantly.",
+      "Don't render `Text` or `TextInput` outside `RText` / `RTextInput` (and the sanctioned `OtpInput`)."
+    ]
+  }
+}
