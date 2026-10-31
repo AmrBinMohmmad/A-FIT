@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native";
 import { Avatar } from "@/components/Avatar";
 import { CodeChip } from "@/components/line/CodeChip";
 import { RText } from "@/components/RText";
+import { RANK_EMOJI } from "@/constants/avatars";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useTheme } from "@/contexts/ThemeContext";
 import { makeStyles } from "@/hooks/useStyles";
@@ -29,23 +30,34 @@ const useStyles = makeStyles((theme) => ({
     borderTopColor: theme.colors.divider,
   },
   first: { borderTopWidth: 0 },
+  rank: { minWidth: 28, alignItems: "center", justifyContent: "center" },
   body: { flex: 1, gap: theme.spacing.xs },
   nameRow: { flexDirection: "row", alignItems: "center", gap: theme.spacing.sm },
   track: { height: 4, borderRadius: 2, backgroundColor: theme.colors.track, overflow: "hidden" },
   fill: { height: 4, borderRadius: 2 },
 }));
 
-/** A ranked member on the group line: rank chip, name, exact-magnitude bar on one shared scale, steps. */
+/**
+ * A ranked member on the group line: crown/medal for the podium (rank chip from fourth
+ * place), avatar, name, exact-magnitude bar on one shared scale, steps.
+ */
 export function StandingRow({ standing, max, youLabel, ownerLabel, onLongPress, first }: StandingRowProps) {
   const styles = useStyles();
   const { theme } = useTheme();
   const share = Math.max(0, Math.min(1, standing.steps / Math.max(max, 1)));
   const tone = standing.is_me ? "accent" : standing.rank === 1 ? "primary" : "muted";
+  const medal = standing.steps > 0 ? RANK_EMOJI[standing.rank] : undefined;
 
   const content = (
     <>
-      <CodeChip code={standing.rank} tone={tone} />
-      <Avatar uri={standing.avatar_url} name={standing.name} size={32} tone={tone} />
+      {medal ? (
+        <View style={styles.rank} accessibilityLabel={String(standing.rank)}>
+          <RText style={{ fontSize: 22, lineHeight: 28 }}>{medal}</RText>
+        </View>
+      ) : (
+        <CodeChip code={standing.rank} tone={tone} />
+      )}
+      <Avatar avatar={standing.avatar} name={standing.name} size={32} tone={tone} />
       <View style={styles.body}>
         <View style={styles.nameRow}>
           <RText

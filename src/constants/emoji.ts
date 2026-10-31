@@ -24,5 +24,5 @@ export const EMOJI = {
   trophy: "🏆",
   steps: "👟",
   meals: "🥘",
-  camera: "📷",
+  sparkle: "✨",
 } as const;

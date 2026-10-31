@@ -61,7 +61,7 @@ export default function GroupScreen() {
       back
       title={g?.name ?? ""}
       subtitle={g ? t("common.members", { count: g.members_count }) : undefined}
-      leading={g ? <Avatar uri={g.photo_url} name={g.name} size={40} emoji={EMOJI.group} /> : undefined}
+      leading={g ? <Avatar name={g.name} size={40} emoji={EMOJI.group} /> : undefined}
       action={g ? <GroupActions group={g} /> : undefined}
       refreshControl={
         <RefreshControl

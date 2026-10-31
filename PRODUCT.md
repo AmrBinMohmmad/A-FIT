@@ -59,8 +59,11 @@ Confirmed capabilities:
   upcoming / active / ended; winner shown when ended.
 - Account deletion from inside the app (store requirement).
 - Light and dark appearance, tri-state (system / light / dark).
-- Profile photo and group photo; emoji as content glyphs (meal types, celebrations, empty
-  states) to keep the tone friendly (owner request 2026-10-31).
+- A predefined avatar per account (16 emoji choices) shown on the group line; emoji as content
+  glyphs (meal types, celebrations, empty states, crown and medals on the podium) to keep the
+  tone friendly (owner request 2026-10-31).
+- The calorie plan paces the goal: about 12 weeks to the target weight within a safe weekly
+  band, so a small change asks for a small surplus or deficit (owner feedback 2026-10-31).
 - "Sign out of all devices" for a lost phone; at most ten live sessions per account.
 
 Constraints:
@@ -70,9 +73,9 @@ Constraints:
 - Health permissions are requested in-context with a plain explanation; a user who declines
   can still use meals, groups and manual weight/water.
 - No push notifications in this release (polled refresh only). Explicitly undecided: push.
-- Photos are limited to a profile picture and a group photo (owner-set), both square and
-  downsized on the device before upload (owner request 2026-10-31). No meal photos, no feed,
-  no chat. Explicitly undecided: friend requests outside groups.
+- No photo uploads: users pick one of 16 predefined emoji avatars (owner decision 2026-10-31,
+  replacing the same-day photo feature). No meal photos, no feed, no chat. Explicitly
+  undecided: friend requests outside groups.
 
 Terminology (Arabic / English): خطوات / steps, مجموعة / group, تحدي / challenge, وجبة / meal,
 الخطة اليومية / daily plan, سعرة / kcal, بروتين / protein, كارب / carbs, دهون / fat.

@@ -84,14 +84,6 @@
           "NSHealthShareUsageDescription": "A-FIT reads your step count so your daily progress and group leaderboard reflect your real steps. أي-فت يقرأ عدد خطواتك لعرض تقدمك اليومي وترتيبك في المجموعة.",
           "background": true
         }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "A-FIT uses your photos only for the profile picture you choose and the photo of a group you own. أي-فت يستخدم صورك فقط لصورة ملفك الشخصي وصورة المجموعة التي تملكها.",
-          "cameraPermission": false,
-          "microphonePermission": false
-        }
       ]
     ],
     "experiments": {

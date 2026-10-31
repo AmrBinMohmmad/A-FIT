@@ -104,14 +104,16 @@
     "stepsGoal": "Daily steps goal",
     "waterGoal": "Daily water goal",
     "planTitle": "Your daily plan",
-    "planSubtitle": "Calculated from your measurements and activity.",
+    "planSubtitle": "Calculated from your measurements and activity. Small goal, small change: we pace it at a safe weekly rate.",
     "dailyCalories": "Daily calories",
-    "bmr": "BMR {{value}}",
-    "tdee": "TDEE {{value}}",
     "macros": "Macro targets",
     "start": "Start my journey",
     "previewNote": "Preview — the server confirms the final numbers when you save.",
-    "saved": "Your plan is saved."
+    "saved": "Your plan is saved.",
+    "maintenance": "To keep your weight: {{value}} kcal",
+    "paceMaintain": "No surplus or deficit",
+    "paceLose": "−{{value}} kcal a day, about {{weeks}} weeks to your target",
+    "paceGain": "+{{value}} kcal a day, about {{weeks}} weeks to your target"
   },
   "home": {
     "greeting": "Today's line",
@@ -232,9 +234,7 @@
     "rename": "Rename",
     "renameTitle": "Rename group",
     "renameLabel": "New name",
-    "removeHint": "Hold a member to remove them",
-    "changePhoto": "Change group photo",
-    "removePhoto": "Remove group photo"
+    "removeHint": "Hold a member to remove them"
   },
   "challenges": {
     "title": "Challenge",
@@ -289,10 +289,10 @@
     "toTarget": "{{value}} kg to target",
     "atTarget": "At target weight",
     "nameSaved": "Name saved",
-    "photo": "Profile photo",
-    "changePhoto": "Change photo",
-    "removePhoto": "Remove photo",
-    "photoPermission": "Allow photo access in your phone settings to pick a picture."
+    "avatarTitle": "Pick your avatar",
+    "avatarSubtitle": "Friends see it next to your name on the group line.",
+    "changeAvatar": "Change avatar",
+    "avatarNone": "Use my initials instead"
   },
   "steps": {
     "title": "Step history",
@@ -410,5 +410,23 @@
     "generic": "Something went wrong. Please try again.",
     "title": "Something went wrong",
     "healthRead": "Could not read steps from the health store."
+  },
+  "avatars": {
+    "fox": "Fox",
+    "panda": "Panda",
+    "tiger": "Tiger",
+    "lion": "Lion",
+    "frog": "Frog",
+    "koala": "Koala",
+    "unicorn": "Unicorn",
+    "octopus": "Octopus",
+    "penguin": "Penguin",
+    "owl": "Owl",
+    "turtle": "Turtle",
+    "dolphin": "Dolphin",
+    "butterfly": "Butterfly",
+    "bee": "Bee",
+    "rocket": "Rocket",
+    "star": "Star"
   }
 }

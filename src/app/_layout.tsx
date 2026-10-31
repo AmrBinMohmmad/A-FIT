@@ -103,6 +103,7 @@ function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
         <Stack.Screen name="weight" options={{ animation: "slide_from_right" }} />
         <Stack.Screen name="water" options={{ animation: "slide_from_right" }} />
         <Stack.Screen name="settings" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="avatar" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
       </Stack>
     </>
   );

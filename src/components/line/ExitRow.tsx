@@ -10,7 +10,7 @@ import { useRTL } from "@/hooks/useRTL";
 
 interface ExitRowProps {
   code: string | number;
-  /** Replaces the code chip, e.g. a group photo. */
+  /** Replaces the code chip, e.g. an avatar roundel. */
   leading?: React.ReactNode;
   title: string;
   subtitle?: string;

@@ -5,7 +5,7 @@ import { ExitRow } from "@/components/line/ExitRow";
 import { EMOJI } from "@/constants/emoji";
 import type { Group } from "@/types/api";
 
-/** A group as a station exit: its photo (or a 👥 roundel) leads, the subtitle is the member count. */
+/** A group as a station exit: a 👥 roundel leads, the subtitle is the member count. */
 export function GroupRow({ group, onPress, first }: { group: Group; onPress: () => void; first?: boolean }) {
   const { t } = useTranslation();
   return (
@@ -14,7 +14,6 @@ export function GroupRow({ group, onPress, first }: { group: Group; onPress: () 
       code={group.name.trim().charAt(0).toUpperCase() || "•"}
       leading={
         <Avatar
-          uri={group.photo_url}
           name={group.name}
           size={40}
           emoji={EMOJI.group}

@@ -133,7 +133,7 @@ export default function OnboardingScreen() {
           onWater={setWaterGoal}
         />
       ) : null}
-      {step === 6 ? <PlanStep preview={preview} /> : null}
+      {step === 6 ? <PlanStep preview={preview} kgToGo={Math.abs(targetWeight - currentWeight)} /> : null}
 
       {step === 6 ? (
         <RText variant="caption" color="textMuted">

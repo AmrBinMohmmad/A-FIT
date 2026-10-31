@@ -36,6 +36,21 @@ export const ACTIVITY_MULTIPLIER: Record<ActivityLevel, number> = {
 
 const round = (n: number) => Math.round(n);
 
+// Mirrors NutritionPlan::KCAL_PER_KG / TARGET_WEEKS / *_PACE_KG_PER_WEEK
+const KCAL_PER_KG = 7700;
+const TARGET_WEEKS = 12;
+const LOSE_PACE: [number, number] = [0.25, 0.5];
+const GAIN_PACE: [number, number] = [0.15, 0.3];
+
+/** Mirrors NutritionPlan::dailyAdjustment — a paced surplus/deficit, not a flat number. */
+export function dailyAdjustment(goalType: GoalType, kgToGo: number): number {
+  if (goalType === "maintain") return 0;
+  const [min, max] = goalType === "lose" ? LOSE_PACE : GAIN_PACE;
+  const pace = Math.min(max, Math.max(min, kgToGo / TARGET_WEEKS));
+  const daily = round((pace * KCAL_PER_KG) / 7 / 10) * 10;
+  return goalType === "lose" ? -daily : daily;
+}
+
 export function computeNutritionPreview(input: PhysicalInputs): NutritionPreview {
   const { gender, age, height, currentWeight, targetWeight, activityLevel } = input;
 
@@ -43,18 +58,11 @@ export function computeNutritionPreview(input: PhysicalInputs): NutritionPreview
   const tdee = round(bmr * ACTIVITY_MULTIPLIER[activityLevel]);
 
   const diff = targetWeight - currentWeight;
-  let goalType: GoalType = "maintain";
-  let adjustment = 0;
-  if (diff < -0.5) {
-    goalType = "lose";
-    adjustment = -450;
-  } else if (diff > 0.5) {
-    goalType = "gain";
-    adjustment = 350;
-  }
+  const goalType: GoalType = diff < -0.5 ? "lose" : diff > 0.5 ? "gain" : "maintain";
+  const adjustment = dailyAdjustment(goalType, Math.abs(diff));
 
   const floor = gender === "female" ? 1200 : 1500;
-  const dailyCalories = Math.max(floor, round(tdee + adjustment));
+  const dailyCalories = Math.max(floor, round((tdee + adjustment) / 10) * 10);
 
   const proteinPerKg =
     (gender === "female" ? 1.5 : 1.7) +

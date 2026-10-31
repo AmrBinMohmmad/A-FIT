@@ -41,9 +41,18 @@ function Intro({ title, subtitle }: { title: string; subtitle: string }) {
 }
 
 /** The final station: the calculated plan (preview; the server confirms on save). */
-export function PlanStep({ preview }: { preview: NutritionPreview }) {
+export function PlanStep({ preview, kgToGo }: { preview: NutritionPreview; kgToGo: number }) {
   const { t } = useTranslation();
   const styles = useStyles();
+  // The surplus/deficit the server will apply (the 1200/1500 floor can shrink it for small bodies).
+  const adjustment = preview.dailyCalories - preview.tdee;
+  const weeks = adjustment !== 0 ? Math.max(1, Math.round((kgToGo * 7700) / (Math.abs(adjustment) * 7))) : 0;
+  const paceKey =
+    preview.goalType === "maintain"
+      ? "onboarding.paceMaintain"
+      : preview.goalType === "lose"
+        ? "onboarding.paceLose"
+        : "onboarding.paceGain";
   return (
     <View style={styles.section}>
       <Intro title={t("onboarding.planTitle")} subtitle={t("onboarding.planSubtitle")} />
@@ -55,12 +64,12 @@ export function PlanStep({ preview }: { preview: NutritionPreview }) {
       <View style={styles.pills}>
         <View style={styles.pill}>
           <RText variant="caption" color="textSecondary" tabular>
-            {t("onboarding.bmr", { value: formatInt(preview.bmr) })}
+            {t("onboarding.maintenance", { value: formatInt(preview.tdee) })}
           </RText>
         </View>
         <View style={styles.pill}>
           <RText variant="caption" color="textSecondary" tabular>
-            {t("onboarding.tdee", { value: formatInt(preview.tdee) })}
+            {t(paceKey, { value: formatInt(Math.abs(adjustment)), weeks })}
           </RText>
         </View>
       </View>

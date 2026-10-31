@@ -118,7 +118,7 @@ export function StepsPanel({ steps, group }: { steps: Dashboard["steps"]; group:
         <View style={styles.friends} accessibilityLabel={t("home.friendsOnLine")}>
           {friends.slice(0, 4).map((f) => (
             <View key={f.user_id} style={styles.friend}>
-              <Avatar uri={f.avatar_url} name={f.name} size={20} tone="muted" />
+              <Avatar avatar={f.avatar} name={f.name} size={20} tone="muted" />
               <RText variant="caption" color="textSecondary" numberOfLines={1}>
                 {f.name}{" "}
                 <RText variant="caption" color="textPrimary" tabular>

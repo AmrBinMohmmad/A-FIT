@@ -46,10 +46,10 @@ strike-through glyph has no RN primitive without a second drawing layer.
 
 ADAPTATIONS (owner request, 2026-10-31): emoji are admitted as CONTENT glyphs — meal-type
 marks, the goal-reached and streak celebrations, empty states, the greeting — never as controls
-(controls stay stroke icons in one weight; `src/constants/emoji.ts` is the single list). Photos:
-the user's avatar replaces the brand roundel in the header when present, members carry a 32 px
-avatar after the rank chip, groups lead with their photo (👥 fallback); initials on a tinted disc
-when there is no photo (`src/components/Avatar.tsx`).
+(controls stay stroke icons in one weight; `src/constants/emoji.ts` is the single list). Avatars
+(no uploads): the user's chosen emoji avatar replaces the brand roundel in the header, members
+carry a 32 px avatar after the rank glyph, the podium shows 👑 🥈 🥉 instead of the rank chip,
+groups lead with 👥; initials on a tinted disc when nothing is chosen (`src/components/Avatar.tsx`).
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review,
 the verdict, DESIGN.md, and every shipping raster carrying its provenance.

@@ -21,7 +21,7 @@ interface ScreenProps {
   title?: string;
   subtitle?: string;
   back?: boolean;
-  /** Start-side header element (e.g. a group photo). */
+  /** Start-side header element (e.g. an avatar roundel). */
   leading?: React.ReactNode;
   /** Right-hand (end-side) header action. */
   action?: React.ReactNode;

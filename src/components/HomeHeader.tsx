@@ -41,8 +41,8 @@ export function HomeHeader({ syncedAt, syncing }: { syncedAt: string | null; syn
 
   return (
     <View style={styles.row}>
-      {user?.avatar_url ? (
-        <Avatar uri={user.avatar_url} name={user.name} size={40} />
+      {user?.avatar ? (
+        <Avatar avatar={user.avatar} name={user.name} size={40} />
       ) : (
         <View style={styles.roundel} accessibilityRole="image" accessibilityLabel={t("common.appName")}>
           <RText variant="callout" weight="bold" color="onPrimary">

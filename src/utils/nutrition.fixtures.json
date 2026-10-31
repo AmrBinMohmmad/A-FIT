@@ -12,9 +12,9 @@
       "bmr": 1749,
       "tdee": 2711,
       "goalType": "lose",
-      "dailyCalories": 2261,
+      "dailyCalories": 2250,
       "dailyProtein": 128,
-      "dailyCarbs": 280,
+      "dailyCarbs": 277,
       "dailyFat": 70
     }
   },
@@ -31,10 +31,10 @@
       "bmr": 1322,
       "tdee": 1818,
       "goalType": "lose",
-      "dailyCalories": 1368,
+      "dailyCalories": 1360,
       "dailyProtein": 83,
-      "dailyCarbs": 162,
-      "dailyFat": 43
+      "dailyCarbs": 163,
+      "dailyFat": 42
     }
   },
   {
@@ -50,10 +50,10 @@
       "bmr": 1855,
       "tdee": 2226,
       "goalType": "lose",
-      "dailyCalories": 1776,
-      "dailyProtein": 133,
-      "dailyCarbs": 187,
-      "dailyFat": 55
+      "dailyCalories": 1680,
+      "dailyProtein": 126,
+      "dailyCarbs": 177,
+      "dailyFat": 52
     }
   },
   {
@@ -69,10 +69,10 @@
       "bmr": 1299,
       "tdee": 2241,
       "goalType": "gain",
-      "dailyCalories": 2591,
-      "dailyProtein": 130,
-      "dailyCarbs": 336,
-      "dailyFat": 81
+      "dailyCalories": 2570,
+      "dailyProtein": 129,
+      "dailyCarbs": 334,
+      "dailyFat": 80
     }
   },
   {
@@ -88,10 +88,10 @@
       "bmr": 1608,
       "tdee": 3055,
       "goalType": "gain",
-      "dailyCalories": 3405,
+      "dailyCalories": 3390,
       "dailyProtein": 170,
-      "dailyCarbs": 443,
-      "dailyFat": 106
+      "dailyCarbs": 441,
+      "dailyFat": 105
     }
   },
   {
@@ -126,10 +126,10 @@
       "bmr": 2198,
       "tdee": 3022,
       "goalType": "lose",
-      "dailyCalories": 2572,
+      "dailyCalories": 2470,
       "dailyProtein": 153,
-      "dailyCarbs": 310,
-      "dailyFat": 80
+      "dailyCarbs": 291,
+      "dailyFat": 77
     }
   },
   {
@@ -149,6 +149,25 @@
       "dailyProtein": 68,
       "dailyCarbs": 149,
       "dailyFat": 37
+    }
+  },
+  {
+    "input": {
+      "gender": "male",
+      "age": 25,
+      "height": 180,
+      "currentWeight": 80,
+      "targetWeight": 81,
+      "activityLevel": "moderate"
+    },
+    "expected": {
+      "bmr": 1805,
+      "tdee": 2798,
+      "goalType": "gain",
+      "dailyCalories": 2970,
+      "dailyProtein": 149,
+      "dailyCarbs": 387,
+      "dailyFat": 92
     }
   }
 ]

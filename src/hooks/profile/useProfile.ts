@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import type { AvatarKey } from "@/constants/avatars";
 import { useAuth } from "@/contexts/AuthContext";
 import type { ApiEnvelope, SaveProfilePayload, User, UserProfile } from "@/types/api";
 import { api, fetcher } from "@/utils/api/client";
@@ -28,7 +29,7 @@ export function useSaveProfile() {
 export function useUpdateMe() {
   const { setUser } = useAuth();
   return useMutation({
-    mutationFn: (payload: { name?: string; locale?: "ar" | "en" }) =>
+    mutationFn: (payload: { name?: string; locale?: "ar" | "en"; avatar?: AvatarKey | null }) =>
       api.patch<ApiEnvelope<User>>("me", payload),
     onSuccess: (res) => setUser(res.data.data),
   });

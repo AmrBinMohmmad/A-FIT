@@ -1,3 +1,5 @@
+import type { AvatarKey } from "@/constants/avatars";
+
 /**
  * The wire contract — the ONLY hand-maintained mirror of the backend's responses.
  * `ApiEnvelope<T>` and `Paginated<T>` are structural (Rakaya D1). Every enum is a string
@@ -57,7 +59,7 @@ export interface User {
   name: string;
   email: string;
   locale: "ar" | "en";
-  avatar_url: string | null;
+  avatar: AvatarKey | null;
   has_profile: boolean | null;
   profile?: UserProfile | null;
   created_at: string | null;
@@ -185,7 +187,6 @@ export interface WeightEntry {
 export interface Group {
   id: number;
   name: string;
-  photo_url: string | null;
   invite_code: string;
   owner_id: number;
   my_role: GroupRole;
@@ -198,7 +199,7 @@ export interface Group {
 export interface Standing {
   user_id: number;
   name: string;
-  avatar_url: string | null;
+  avatar: AvatarKey | null;
   role: GroupRole;
   steps: number;
   rank: number;
@@ -271,9 +272,8 @@ export interface Dashboard {
     name: string;
     members_count: number;
     my_rank: number | null;
-    photo_url: string | null;
-    leader: { user_id: number; name: string; avatar_url: string | null; steps: number } | null;
-    others: { user_id: number; name: string; avatar_url: string | null; steps: number }[];
+    leader: { user_id: number; name: string; avatar: AvatarKey | null; steps: number } | null;
+    others: { user_id: number; name: string; avatar: AvatarKey | null; steps: number }[];
   } | null;
   challenge: {
     id: number;
