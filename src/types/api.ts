@@ -164,6 +164,8 @@ export interface FoodPayload {
   name: string;
   name_ar?: string;
   brand?: string;
+  /** EAN/UPC digits from the scanner, so the next scan finds this food. */
+  barcode?: string;
   category: FoodCategory;
   generic_id?: number;
   serving_grams: number;

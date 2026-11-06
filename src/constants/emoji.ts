@@ -25,6 +25,7 @@ export const EMOJI = {
   steps: "👟",
   meals: "🥘",
   sparkle: "✨",
+  scan: "📷",
 } as const;
 
 /** Grocery aisles in the food picker. */

@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
@@ -32,6 +32,7 @@ export default function NewFoodScreen() {
   const { t } = useTranslation();
   const styles = useStyles();
   const router = useRouter();
+  const { barcode } = useLocalSearchParams<{ barcode?: string }>();
   const draft = useMealDraft();
   const create = useCreateFood();
   const [name, setName] = useState("");
@@ -59,6 +60,7 @@ export default function NewFoodScreen() {
       {
         name: name.trim(),
         brand: brand.trim() || undefined,
+        barcode: barcode && /^\d{8,14}$/.test(barcode) ? barcode : undefined,
         category,
         serving_grams: grams,
         serving_label: servingLabel.trim() || undefined,
@@ -91,7 +93,11 @@ export default function NewFoodScreen() {
   );
 
   return (
-    <Screen title={t("foods.newTitle")} subtitle={t("foods.newSubtitle")} back keyboard>
+    <Screen
+      title={t("foods.newTitle")}
+      subtitle={barcode ? t("foods.scannedCode", { code: barcode }) : t("foods.newSubtitle")}
+      back
+      keyboard>
       <View style={styles.form}>
         <RTextInput
           label={t("foods.nameLabel")}

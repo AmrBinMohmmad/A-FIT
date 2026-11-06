@@ -522,6 +522,17 @@
     "kinds_two": "نوعان",
     "kinds_few": "{{count}} أنواع",
     "kinds_many": "{{count}} نوعاً",
-    "kinds_other": "{{count}} نوع"
+    "kinds_other": "{{count}} نوع",
+    "scan": "مسح باركود",
+    "scanTitle": "مسح باركود",
+    "scanHint": "وجّه الكاميرا إلى باركود المنتج.",
+    "scannedCode": "الباركود {{code}}",
+    "scanPermissionTitle": "الوصول إلى الكاميرا",
+    "scanPermissionBody": "تُستخدم الكاميرا فقط لقراءة باركود المنتج. لا يُسجَّل شيء.",
+    "scanAllow": "السماح للكاميرا",
+    "scanNotFound": "غير موجود في القائمة بعد",
+    "scanNotFoundHint": "أضفه من ملصق العبوة؛ يبقى الباركود معه فيجده المسح التالي.",
+    "scanAddWithBarcode": "إضافته بهذا الباركود",
+    "scanAgain": "مسح مرة أخرى"
   }
 }

@@ -88,6 +88,7 @@ function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
         <Stack.Screen name="meals/new" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
         <Stack.Screen name="meals/[id]" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
         <Stack.Screen name="foods/new" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
+        <Stack.Screen name="foods/scan" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
         <Stack.Screen name="groups/new" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
         <Stack.Screen
           name="groups/join"

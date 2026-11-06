@@ -84,6 +84,14 @@
           "NSHealthShareUsageDescription": "A-FIT reads your step count so your daily progress and group leaderboard reflect your real steps. أي-فت يقرأ عدد خطواتك لعرض تقدمك اليومي وترتيبك في المجموعة.",
           "background": true
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "A-FIT uses the camera only to scan a product's barcode so you can log it. أي-فت يستخدم الكاميرا فقط لمسح باركود المنتج لتسجيله.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "experiments": {

@@ -522,6 +522,17 @@
     "kinds_two": "{{count}} kinds",
     "kinds_few": "{{count}} kinds",
     "kinds_many": "{{count}} kinds",
-    "kinds_other": "{{count}} kinds"
+    "kinds_other": "{{count}} kinds",
+    "scan": "Scan a barcode",
+    "scanTitle": "Scan a barcode",
+    "scanHint": "Point the camera at the product's barcode.",
+    "scannedCode": "Barcode {{code}}",
+    "scanPermissionTitle": "Camera access",
+    "scanPermissionBody": "The camera is used only to read a product's barcode. Nothing is recorded.",
+    "scanAllow": "Allow the camera",
+    "scanNotFound": "Not in the catalog yet",
+    "scanNotFoundHint": "Add it from the package label; the barcode stays with it so the next scan finds it.",
+    "scanAddWithBarcode": "Add it with this barcode",
+    "scanAgain": "Scan again"
   }
 }

@@ -13,6 +13,7 @@ import { RText } from "@/components/RText";
 import { RTextInput } from "@/components/RTextInput";
 import { EMOJI, FOOD_CATEGORY_EMOJI } from "@/constants/emoji";
 import { FOOD_CATEGORIES } from "@/constants/enums";
+import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useTheme } from "@/contexts/ThemeContext";
 import { MIN_QUERY_LENGTH, useFoodSearch, useRecentFoods } from "@/hooks/foods/useFoods";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -33,6 +34,16 @@ interface FoodPickerProps {
 
 const useStyles = makeStyles((theme) => ({
   wrap: { gap: theme.spacing.sm },
+  search: { flexDirection: "row", alignItems: "flex-start", gap: theme.spacing.sm },
+  scan: {
+    width: MIN_TOUCH_TARGET + 4,
+    height: MIN_TOUCH_TARGET + 4,
+    borderRadius: theme.radii.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   head: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
 }));
 
@@ -82,28 +93,38 @@ export function FoodPicker({ ref, onPick, onActiveChange }: FoodPickerProps) {
 
   return (
     <View style={styles.wrap}>
-      <RTextInput
-        value={query}
-        onChangeText={(v) => {
-          setQuery(v);
-          setOpenId(null);
-        }}
-        placeholder={t("foods.searchPlaceholder")}
-        returnKeyType="search"
-        autoCorrect={false}
-        startAdornment={<Ionicons name="search-outline" size={18} color={theme.colors.textMuted} />}
-        endAdornment={
-          active ? (
-            <Pressable
-              onPress={clear}
-              hitSlop={13}
-              accessibilityRole="button"
-              accessibilityLabel={t("common.clear")}>
-              <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
-            </Pressable>
-          ) : undefined
-        }
-      />
+      <View style={styles.search}>
+        <RTextInput
+          containerStyle={{ flex: 1 }}
+          value={query}
+          onChangeText={(v) => {
+            setQuery(v);
+            setOpenId(null);
+          }}
+          placeholder={t("foods.searchPlaceholder")}
+          returnKeyType="search"
+          autoCorrect={false}
+          startAdornment={<Ionicons name="search-outline" size={18} color={theme.colors.textMuted} />}
+          endAdornment={
+            active ? (
+              <Pressable
+                onPress={clear}
+                hitSlop={13}
+                accessibilityRole="button"
+                accessibilityLabel={t("common.clear")}>
+                <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
+              </Pressable>
+            ) : undefined
+          }
+        />
+        <Pressable
+          onPress={() => router.push("/foods/scan")}
+          style={styles.scan}
+          accessibilityRole="button"
+          accessibilityLabel={t("foods.scan")}>
+          <Ionicons name="barcode-outline" size={24} color={theme.colors.primary} />
+        </Pressable>
+      </View>
       {openId === null ? (
         <Chips
           items={chips}
