@@ -51,5 +51,9 @@ marks, the goal-reached and streak celebrations, empty states, the greeting — 
 carry a 32 px avatar after the rank glyph, the podium shows 👑 🥈 🥉 instead of the rank chip,
 groups lead with 👥; initials on a tinted disc when nothing is chosen (`src/components/Avatar.tsx`).
 
+MOTION ADAPTATION (owner request, 2026-11-06): motion beyond the roundel is admitted where it
+explains a change — staggered row entry, basket add/remove, button press, sign-value cross-fade,
+segment fill, and the appearance-switch wave from the tap point. See DESIGN.md "Motion".
+
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review,
 the verdict, DESIGN.md, and every shipping raster carrying its provenance.

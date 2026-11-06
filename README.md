@@ -21,23 +21,15 @@ The API base URL lives in `src/constants/env.ts`; point it at the machine runnin
 npm run verify   # tsc · eslint (0 warnings) · check-structure · prettier · jest
 ```
 
-CI (`.github/workflows/mobile.yml`) runs the same members plus a Metro export for both platforms
-on every push and pull request to `main` and `dev`.
+Run it before every pull request; this repository has no CI workflow (owner decision).
 
 ## Branching
 
-- `main` — what is shipped to the stores. Only fast-forward merges from `dev` via a pull request.
+- `main` — what is shipped to the stores. Changes only through a pull request from `dev`.
 - `dev` — integration branch and the GitHub default. Feature branches (`feat/...`, `fix/...`)
-  branch from `dev` and come back through a pull request with the gate green.
-- Nothing is pushed straight to `main`. Commits carry the author's own identity.
-
-## Releases
-
-```bash
-git checkout main && git pull
-npm version minor          # bumps package.json + app.json, commits, tags vX.Y.Z
-git push --follow-tags     # CI verifies, exports, publishes the GitHub release (+ EAS if EXPO_TOKEN)
-```
+  branch from `dev` and come back through a pull request with `npm run verify` green.
+- Nothing is pushed straight to `main` or `dev`: every change is a branch and a pull request.
+  Commits carry the author's own identity.
 
 ## Where things are
 

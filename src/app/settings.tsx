@@ -91,7 +91,7 @@ export default function SettingsScreen() {
             title={t(`theme.${m}`)}
             icon={m === "dark" ? "moon-outline" : m === "light" ? "sunny-outline" : "phone-portrait-outline"}
             selected={mode === m}
-            onPress={() => setMode(m)}
+            onPress={(e) => setMode(m, { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY })}
           />
         ))}
       </View>

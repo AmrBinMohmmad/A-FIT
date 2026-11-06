@@ -69,6 +69,7 @@ export default function GroupsScreen() {
               key={group.id}
               group={group}
               first={i === 0}
+              index={i}
               onPress={() => router.push({ pathname: "/groups/[id]", params: { id: String(group.id) } })}
             />
           ))}

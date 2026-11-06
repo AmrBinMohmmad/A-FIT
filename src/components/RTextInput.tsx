@@ -115,14 +115,20 @@ export function RTextInput({
           style={[styles.input, isRtlText && styles.inputRtl, figure && styles.figure]}
           value={value}
           onChangeText={handleChange}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
           placeholderTextColor={theme.colors.placeholder}
           keyboardAppearance={theme.isDark ? "dark" : "light"}
           keyboardType={keyboardType}
           editable={editable}
           accessibilityLabel={label}
           {...rest}
+          onFocus={(e) => {
+            setFocused(true);
+            rest.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            rest.onBlur?.(e);
+          }}
         />
         {showClear ? (
           <TouchableOpacity

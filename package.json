@@ -15,6 +15,7 @@
     "expo": "~57.0.21",
     "expo-background-task": "~57.0.21",
     "expo-build-properties": "~57.0.22",
+    "expo-camera": "~57.0.6",
     "expo-clipboard": "~57.0.2",
     "expo-constants": "~57.0.17",
     "expo-dev-client": "~57.0.18",
@@ -76,8 +77,7 @@
     "verify": "npm run typecheck && npm run lint && npm run check:structure && npm run format:check && npm test",
     "build:dev": "eas build --platform all --profile development",
     "build:preview": "eas build --platform all --profile preview",
-    "build:prod": "eas build --platform all --profile production",
-    "version": "node scripts/sync-version.mjs && git add app.json"
+    "build:prod": "eas build --platform all --profile production"
   },
   "private": true,
   "jest": {

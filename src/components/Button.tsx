@@ -7,6 +7,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { RText, type TextColor } from "@/components/RText";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
@@ -23,6 +24,8 @@ interface ButtonProps extends Omit<PressableProps, "style" | "children"> {
   size?: "md" | "lg";
   style?: StyleProp<ViewStyle>;
 }
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const useStyles = makeStyles((theme) => ({
   base: {
@@ -65,23 +68,32 @@ export function Button({
   };
   const p = palette[variant];
   const isDisabled = Boolean(disabled) || Boolean(loading);
+  // Press feedback: a slight scale-down, back on release (Reduce Motion makes it instant).
+  const scale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled, busy: Boolean(loading) }}
       disabled={isDisabled}
+      onPressIn={() => {
+        scale.set(withTiming(0.97, { duration: theme.duration.fast }));
+      }}
+      onPressOut={() => {
+        scale.set(withTiming(1, { duration: theme.duration.base }));
+      }}
       onPress={(e) => {
         if (variant === "accent") void Haptics.selectionAsync().catch(() => undefined);
         onPress?.(e);
       }}
-      style={({ pressed }) => [
+      style={[
         styles.base,
         size === "lg" && styles.lg,
         { backgroundColor: p.bg, borderColor: p.border },
-        pressed && styles.pressed,
         isDisabled && styles.disabled,
         style,
+        pressStyle,
       ]}
       {...rest}>
       {loading ? (
@@ -94,6 +106,6 @@ export function Button({
           </RText>
         </>
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }

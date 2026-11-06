@@ -366,3 +366,17 @@ Flat, bordered, one height; the orange one is rare and haptic.
   `surface`); without a choice it shows initials, groups show 👥. Sizes in use: 20 (home
   friends), 32 (standings), 40 (header, group rows), 64 (Me card and the picker). The podium on
   the group ledger uses 👑 🥈 🥉 in place of the rank chip; ranks from four keep the chip.
+
+## Motion (2026-11-06, owner request)
+
+The contract's "everything else changes instantly" is relaxed to motion that explains a change,
+never decoration. Recipes live in `src/utils/motion.ts` and all honour the system Reduce Motion
+setting (Reanimated default):
+
+- **Rows enter** staggered top-down (fade + 8 px rise, 250 ms, 35 ms per row, capped at 8).
+- **Basket lines** enter, exit upward and the list closes the gap (layout transition).
+- **Buttons** press to 97 % and back (150/200 ms); the "you" roundel still travels 600 ms.
+- **Sign values** cross-fade when the figure changes; **segment blocks** fade in as they fill.
+- **Appearance switch**: a disc in the new background colour grows from the tap until it covers
+  the screen (360 ms, ease-in-out), the theme flips beneath it, and the disc fades (250 ms).
+  Without a tap origin or with Reduce Motion the switch is instant.

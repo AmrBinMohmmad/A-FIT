@@ -17,6 +17,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AlertProvider } from "@/contexts/AlertContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
+import { MealDraftProvider } from "@/contexts/MealDraftContext";
 import { QueryProvider } from "@/contexts/QueryProvider";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { ToastProvider } from "@/contexts/ToastContext";
@@ -41,13 +42,15 @@ export default function RootLayout() {
         <ThemeProvider>
           <LanguageProvider>
             <QueryProvider>
-              <ToastProvider>
-                <AuthProvider>
-                  <AlertProvider>
-                    <Root fontsLoaded={fontsLoaded} />
-                  </AlertProvider>
-                </AuthProvider>
-              </ToastProvider>
+              <MealDraftProvider>
+                <ToastProvider>
+                  <AuthProvider>
+                    <AlertProvider>
+                      <Root fontsLoaded={fontsLoaded} />
+                    </AlertProvider>
+                  </AuthProvider>
+                </ToastProvider>
+              </MealDraftProvider>
             </QueryProvider>
           </LanguageProvider>
         </ThemeProvider>
@@ -84,6 +87,8 @@ function Root({ fontsLoaded }: { fontsLoaded: boolean }) {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="meals/new" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
         <Stack.Screen name="meals/[id]" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
+        <Stack.Screen name="foods/new" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
+        <Stack.Screen name="foods/scan" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
         <Stack.Screen name="groups/new" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
         <Stack.Screen
           name="groups/join"

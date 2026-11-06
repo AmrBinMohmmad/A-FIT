@@ -16,6 +16,14 @@ export const queryKeys = {
     summary: (from: string, to: string) => ["meals", "summary", { from, to }] as const,
     frequent: ["meals", "frequent"] as const,
   },
+  foods: {
+    all: ["foods"] as const,
+    search: (q: string, category: string | null) => ["foods", "search", { q, category }] as const,
+    recent: ["foods", "recent"] as const,
+    detail: (id: number) => ["foods", id] as const,
+    lookup: (q: string) => ["foods", "lookup", { q }] as const,
+    barcode: (code: string) => ["foods", "lookup", "barcode", code] as const,
+  },
   steps: {
     all: ["steps"] as const,
     history: (from: string, to: string) => ["steps", { from, to }] as const,
