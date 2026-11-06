@@ -1,79 +1,66 @@
-import { Meal } from '@/storage/meals';
-
 /**
- * Strips time and compares whether two dates fall on the same calendar day (Midnight 00:00 reset boundary).
+ * Local calendar-day helpers. The API speaks in the user's LOCAL day as "YYYY-MM-DD";
+ * these never touch UTC conversions.
  */
-export function isSameDay(dateA: Date | string, dateB: Date | string = new Date()): boolean {
-  if (!dateA || !dateB) return false;
-  const d1 = new Date(dateA);
-  const d2 = new Date(dateB);
-
-  if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return false;
-
-  return (
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate()
-  );
-}
-
-/**
- * Checks if a date string or object corresponds to today (Midnight reset).
- */
-export function isToday(date: Date | string): boolean {
-  return isSameDay(date, new Date());
-}
-
-/**
- * Filters a list of meals to only those created on the given target date.
- */
-export function filterMealsByDay(meals: Meal[], targetDate: Date = new Date()): Meal[] {
-  return meals.filter((meal) => {
-    const rawDate = meal.createdAt || (meal as any).created_at;
-    if (!rawDate) return isToday(targetDate);
-    return isSameDay(rawDate, targetDate);
-  });
-}
-
-/**
- * Converts a Date object to YYYY-MM-DD string for API queries.
- */
-export function toDateString(date: Date): string {
+export function toDateKey(date: Date): string {
   const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 
-/**
- * Formats a Date object to a friendly Arabic label:
- * - "اليوم، 4 سبتمبر"
- * - "أمس، 3 سبتمبر"
- * - "الخميس، 4 سبتمبر"
- */
-export function formatDateArabic(date: Date): string {
-  const now = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(now.getDate() - 1);
-
-  const months = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
-  ];
-
-  const dayNumber = date.getDate();
-  const monthName = months[date.getMonth()];
-
-  if (isSameDay(date, now)) {
-    return `اليوم، ${dayNumber} ${monthName}`;
-  }
-
-  if (isSameDay(date, yesterday)) {
-    return `أمس، ${dayNumber} ${monthName}`;
-  }
-
-  const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  const dayName = days[date.getDay()];
-  return `${dayName}، ${dayNumber} ${monthName}`;
+export function todayKey(): string {
+  return toDateKey(new Date());
 }
 
+export function fromDateKey(key: string): Date {
+  const [y, m, d] = key.split("-").map((part) => Number.parseInt(part, 10));
+  return new Date(y ?? 1970, (m ?? 1) - 1, d ?? 1);
+}
+
+export function addDays(date: Date, days: number): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+export function startOfDay(date: Date): Date {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+export function isSameDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+/** Inclusive list of date keys from `from` to `to`. */
+export function dateKeysBetween(from: Date, to: Date): string[] {
+  const keys: string[] = [];
+  for (let d = startOfDay(from); d <= to; d = addDays(d, 1)) keys.push(toDateKey(d));
+  return keys;
+}
+
+const intlLocale = (locale: string) => (locale === "ar" ? "ar-SA-u-nu-latn-ca-gregory" : "en-GB");
+
+export function formatLongDate(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(date);
+}
+
+export function formatShortDate(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" }).format(date);
+}
+
+export function formatWeekday(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), { weekday: "short" }).format(date);
+}
+
+export function formatTime(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), { hour: "2-digit", minute: "2-digit" }).format(
+    new Date(iso),
+  );
+}

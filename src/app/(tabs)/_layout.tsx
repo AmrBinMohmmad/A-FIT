@@ -1,82 +1,91 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useTheme } from '@/context/ThemeContext';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from "@expo/vector-icons";
+import { Redirect, Tabs } from "expo-router";
+import { useTranslation } from "react-i18next";
+import type { ColorValue } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function TabLayout() {
-  const { colors, isDark } = useTheme();
+import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
+
+/** The four sections (Home, Meals, Groups, Me). Guards: signed-out → e-mail screen. */
+export default function TabsLayout() {
+  const { status } = useAuth();
+  const { theme } = useTheme();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
-  // Ensure safe padding above Android navigation buttons (3-button navigation) and iOS home indicator
-  const bottomPadding = insets.bottom > 0 ? insets.bottom + 6 : 12;
-  const tabHeight = 58 + bottomPadding;
+  if (status !== "signedIn") return <Redirect href="/(auth)/email" />;
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarActiveTintColor: theme.colors.tabBarActive,
+        tabBarInactiveTintColor: theme.colors.tabBarInactive,
         tabBarStyle: {
-          backgroundColor: isDark ? colors.surface : colors.surface,
-          borderTopColor: colors.border,
+          backgroundColor: theme.colors.tabBar,
+          borderTopColor: theme.colors.border,
           borderTopWidth: 1,
-          height: tabHeight,
-          paddingTop: 8,
-          paddingBottom: bottomPadding,
-          elevation: 12,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 12,
+          height: 56 + Math.max(insets.bottom, 8),
+          paddingTop: 6,
+          paddingBottom: Math.max(insets.bottom, 8),
         },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '700',
-          marginTop: 2,
-        },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted,
-      }}
-    >
+        tabBarLabelStyle: { fontFamily: theme.fontFamily.medium, fontSize: theme.fontSize.caption },
+        sceneStyle: { backgroundColor: theme.colors.background },
+      }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'الرئيسية',
+          title: t("tabs.home"),
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'home' : 'home-outline'}
-              size={22}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="add-meal"
-        options={{
-          title: 'أضف وجبة',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'add-circle' : 'add-circle-outline'}
-              size={24}
-              color={color}
-            />
+            <TabIcon on="home" off="home-outline" color={color} focused={focused} />
           ),
         }}
       />
       <Tabs.Screen
         name="meals"
         options={{
-          title: 'الوجبات',
+          title: t("tabs.meals"),
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'restaurant' : 'restaurant-outline'}
-              size={22}
-              color={color}
-            />
+            <TabIcon on="restaurant" off="restaurant-outline" color={color} focused={focused} />
           ),
         }}
       />
+      <Tabs.Screen
+        name="groups"
+        options={{
+          title: t("tabs.groups"),
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon on="people" off="people-outline" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="me"
+        options={{
+          title: t("tabs.me"),
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon on="person" off="person-outline" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen name="add-meal" options={{ href: null }} />
     </Tabs>
   );
+}
+
+type IconName = keyof typeof Ionicons.glyphMap;
+
+function TabIcon({
+  on,
+  off,
+  color,
+  focused,
+}: {
+  on: IconName;
+  off: IconName;
+  color: ColorValue;
+  focused: boolean;
+}) {
+  return <Ionicons name={focused ? on : off} size={22} color={color} />;
 }

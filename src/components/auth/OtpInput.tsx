@@ -1,124 +1,100 @@
-import React, { useRef, useState } from 'react';
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  Pressable,
-  Text,
-} from 'react-native';
-import { useTheme } from '@/context/ThemeContext';
+import { useRef, useState } from "react";
+import { Pressable, TextInput, View } from "react-native";
+
+import { RText } from "@/components/RText";
+import { useTheme } from "@/contexts/ThemeContext";
+import { makeStyles } from "@/hooks/useStyles";
+import { toWesternDigits } from "@/utils/number";
 
 interface OtpInputProps {
   length?: number;
   value: string;
   onChange: (otp: string) => void;
   disabled?: boolean;
+  error?: string;
 }
 
-export function OtpInput({
-  length = 6,
-  value,
-  onChange,
-  disabled = false,
-}: OtpInputProps) {
-  const inputRef = useRef<TextInput>(null);
-  const [isFocused, setIsFocused] = useState(false);
-  const { colors, isDark } = useTheme();
-
-  const handlePress = () => {
-    if (!disabled) {
-      inputRef.current?.focus();
-    }
-  };
-
-  const digits = value.split('').slice(0, length);
-  while (digits.length < length) {
-    digits.push('');
-  }
-
-  return (
-    <Pressable onPress={handlePress} style={styles.container}>
-      <TextInput
-        ref={inputRef}
-        value={value}
-        onChangeText={(text) => {
-          const numericText = text.replace(/[^0-9]/g, '').slice(0, length);
-          onChange(numericText);
-        }}
-        keyboardType="number-pad"
-        maxLength={length}
-        editable={!disabled}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        style={styles.hiddenInput}
-        autoFocus
-      />
-
-      <View style={styles.boxesContainer}>
-        {digits.map((digit, index) => {
-          const isCurrent = isFocused && index === value.length;
-          const isFilled = digit !== '';
-
-          return (
-            <View
-              key={index}
-              style={[
-                styles.box,
-                {
-                  backgroundColor: isDark ? colors.surfaceElevated : colors.surfaceElevated,
-                  borderColor: isCurrent
-                    ? colors.primary
-                    : isFilled
-                    ? colors.borderActive
-                    : colors.border,
-                },
-                isCurrent && {
-                  backgroundColor: isDark ? 'rgba(16, 185, 129, 0.1)' : 'rgba(5, 150, 105, 0.08)',
-                },
-                disabled && styles.boxDisabled,
-              ]}
-            >
-              <Text style={[styles.digitText, { color: colors.text }]}>{digit}</Text>
-            </View>
-          );
-        })}
-      </View>
-    </Pressable>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 20,
-    alignItems: 'center',
-  },
-  hiddenInput: {
-    position: 'absolute',
-    opacity: 0,
-    width: 1,
-    height: 1,
-  },
-  boxesContainer: {
-    flexDirection: 'row',
-    direction: 'ltr',
-    justifyContent: 'space-between',
-    width: '100%',
-    maxWidth: 320,
-    gap: 8,
-  },
+const useStyles = makeStyles((theme) => ({
+  wrap: { gap: theme.spacing.sm },
+  boxes: { flexDirection: "row", gap: theme.spacing.sm, direction: "ltr" },
   box: {
     flex: 1,
     height: 56,
-    borderRadius: 14,
+    borderRadius: theme.radii.md,
     borderWidth: 1.5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.inputBackground,
   },
-  boxDisabled: {
-    opacity: 0.5,
-  },
-  digitText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-});
+  hidden: { position: "absolute", opacity: 0, width: 1, height: 1 },
+}));
+
+/**
+ * Six-cell code entry over one hidden TextInput (one-time-code autofill works). Cells are
+ * always LTR because the code is a Western-digit string. This file is one of the two
+ * sanctioned RN TextInput importers besides RTextInput (the hidden field is not a styled input).
+ */
+export function OtpInput({ length = 6, value, onChange, disabled, error }: OtpInputProps) {
+  const ref = useRef<TextInput>(null);
+  const [focused, setFocused] = useState(false);
+  const { theme } = useTheme();
+  const styles = useStyles();
+
+  const digits = Array.from({ length }, (_, i) => value[i] ?? "");
+
+  return (
+    <View style={styles.wrap}>
+      <Pressable
+        onPress={() => !disabled && ref.current?.focus()}
+        accessibilityRole="button"
+        accessibilityLabel={value}>
+        <TextInput
+          ref={ref}
+          value={value}
+          onChangeText={(text) => onChange(toWesternDigits(text).replace(/\D/g, "").slice(0, length))}
+          keyboardType="number-pad"
+          textContentType="oneTimeCode"
+          autoComplete="sms-otp"
+          maxLength={length}
+          editable={!disabled}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={styles.hidden}
+          autoFocus
+          accessibilityLabel="code"
+        />
+        <View style={styles.boxes}>
+          {digits.map((d, i) => {
+            const current = focused && i === value.length;
+            return (
+              <View
+                key={i}
+                style={[
+                  styles.box,
+                  {
+                    borderColor: error
+                      ? theme.colors.danger
+                      : current
+                        ? theme.colors.inputFocusBorder
+                        : d
+                          ? theme.colors.primary
+                          : theme.colors.inputBorder,
+                  },
+                  disabled && { opacity: 0.5 },
+                ]}>
+                <RText variant="title" tabular>
+                  {d}
+                </RText>
+              </View>
+            );
+          })}
+        </View>
+      </Pressable>
+      {error ? (
+        <RText variant="caption" color="danger">
+          {error}
+        </RText>
+      ) : null}
+    </View>
+  );
+}

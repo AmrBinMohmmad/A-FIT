@@ -1,64 +1,39 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from "react-i18next";
+import { View } from "react-native";
 
-interface AuthHeaderProps {
-  title: string;
-  subtitle?: string;
-}
+import { CodeChip } from "@/components/line/CodeChip";
+import { RText } from "@/components/RText";
+import { makeStyles } from "@/hooks/useStyles";
 
-export function AuthHeader({ title, subtitle }: AuthHeaderProps) {
-  const { colors, isDark } = useTheme();
+const useStyles = makeStyles((theme) => ({
+  wrap: { paddingTop: theme.spacing.xl, paddingBottom: theme.spacing.xxl, gap: theme.spacing.md },
+  line: { flexDirection: "row", alignItems: "center", gap: theme.spacing.sm },
+  track: { flex: 1, height: 3, borderRadius: 2, backgroundColor: theme.colors.track },
+  trackOn: { backgroundColor: theme.colors.primary },
+  titles: { gap: theme.spacing.xs },
+}));
 
+/** Sign-in header: a three-station line (e-mail → code → name) and the station's title. */
+export function AuthHeader({ step, title, subtitle }: { step: 1 | 2 | 3; title: string; subtitle?: string }) {
+  const styles = useStyles();
+  const { t } = useTranslation();
   return (
-    <View style={styles.container}>
-      <View
-        style={[
-          styles.badge,
-          {
-            backgroundColor: isDark ? 'rgba(16, 185, 129, 0.12)' : 'rgba(5, 150, 105, 0.1)',
-            borderColor: isDark ? 'rgba(16, 185, 129, 0.3)' : 'rgba(5, 150, 105, 0.25)',
-          },
-        ]}
-      >
-        <Text style={[styles.badgeText, { color: colors.primary }]}>أي-فت • A-FIT</Text>
+    <View style={styles.wrap}>
+      <View style={styles.line} accessibilityLabel={t("onboarding.step", { step, total: 3 })}>
+        <CodeChip code={1} tone={step >= 1 ? "primary" : "muted"} />
+        <View style={[styles.track, step >= 2 && styles.trackOn]} />
+        <CodeChip code={2} tone={step >= 2 ? "primary" : "muted"} />
+        <View style={[styles.track, step >= 3 && styles.trackOn]} />
+        <CodeChip code={3} tone={step >= 3 ? "primary" : "muted"} />
       </View>
-      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-      {subtitle ? (
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{subtitle}</Text>
-      ) : null}
+      <View style={styles.titles}>
+        <RText variant="largeTitle">{title}</RText>
+        {subtitle ? (
+          <RText variant="body" color="textSecondary">
+            {subtitle}
+          </RText>
+        ) : null}
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    marginBottom: 28,
-    marginTop: 16,
-  },
-  badge: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    marginBottom: 16,
-  },
-  badgeText: {
-    fontWeight: '800',
-    fontSize: 13,
-    letterSpacing: 1,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '900',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 16,
-  },
-});
