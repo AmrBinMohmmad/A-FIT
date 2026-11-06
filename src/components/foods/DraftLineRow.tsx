@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { RText } from "@/components/RText";
 import { RTextInput } from "@/components/RTextInput";
@@ -10,6 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { makeStyles } from "@/hooks/useStyles";
 import { type DraftLine, foodName, gramsForServings, macrosFor, servingLabel } from "@/utils/foodMath";
+import { enterAt, exitRow, listLayout } from "@/utils/motion";
 import { formatDecimal, formatInt, parseFloatSafe } from "@/utils/number";
 
 interface DraftLineRowProps {
@@ -82,7 +84,11 @@ export function DraftLineRow({ line, first, onServings, onGrams, onRemove }: Dra
   };
 
   return (
-    <View style={[styles.row, first && styles.first]}>
+    <Animated.View
+      entering={enterAt(0)}
+      exiting={exitRow}
+      layout={listLayout}
+      style={[styles.row, first && styles.first]}>
       <View style={styles.top}>
         <View style={{ flex: 1 }}>
           <RText variant="callout" weight="medium" numberOfLines={1}>
@@ -159,6 +165,6 @@ export function DraftLineRow({ line, first, onServings, onGrams, onRemove }: Dra
           </Pressable>
         )}
       </View>
-    </View>
+    </Animated.View>
   );
 }

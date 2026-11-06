@@ -66,9 +66,9 @@ export function FoodVariants({
         empty={!detail.data}
         emptyEmoji={EMOJI.meals}>
         <View>
-          {generic ? <FoodRow food={generic} first onPress={() => onPick(generic)} /> : null}
-          {(detail.data?.variants ?? []).map((v) => (
-            <FoodRow key={v.id} food={{ ...v, variants_count: 0 }} onPress={() => onPick(v)} />
+          {generic ? <FoodRow food={generic} first index={0} onPress={() => onPick(generic)} /> : null}
+          {(detail.data?.variants ?? []).map((v, i) => (
+            <FoodRow key={v.id} food={{ ...v, variants_count: 0 }} index={i + 1} onPress={() => onPick(v)} />
           ))}
         </View>
       </ListState>

@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { Pressable, View } from "react-native";
+import { Pressable, View, type GestureResponderEvent } from "react-native";
 
 import { RText } from "@/components/RText";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
@@ -12,7 +12,7 @@ interface ChoiceRowProps {
   hint?: string;
   selected: boolean;
   icon?: keyof typeof Ionicons.glyphMap;
-  onPress: () => void;
+  onPress: (event: GestureResponderEvent) => void;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -38,9 +38,9 @@ export function ChoiceRow({ title, hint, selected, icon, onPress }: ChoiceRowPro
   const { theme } = useTheme();
   return (
     <Pressable
-      onPress={() => {
+      onPress={(event) => {
         void Haptics.selectionAsync().catch(() => undefined);
-        onPress();
+        onPress(event);
       }}
       style={[styles.row, selected && styles.selected]}
       accessibilityRole="radio"

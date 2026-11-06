@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { CodeChip } from "@/components/line/CodeChip";
 import { RText } from "@/components/RText";
@@ -7,6 +8,7 @@ import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useTheme } from "@/contexts/ThemeContext";
 import { makeStyles } from "@/hooks/useStyles";
 import { useRTL } from "@/hooks/useRTL";
+import { enterAt } from "@/utils/motion";
 
 interface ExitRowProps {
   code: string | number;
@@ -21,6 +23,8 @@ interface ExitRowProps {
   /** Rendered under the value: e.g. a thin budget bar. */
   trailing?: React.ReactNode;
   first?: boolean;
+  /** Position in a list: rows enter staggered top-down. */
+  index?: number;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -51,6 +55,7 @@ export function ExitRow({
   onPress,
   trailing,
   first,
+  index,
 }: ExitRowProps) {
   const styles = useStyles();
   const { theme } = useTheme();
@@ -91,15 +96,23 @@ export function ExitRow({
     </>
   );
 
-  if (!onPress) return <View style={[styles.row, first && styles.first]}>{content}</View>;
+  if (!onPress) {
+    return (
+      <Animated.View entering={enterAt(index)} style={[styles.row, first && styles.first]}>
+        {content}
+      </Animated.View>
+    );
+  }
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.row, first && styles.first, pressed && styles.pressed]}
-      accessibilityRole="button"
-      accessibilityLabel={title}>
-      {content}
-    </Pressable>
+    <Animated.View entering={enterAt(index)}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [styles.row, first && styles.first, pressed && styles.pressed]}
+        accessibilityRole="button"
+        accessibilityLabel={title}>
+        {content}
+      </Pressable>
+    </Animated.View>
   );
 }

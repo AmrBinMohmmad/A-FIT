@@ -1,12 +1,14 @@
 import type { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { RText } from "@/components/RText";
 import { MEAL_TYPE_EMOJI } from "@/constants/emoji";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { makeStyles } from "@/hooks/useStyles";
 import type { Meal, MealType } from "@/types/api";
+import { enterAt } from "@/utils/motion";
 import { formatInt } from "@/utils/number";
 
 export const MEAL_TYPE_ICON: Record<MealType, keyof typeof Ionicons.glyphMap> = {
@@ -42,37 +44,49 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /** One ledger line: type icon, name, macros in words, calories as the figure. */
-export function MealItem({ meal, onPress, first }: { meal: Meal; onPress: () => void; first?: boolean }) {
+export function MealItem({
+  meal,
+  onPress,
+  first,
+  index,
+}: {
+  meal: Meal;
+  onPress: () => void;
+  first?: boolean;
+  index?: number;
+}) {
   const styles = useStyles();
   const { t } = useTranslation();
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.row, first && styles.first, pressed && styles.pressed]}
-      accessibilityRole="button"
-      accessibilityLabel={meal.name}>
-      <View style={styles.icon}>
-        <RText style={{ fontSize: 18, lineHeight: 22 }}>{MEAL_TYPE_EMOJI[meal.meal_type]}</RText>
-      </View>
-      <View style={styles.body}>
-        <RText variant="callout" weight="medium" numberOfLines={1}>
-          {meal.name}
-        </RText>
-        <View style={styles.macros}>
-          <RText variant="caption" color="textSecondary" numberOfLines={1} style={{ flexShrink: 1 }}>
-            {meal.items.length
-              ? meal.items.map((i) => (i.servings ? `${i.name} ×${i.servings}` : i.name)).join(", ")
-              : t(`enums.mealType.${meal.meal_type}`)}
-          </RText>
-          <RText variant="caption" color="textMuted" tabular>
-            {t("meals.protein")} {meal.protein} · {t("meals.carbs")} {meal.carbs} · {t("meals.fat")}{" "}
-            {meal.fat}
-          </RText>
+    <Animated.View entering={enterAt(index)}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [styles.row, first && styles.first, pressed && styles.pressed]}
+        accessibilityRole="button"
+        accessibilityLabel={meal.name}>
+        <View style={styles.icon}>
+          <RText style={{ fontSize: 18, lineHeight: 22 }}>{MEAL_TYPE_EMOJI[meal.meal_type]}</RText>
         </View>
-      </View>
-      <RText variant="callout" weight="bold" tabular>
-        {formatInt(meal.calories)}
-      </RText>
-    </Pressable>
+        <View style={styles.body}>
+          <RText variant="callout" weight="medium" numberOfLines={1}>
+            {meal.name}
+          </RText>
+          <View style={styles.macros}>
+            <RText variant="caption" color="textSecondary" numberOfLines={1} style={{ flexShrink: 1 }}>
+              {meal.items.length
+                ? meal.items.map((i) => (i.servings ? `${i.name} ×${i.servings}` : i.name)).join(", ")
+                : t(`enums.mealType.${meal.meal_type}`)}
+            </RText>
+            <RText variant="caption" color="textMuted" tabular>
+              {t("meals.protein")} {meal.protein} · {t("meals.carbs")} {meal.carbs} · {t("meals.fat")}{" "}
+              {meal.fat}
+            </RText>
+          </View>
+        </View>
+        <RText variant="callout" weight="bold" tabular>
+          {formatInt(meal.calories)}
+        </RText>
+      </Pressable>
+    </Animated.View>
   );
 }

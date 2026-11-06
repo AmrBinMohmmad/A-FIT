@@ -82,6 +82,7 @@ export function Leaderboard({ period, onPeriod, data, loading, error, onRetry, o
               youLabel={t("common.you")}
               ownerLabel={t("groups.owner")}
               first={i === 0}
+              index={i}
               onLongPress={onRemove && !s.is_me && s.role !== "owner" ? () => onRemove(s) : undefined}
             />
           ))}

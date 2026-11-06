@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { RText } from "@/components/RText";
 import { FOOD_CATEGORY_EMOJI } from "@/constants/emoji";
@@ -12,6 +13,7 @@ import { makeStyles } from "@/hooks/useStyles";
 import { useRTL } from "@/hooks/useRTL";
 import type { Food, LookupResult } from "@/types/api";
 import { foodName, servingLabel } from "@/utils/foodMath";
+import { enterAt } from "@/utils/motion";
 import { formatInt } from "@/utils/number";
 
 const useStyles = makeStyles((theme) => ({
@@ -58,7 +60,17 @@ export type FoodLike = Pick<
  * brand · serving, calories per serving. A generic item with kinds shows the count and a
  * chevron; others show a plus.
  */
-export function FoodRow({ food, onPress, first }: { food: FoodLike; onPress: () => void; first?: boolean }) {
+export function FoodRow({
+  food,
+  onPress,
+  first,
+  index,
+}: {
+  food: FoodLike;
+  onPress: () => void;
+  first?: boolean;
+  index?: number;
+}) {
   const styles = useStyles();
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -76,45 +88,47 @@ export function FoodRow({ food, onPress, first }: { food: FoodLike; onPress: () 
     .join(" · ");
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.row, first && styles.first, pressed && styles.pressed]}
-      accessibilityRole="button"
-      accessibilityLabel={`${foodName(food, language)}, ${formatInt(food.per_serving.calories)} ${t("common.kcal")}${hasKinds ? `, ${t("foods.kinds", { count: food.variants_count ?? 0 })}` : ""}`}
-      accessibilityHint={hasKinds ? t("foods.openKinds") : t("foods.tapAdds")}>
-      {food.image_url ? (
-        <Image
-          source={{ uri: food.image_url }}
-          style={styles.icon}
-          contentFit="cover"
-          cachePolicy="memory-disk"
-          transition={120}
-          accessibilityIgnoresInvertColors
-        />
-      ) : (
-        <View style={styles.icon}>
-          <RText style={{ fontSize: 18, lineHeight: 22 }}>{FOOD_CATEGORY_EMOJI[food.category]}</RText>
+    <Animated.View entering={enterAt(index)}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [styles.row, first && styles.first, pressed && styles.pressed]}
+        accessibilityRole="button"
+        accessibilityLabel={`${foodName(food, language)}, ${formatInt(food.per_serving.calories)} ${t("common.kcal")}${hasKinds ? `, ${t("foods.kinds", { count: food.variants_count ?? 0 })}` : ""}`}
+        accessibilityHint={hasKinds ? t("foods.openKinds") : t("foods.tapAdds")}>
+        {food.image_url ? (
+          <Image
+            source={{ uri: food.image_url }}
+            style={styles.icon}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={120}
+            accessibilityIgnoresInvertColors
+          />
+        ) : (
+          <View style={styles.icon}>
+            <RText style={{ fontSize: 18, lineHeight: 22 }}>{FOOD_CATEGORY_EMOJI[food.category]}</RText>
+          </View>
+        )}
+        <View style={styles.body}>
+          <RText variant="callout" weight="medium" numberOfLines={1}>
+            {foodName(food, language)}
+          </RText>
+          <RText variant="caption" color="textSecondary" numberOfLines={1}>
+            {subtitle}
+          </RText>
         </View>
-      )}
-      <View style={styles.body}>
-        <RText variant="callout" weight="medium" numberOfLines={1}>
-          {foodName(food, language)}
+        <RText variant="callout" weight="bold" tabular>
+          {formatInt(food.per_serving.calories)}{" "}
+          <RText variant="caption" color="textMuted">
+            {t("common.kcal")}
+          </RText>
         </RText>
-        <RText variant="caption" color="textSecondary" numberOfLines={1}>
-          {subtitle}
-        </RText>
-      </View>
-      <RText variant="callout" weight="bold" tabular>
-        {formatInt(food.per_serving.calories)}{" "}
-        <RText variant="caption" color="textMuted">
-          {t("common.kcal")}
-        </RText>
-      </RText>
-      <Ionicons
-        name={hasKinds ? (isRTL ? "chevron-back" : "chevron-forward") : "add-circle-outline"}
-        size={20}
-        color={hasKinds ? theme.colors.textMuted : theme.colors.primary}
-      />
-    </Pressable>
+        <Ionicons
+          name={hasKinds ? (isRTL ? "chevron-back" : "chevron-forward") : "add-circle-outline"}
+          size={20}
+          color={hasKinds ? theme.colors.textMuted : theme.colors.primary}
+        />
+      </Pressable>
+    </Animated.View>
   );
 }

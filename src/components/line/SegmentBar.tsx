@@ -1,4 +1,5 @@
 import { View, type StyleProp, type ViewStyle } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { useTheme } from "@/contexts/ThemeContext";
 import { makeStyles } from "@/hooks/useStyles";
@@ -43,8 +44,9 @@ export function SegmentBar({
         const isLast = i === segments - 1;
         const on = i < filled;
         return (
-          <View
-            key={i}
+          <Animated.View
+            key={`${i}-${on}-${over && isLast}`}
+            entering={FadeIn.duration(theme.duration.base).delay(i * 20)}
             style={[
               styles.seg,
               { height },
