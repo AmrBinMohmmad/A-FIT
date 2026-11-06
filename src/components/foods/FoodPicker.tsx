@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useImperativeHandle, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 
@@ -19,9 +19,15 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { makeStyles } from "@/hooks/useStyles";
 import type { Food, FoodCategory } from "@/types/api";
 
+export interface FoodPickerHandle {
+  /** Leave search mode: clears the query, the aisle and any open kinds. */
+  clear: () => void;
+}
+
 interface FoodPickerProps {
+  ref?: React.Ref<FoodPickerHandle>;
   onPick: (food: Food) => void;
-  /** Tells the parent whether results are showing (the basket hides meanwhile). */
+  /** Tells the parent whether results are showing (the basket list hides meanwhile). */
   onActiveChange: (active: boolean) => void;
 }
 
@@ -34,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
  * Search box + aisle chips. Empty → the user's recent foods; typing (2+ chars, debounced)
  * or an aisle → one catalog request per pause; a generic item opens its kinds in place.
  */
-export function FoodPicker({ onPick, onActiveChange }: FoodPickerProps) {
+export function FoodPicker({ ref, onPick, onActiveChange }: FoodPickerProps) {
   const styles = useStyles();
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -69,6 +75,7 @@ export function FoodPicker({ onPick, onActiveChange }: FoodPickerProps) {
     setCategory(null);
     setOpenId(null);
   };
+  useImperativeHandle(ref, () => ({ clear }));
 
   const list = searching ? search : recent;
   const foods = list.data ?? [];
@@ -89,7 +96,7 @@ export function FoodPicker({ onPick, onActiveChange }: FoodPickerProps) {
           active ? (
             <Pressable
               onPress={clear}
-              hitSlop={8}
+              hitSlop={13}
               accessibilityRole="button"
               accessibilityLabel={t("common.clear")}>
               <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
@@ -123,20 +130,30 @@ export function FoodPicker({ onPick, onActiveChange }: FoodPickerProps) {
               onPress={() => router.push("/foods/new")}
             />
           </View>
+          <RText variant="caption" color="textMuted">
+            {t("foods.tapAdds")}
+          </RText>
           <ListState
-            loading={list.isPending && searching}
+            loading={searching && (list.isPending || list.isPlaceholderData)}
             error={list.isError ? list.error : undefined}
             onRetry={() => void list.refetch()}
             empty={foods.length === 0 && (searching ? !list.isPending : !recent.isPending)}
             emptyEmoji={EMOJI.meals}
-            emptyTitle={searching ? t("foods.searchEmpty", { q: debounced.trim() }) : t("foods.noRecent")}
-            emptyBody={searching ? t("foods.searchEmptyHint") : undefined}>
+            emptyTitle={
+              searching ? t("foods.searchEmpty", { q: debounced.trim() }) : t("foods.noRecentTitle")
+            }
+            emptyBody={searching ? t("foods.searchEmptyHint") : t("foods.noRecent")}>
             <View>
               {foods.map((food, i) => (
                 <FoodRow key={food.id} food={food} first={i === 0} onPress={() => pick(food)} />
               ))}
             </View>
           </ListState>
+          {searching ? (
+            <RText variant="caption" color="textMuted" align="center">
+              {t("foods.attribution")}
+            </RText>
+          ) : null}
         </View>
       ) : (
         <View style={styles.head}>

@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Platform, View } from "react-native";
+import { View } from "react-native";
 
 import { Button } from "@/components/Button";
 import { Chips } from "@/components/foods/Chips";
@@ -91,100 +91,98 @@ export default function NewFoodScreen() {
   );
 
   return (
-    <Screen title={t("foods.newTitle")} subtitle={t("foods.newSubtitle")} back>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <View style={styles.form}>
+    <Screen title={t("foods.newTitle")} subtitle={t("foods.newSubtitle")} back keyboard>
+      <View style={styles.form}>
+        <RTextInput
+          label={t("foods.nameLabel")}
+          placeholder={t("foods.namePlaceholder")}
+          value={name}
+          onChangeText={setName}
+          error={errors.name}
+          maxLength={120}
+          autoFocus
+        />
+        <RTextInput
+          label={`${t("foods.brandLabel")} (${t("common.optional")})`}
+          placeholder={t("foods.brandPlaceholder")}
+          value={brand}
+          onChangeText={setBrand}
+          maxLength={80}
+        />
+
+        <RText variant="footnote" weight="medium" color="textSecondary">
+          {t("foods.categoryLabel")}
+        </RText>
+        <Chips
+          items={FOOD_CATEGORIES.map((c) => ({
+            key: c,
+            label: t(`enums.foodCategory.${c}`),
+            emoji: FOOD_CATEGORY_EMOJI[c],
+          }))}
+          selected={category}
+          onSelect={(c) => c && setCategory(c)}
+          clearable={false}
+        />
+
+        <View style={styles.row}>
           <RTextInput
-            label={t("foods.nameLabel")}
-            placeholder={t("foods.namePlaceholder")}
-            value={name}
-            onChangeText={setName}
-            error={errors.name}
-            maxLength={120}
-            autoFocus
-          />
-          <RTextInput
-            label={`${t("foods.brandLabel")} (${t("common.optional")})`}
-            placeholder={t("foods.brandPlaceholder")}
-            value={brand}
-            onChangeText={setBrand}
-            maxLength={80}
-          />
-
-          <RText variant="footnote" weight="medium" color="textSecondary">
-            {t("foods.categoryLabel")}
-          </RText>
-          <Chips
-            items={FOOD_CATEGORIES.map((c) => ({
-              key: c,
-              label: t(`enums.foodCategory.${c}`),
-              emoji: FOOD_CATEGORY_EMOJI[c],
-            }))}
-            selected={category}
-            onSelect={(c) => c && setCategory(c)}
-            clearable={false}
-          />
-
-          <View style={styles.row}>
-            <RTextInput
-              label={t("foods.servingGrams")}
-              placeholder="30"
-              value={servingGrams}
-              onChangeText={setServingGrams}
-              error={errors.serving}
-              keyboardType="decimal-pad"
-              englishNumbers
-              maxLength={6}
-              containerStyle={styles.col}
-            />
-            <RTextInput
-              label={t("foods.servingLabelLabel")}
-              placeholder={t("foods.servingPlaceholder")}
-              value={servingLabel}
-              onChangeText={setServingLabel}
-              maxLength={60}
-              containerStyle={styles.col}
-            />
-          </View>
-
-          <RText variant="footnote" weight="medium" color="textSecondary">
-            {t("foods.perLabel")}
-          </RText>
-          <Chips
-            items={[
-              { key: "serving", label: t("foods.perServing") },
-              { key: "100g", label: t("foods.per100") },
-            ]}
-            selected={per}
-            onSelect={(k) => k && setPer(k)}
-            clearable={false}
-          />
-
-          <RTextInput
-            label={`${t("meals.calories")} (${t("common.kcal")})`}
-            placeholder="0"
-            value={calories}
-            onChangeText={setCalories}
-            error={errors.calories}
+            label={t("foods.servingGrams")}
+            placeholder="30"
+            value={servingGrams}
+            onChangeText={setServingGrams}
+            error={errors.serving}
             keyboardType="decimal-pad"
             englishNumbers
             maxLength={6}
+            containerStyle={styles.col}
           />
-          <View style={styles.row}>
-            {macro(t("meals.protein"), protein, setProtein)}
-            {macro(t("meals.carbs"), carbs, setCarbs)}
-            {macro(t("meals.fat"), fat, setFat)}
-          </View>
-
-          <Button
-            title={t("foods.saveAndAdd")}
-            variant="accent"
-            size="lg"
-            onPress={submit}
-            loading={create.isPending}
+          <RTextInput
+            label={t("foods.servingLabelLabel")}
+            placeholder={t("foods.servingPlaceholder")}
+            value={servingLabel}
+            onChangeText={setServingLabel}
+            maxLength={60}
+            containerStyle={styles.col}
           />
         </View>
-      </KeyboardAvoidingView>
+
+        <RText variant="footnote" weight="medium" color="textSecondary">
+          {t("foods.perLabel")}
+        </RText>
+        <Chips
+          items={[
+            { key: "serving", label: t("foods.perServing") },
+            { key: "100g", label: t("foods.per100") },
+          ]}
+          selected={per}
+          onSelect={(k) => k && setPer(k)}
+          clearable={false}
+        />
+
+        <RTextInput
+          label={`${t("meals.calories")} (${t("common.kcal")})`}
+          placeholder="0"
+          value={calories}
+          onChangeText={setCalories}
+          error={errors.calories}
+          keyboardType="decimal-pad"
+          englishNumbers
+          maxLength={6}
+        />
+        <View style={styles.row}>
+          {macro(t("meals.protein"), protein, setProtein)}
+          {macro(t("meals.carbs"), carbs, setCarbs)}
+          {macro(t("meals.fat"), fat, setFat)}
+        </View>
+
+        <Button
+          title={t("foods.saveAndAdd")}
+          variant="accent"
+          size="lg"
+          onPress={submit}
+          loading={create.isPending}
+        />
+      </View>
     </Screen>
   );
 }

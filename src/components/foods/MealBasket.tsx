@@ -2,12 +2,10 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
 import { DraftLineRow } from "@/components/foods/DraftLineRow";
-import { SignPanel } from "@/components/line/SignPanel";
 import { RText } from "@/components/RText";
 import { EMOJI } from "@/constants/emoji";
 import { useMealDraft } from "@/contexts/MealDraftContext";
 import { makeStyles } from "@/hooks/useStyles";
-import { formatInt } from "@/utils/number";
 
 const useStyles = makeStyles((theme) => ({
   wrap: { gap: theme.spacing.sm },
@@ -22,11 +20,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-/** What is in the meal so far, with the live total as a sign panel. */
+/** The portions in the meal so far (the total sign lives in the composer, above the picker). */
 export function MealBasket() {
   const styles = useStyles();
   const { t } = useTranslation();
-  const { lines, totals, remove, setServings, setGrams } = useMealDraft();
+  const { lines, remove, setServings, setGrams } = useMealDraft();
 
   if (lines.length === 0) {
     return (
@@ -44,12 +42,6 @@ export function MealBasket() {
 
   return (
     <View style={styles.wrap}>
-      <SignPanel
-        label={t("meals.totals")}
-        value={`${formatInt(totals.calories)} ${t("common.kcal")}`}
-        endLabel={t("meals.lineMacros", { p: totals.protein, c: totals.carbs, f: totals.fat })}
-        endValue={t("meals.itemsCount", { count: lines.length })}
-      />
       <View>
         {lines.map((line, i) => (
           <DraftLineRow

@@ -1,6 +1,7 @@
 import { Pressable, ScrollView } from "react-native";
 
 import { RText } from "@/components/RText";
+import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { makeStyles } from "@/hooks/useStyles";
 
 export interface Chip<K extends string> {
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.xs,
-    minHeight: 36,
+    minHeight: MIN_TOUCH_TARGET,
     paddingHorizontal: theme.spacing.md,
     borderRadius: theme.radii.md,
     borderWidth: 1,

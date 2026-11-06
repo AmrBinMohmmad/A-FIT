@@ -34,6 +34,8 @@ interface ScreenProps {
   footer?: React.ReactNode;
   /** Inside the tab navigator the tab bar already owns the bottom safe area. */
   insideTabs?: boolean;
+  /** Forms: the scroll view moves its content above the keyboard (Android resizes natively). */
+  keyboard?: boolean;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -81,6 +83,7 @@ export function Screen({
   children,
   footer,
   insideTabs,
+  keyboard,
 }: ScreenProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
@@ -128,6 +131,7 @@ export function Screen({
         contentStyle,
       ]}
       keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets={keyboard}
       showsVerticalScrollIndicator={false}
       refreshControl={refreshControl}>
       {children}

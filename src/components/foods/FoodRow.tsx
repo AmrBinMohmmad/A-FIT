@@ -49,7 +49,7 @@ export function FoodRow({ food, onPress, first }: { food: Food; onPress: () => v
   const hasKinds = food.variants_count > 0;
   const subtitle = [
     food.brand,
-    servingLabel(food, language),
+    servingLabel(food, language, t("common.grams")),
     hasKinds ? t("foods.kinds", { count: food.variants_count }) : null,
     food.is_mine ? t("foods.mine") : null,
   ]
@@ -61,7 +61,8 @@ export function FoodRow({ food, onPress, first }: { food: Food; onPress: () => v
       onPress={onPress}
       style={({ pressed }) => [styles.row, first && styles.first, pressed && styles.pressed]}
       accessibilityRole="button"
-      accessibilityLabel={foodName(food, language)}>
+      accessibilityLabel={`${foodName(food, language)}, ${formatInt(food.per_serving.calories)} ${t("common.kcal")}${hasKinds ? `, ${t("foods.kinds", { count: food.variants_count })}` : ""}`}
+      accessibilityHint={hasKinds ? t("foods.openKinds") : t("foods.tapAdds")}>
       <View style={styles.icon}>
         <RText style={{ fontSize: 18, lineHeight: 22 }}>{FOOD_CATEGORY_EMOJI[food.category]}</RText>
       </View>

@@ -1,12 +1,12 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Platform } from "react-native";
 
 import { Button } from "@/components/Button";
 import { MealComposer } from "@/components/foods/MealComposer";
 import { MealForm } from "@/components/MealForm";
 import { Screen } from "@/components/Screen";
+import { useMealDraft } from "@/contexts/MealDraftContext";
 import { useCreateMeal } from "@/hooks/meals/useMeals";
 import { todayKey } from "@/utils/date";
 
@@ -18,11 +18,14 @@ export default function NewMealScreen() {
   const create = useCreateMeal();
   const [manual, setManual] = useState(false);
   const day = date ?? todayKey();
+  const { reset } = useMealDraft();
+  useEffect(() => () => reset([]), [reset]);
 
   return (
     <Screen
       title={t("meals.newTitle")}
       back
+      keyboard
       action={
         <Button
           title={manual ? t("meals.fromFoods") : t("meals.manual")}
@@ -31,22 +34,20 @@ export default function NewMealScreen() {
           onPress={() => setManual((m) => !m)}
         />
       }>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        {manual ? (
-          <MealForm
-            date={day}
-            submitting={create.isPending}
-            submitLabel={t("common.save")}
-            onSubmit={(payload) => create.mutate(payload, { onSuccess: () => router.back() })}
-          />
-        ) : (
-          <MealComposer
-            date={day}
-            submitting={create.isPending}
-            onSubmit={(payload) => create.mutate(payload, { onSuccess: () => router.back() })}
-          />
-        )}
-      </KeyboardAvoidingView>
+      {manual ? (
+        <MealForm
+          date={day}
+          submitting={create.isPending}
+          submitLabel={t("common.save")}
+          onSubmit={(payload) => create.mutate(payload, { onSuccess: () => router.back() })}
+        />
+      ) : (
+        <MealComposer
+          date={day}
+          submitting={create.isPending}
+          onSubmit={(payload) => create.mutate(payload, { onSuccess: () => router.back() })}
+        />
+      )}
     </Screen>
   );
 }

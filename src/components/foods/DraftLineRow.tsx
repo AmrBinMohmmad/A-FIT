@@ -9,7 +9,7 @@ import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { makeStyles } from "@/hooks/useStyles";
-import { type DraftLine, foodName, macrosFor, servingLabel } from "@/utils/foodMath";
+import { type DraftLine, foodName, gramsForServings, macrosFor, servingLabel } from "@/utils/foodMath";
 import { formatDecimal, formatInt, parseFloatSafe } from "@/utils/number";
 
 interface DraftLineRowProps {
@@ -40,9 +40,14 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: theme.radii.md,
     overflow: "hidden",
   },
-  stepBtn: { width: MIN_TOUCH_TARGET, height: 36, alignItems: "center", justifyContent: "center" },
+  stepBtn: {
+    width: MIN_TOUCH_TARGET,
+    height: MIN_TOUCH_TARGET,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   count: { minWidth: 44, alignItems: "center" },
-  gramsBtn: { minHeight: 36, justifyContent: "center", paddingHorizontal: theme.spacing.sm },
+  gramsBtn: { minHeight: MIN_TOUCH_TARGET, justifyContent: "center", paddingHorizontal: theme.spacing.sm },
   remove: {
     width: MIN_TOUCH_TARGET,
     height: MIN_TOUCH_TARGET,
@@ -61,9 +66,18 @@ export function DraftLineRow({ line, first, onServings, onGrams, onRemove }: Dra
   const [gramsText, setGramsText] = useState(String(line.grams));
   const m = macrosFor(line.food, line.grams);
 
+  // A stepper tap while the grams field is focused refreshes the field, so its later blur
+  // cannot write stale text over the step.
+  const step = (delta: number) => {
+    const servings = Math.min(100, Math.max(STEP, Math.round((line.servings + delta) * 100) / 100));
+    onServings(servings);
+    if (editingGrams) setGramsText(String(gramsForServings(line.food, servings)));
+  };
+
   const commitGrams = () => {
     const g = parseFloatSafe(gramsText);
-    if (g !== null && g >= 1 && g <= 5000) onGrams(Math.round(g * 10) / 10);
+    const rounded = g === null ? null : Math.round(g * 10) / 10;
+    if (rounded !== null && rounded >= 1 && rounded <= 5000 && rounded !== line.grams) onGrams(rounded);
     setEditingGrams(false);
   };
 
@@ -95,7 +109,7 @@ export function DraftLineRow({ line, first, onServings, onGrams, onRemove }: Dra
       <View style={styles.bottom}>
         <View style={styles.stepper}>
           <Pressable
-            onPress={() => onServings(Math.max(STEP, Math.round((line.servings - STEP) * 100) / 100))}
+            onPress={() => step(-STEP)}
             style={styles.stepBtn}
             accessibilityRole="button"
             accessibilityLabel={t("meals.less")}>
@@ -107,7 +121,7 @@ export function DraftLineRow({ line, first, onServings, onGrams, onRemove }: Dra
             </RText>
           </View>
           <Pressable
-            onPress={() => onServings(Math.min(100, Math.round((line.servings + STEP) * 100) / 100))}
+            onPress={() => step(STEP)}
             style={styles.stepBtn}
             accessibilityRole="button"
             accessibilityLabel={t("meals.more")}>
@@ -115,7 +129,7 @@ export function DraftLineRow({ line, first, onServings, onGrams, onRemove }: Dra
           </Pressable>
         </View>
         <RText variant="caption" color="textSecondary" numberOfLines={1} style={{ flexShrink: 1 }}>
-          × {servingLabel(line.food, language)}
+          × {servingLabel(line.food, language, t("common.grams"))}
         </RText>
         {editingGrams ? (
           <RTextInput

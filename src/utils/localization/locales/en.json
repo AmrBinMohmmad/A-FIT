@@ -199,11 +199,28 @@
     "totals": "Meal total",
     "itemsCount": "{{count}} items",
     "itemsCount_one": "{{count}} item",
-    "lineMacros": "P {{p}} · C {{c}} · F {{f}}",
+    "lineMacros": "P {{p}} · C {{c}} · F {{f}} g",
     "less": "Less",
     "more": "More",
     "grams": "Grams",
-    "editGrams": "Edit grams"
+    "editGrams": "Edit grams",
+    "doneAdding": "Done — {{count}} items in this meal",
+    "doneAdding_one": "Done — {{count}} item in this meal",
+    "itemsCount_zero": "no items",
+    "itemsCount_two": "{{count}} items",
+    "itemsCount_few": "{{count}} items",
+    "itemsCount_many": "{{count}} items",
+    "itemsCount_other": "{{count}} items",
+    "basketCount_zero": "Nothing in this meal yet",
+    "basketCount_two": "{{count}} items in this meal",
+    "basketCount_few": "{{count}} items in this meal",
+    "basketCount_many": "{{count}} items in this meal",
+    "basketCount_other": "{{count}} items in this meal",
+    "doneAdding_zero": "Done — nothing added yet",
+    "doneAdding_two": "Done — {{count}} items in this meal",
+    "doneAdding_few": "Done — {{count}} items in this meal",
+    "doneAdding_many": "Done — {{count}} items in this meal",
+    "doneAdding_other": "Done — {{count}} items in this meal"
   },
   "groups": {
     "title": "Groups",
@@ -497,6 +514,14 @@
     "perServing": "serving",
     "per100": "100 g",
     "saveAndAdd": "Save and add to meal",
-    "attribution": "Brand products: Open Food Facts (ODbL)"
+    "attribution": "Brand products: Open Food Facts (ODbL)",
+    "openKinds": "Opens its kinds",
+    "tapAdds": "Tap a food to add one serving.",
+    "noRecentTitle": "Nothing logged yet",
+    "kinds_zero": "no kinds",
+    "kinds_two": "{{count}} kinds",
+    "kinds_few": "{{count}} kinds",
+    "kinds_many": "{{count}} kinds",
+    "kinds_other": "{{count}} kinds"
   }
 }
