@@ -29,6 +29,29 @@ export interface Paginated<T> {
 // Mirrors app/Enums/MealType.php exactly
 export type MealType = "breakfast" | "lunch" | "dinner" | "snack" | "other";
 
+// Mirrors app/Enums/FoodCategory.php exactly
+export type FoodCategory =
+  | "eggs"
+  | "dairy"
+  | "bread"
+  | "grains"
+  | "legumes"
+  | "meat"
+  | "poultry"
+  | "seafood"
+  | "vegetables"
+  | "fruits"
+  | "nuts_seeds"
+  | "fats_oils"
+  | "beverages"
+  | "snacks"
+  | "sweets"
+  | "dishes"
+  | "other";
+
+// Mirrors app/Enums/FoodSource.php exactly
+export type FoodSource = "catalog" | "open_food_facts" | "user";
+
 // Mirrors app/Enums/Gender.php exactly
 export type Gender = "male" | "female";
 
@@ -103,26 +126,94 @@ export interface VerifyOtpResponse {
 }
 
 /** MealResource */
-export interface Meal {
-  id: number;
-  name: string;
+export interface Macros {
   calories: number;
   protein: number;
   carbs: number;
   fat: number;
+}
+
+/** FoodResource — a grocery item; nutrition per 100 g plus the default serving. */
+export interface Food {
+  id: number;
+  name: string;
+  name_ar: string | null;
+  brand: string | null;
+  category: FoodCategory;
+  source: FoodSource;
+  barcode: string | null;
+  generic_id: number | null;
+  variants_count: number;
+  serving_grams: number;
+  serving_label: string | null;
+  serving_label_ar: string | null;
+  per_100g: Macros;
+  per_serving: Macros;
+  is_verified: boolean;
+  is_mine: boolean;
+}
+
+/** GET foods/{id} → data */
+export interface FoodDetail {
+  food: Food;
+  variants: Food[];
+}
+
+/** POST foods — a label typed per serving or per 100 g */
+export interface FoodPayload {
+  name: string;
+  name_ar?: string;
+  brand?: string;
+  /** EAN/UPC digits from the scanner, so the next scan finds this food. */
+  barcode?: string;
+  category: FoodCategory;
+  generic_id?: number;
+  serving_grams: number;
+  serving_label?: string;
+  per: "serving" | "100g";
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+/** MealItemResource — one portion inside a meal (snapshot) plus the live food when it still exists. */
+export interface MealLineItem extends Macros {
+  id: number;
+  food_id: number | null;
+  name: string;
+  brand: string | null;
+  grams: number;
+  servings: number | null;
+  food?: Food | null;
+}
+
+export interface Meal extends Macros {
+  id: number;
+  name: string;
   meal_type: MealType;
   eaten_on: string;
+  items: MealLineItem[];
   created_at: string | null;
 }
 
+/** One portion sent when composing a meal: grams or servings of a catalog food. */
+export interface MealItemInput {
+  food_id: number;
+  grams?: number;
+  servings?: number;
+}
+
 export interface MealPayload {
-  name: string;
-  calories: number;
+  name?: string;
+  calories?: number;
   protein?: number;
   carbs?: number;
   fat?: number;
   meal_type: MealType;
   eaten_on: string;
+  /** When present the server computes every number from the items. */
+  items?: MealItemInput[];
 }
 
 /** FrequentMealResource (GET meals/frequent) — a template for one-tap logging */

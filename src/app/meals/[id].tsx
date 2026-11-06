@@ -1,17 +1,23 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { useEffect } from "react";
 
 import { Button } from "@/components/Button";
+import { MealComposer } from "@/components/foods/MealComposer";
 import { ListState } from "@/components/ListState";
 import { MealForm } from "@/components/MealForm";
 import { Screen } from "@/components/Screen";
 import { useAlert } from "@/contexts/AlertContext";
+import { useMealDraft } from "@/contexts/MealDraftContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useDeleteMeal, useMealsForDay, useUpdateMeal } from "@/hooks/meals/useMeals";
 import { formatShortDate, fromDateKey, todayKey } from "@/utils/date";
+import { linesFromMeal } from "@/utils/foodMath";
 
-/** Edit/delete an existing meal; the record comes from the day's cached list (no extra request). */
+/**
+ * Edit/delete an existing meal; the record comes from the day's cached list (no extra request).
+ * A meal composed from foods re-opens in the composer; a typed one in the macro form.
+ */
 export default function EditMealScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -23,6 +29,10 @@ export default function EditMealScreen() {
   const update = useUpdateMeal();
   const remove = useDeleteMeal();
   const meal = meals.data?.find((m) => String(m.id) === id) ?? null;
+  // Only lines whose food still exists can be edited; otherwise fall back to the macro form.
+  const composed = meal ? linesFromMeal(meal.items).length > 0 : false;
+  const { reset } = useMealDraft();
+  useEffect(() => () => reset([]), [reset]);
 
   const onDelete = async () => {
     if (!meal) return;
@@ -42,6 +52,7 @@ export default function EditMealScreen() {
     <Screen
       title={t("meals.editTitle")}
       back
+      keyboard
       action={
         <Button
           title={t("common.delete")}
@@ -57,7 +68,16 @@ export default function EditMealScreen() {
         emptyTitle={t("errors.notFound")}
         onRetry={() => void meals.refetch()}>
         {meal ? (
-          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          composed ? (
+            <MealComposer
+              date={day}
+              initial={meal}
+              submitting={update.isPending}
+              onSubmit={(payload) =>
+                update.mutate({ id: meal.id, ...payload }, { onSuccess: () => router.back() })
+              }
+            />
+          ) : (
             <MealForm
               initial={meal}
               date={day}
@@ -67,7 +87,7 @@ export default function EditMealScreen() {
                 update.mutate({ id: meal.id, ...payload }, { onSuccess: () => router.back() })
               }
             />
-          </KeyboardAvoidingView>
+          )
         ) : null}
       </ListState>
     </Screen>

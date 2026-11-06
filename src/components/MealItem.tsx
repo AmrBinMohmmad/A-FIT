@@ -59,8 +59,10 @@ export function MealItem({ meal, onPress, first }: { meal: Meal; onPress: () => 
           {meal.name}
         </RText>
         <View style={styles.macros}>
-          <RText variant="caption" color="textSecondary">
-            {t(`enums.mealType.${meal.meal_type}`)}
+          <RText variant="caption" color="textSecondary" numberOfLines={1} style={{ flexShrink: 1 }}>
+            {meal.items.length
+              ? meal.items.map((i) => (i.servings ? `${i.name} ×${i.servings}` : i.name)).join(", ")
+              : t(`enums.mealType.${meal.meal_type}`)}
           </RText>
           <RText variant="caption" color="textMuted" tabular>
             {t("meals.protein")} {meal.protein} · {t("meals.carbs")} {meal.carbs} · {t("meals.fat")}{" "}
