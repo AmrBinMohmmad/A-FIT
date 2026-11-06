@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 
@@ -9,7 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { makeStyles } from "@/hooks/useStyles";
 import { useRTL } from "@/hooks/useRTL";
-import type { Food } from "@/types/api";
+import type { Food, LookupResult } from "@/types/api";
 import { foodName, servingLabel } from "@/utils/foodMath";
 import { formatInt } from "@/utils/number";
 
@@ -36,21 +37,39 @@ const useStyles = makeStyles((theme) => ({
   pressed: { opacity: 0.7 },
 }));
 
+/** A catalog Food or an online candidate — the row reads the same fields from both. */
+export type FoodLike = Pick<
+  Food,
+  | "name"
+  | "name_ar"
+  | "brand"
+  | "category"
+  | "serving_grams"
+  | "serving_label"
+  | "serving_label_ar"
+  | "per_serving"
+  | "image_url"
+> &
+  Partial<Pick<Food, "variants_count" | "is_mine">> &
+  Partial<Pick<LookupResult, "sold_locally">>;
+
 /**
- * One catalog item: aisle glyph, name in the active language, brand · serving, calories per
- * serving. A generic item with kinds shows the count and a chevron; others show a plus.
+ * One item: its photo (online products) or aisle glyph, name in the active language,
+ * brand · serving, calories per serving. A generic item with kinds shows the count and a
+ * chevron; others show a plus.
  */
-export function FoodRow({ food, onPress, first }: { food: Food; onPress: () => void; first?: boolean }) {
+export function FoodRow({ food, onPress, first }: { food: FoodLike; onPress: () => void; first?: boolean }) {
   const styles = useStyles();
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { language } = useLanguage();
   const { isRTL } = useRTL();
-  const hasKinds = food.variants_count > 0;
+  const hasKinds = (food.variants_count ?? 0) > 0;
   const subtitle = [
     food.brand,
     servingLabel(food, language, t("common.grams")),
-    hasKinds ? t("foods.kinds", { count: food.variants_count }) : null,
+    hasKinds ? t("foods.kinds", { count: food.variants_count ?? 0 }) : null,
+    food.sold_locally ? t("foods.soldLocally") : null,
     food.is_mine ? t("foods.mine") : null,
   ]
     .filter(Boolean)
@@ -61,11 +80,22 @@ export function FoodRow({ food, onPress, first }: { food: Food; onPress: () => v
       onPress={onPress}
       style={({ pressed }) => [styles.row, first && styles.first, pressed && styles.pressed]}
       accessibilityRole="button"
-      accessibilityLabel={`${foodName(food, language)}, ${formatInt(food.per_serving.calories)} ${t("common.kcal")}${hasKinds ? `, ${t("foods.kinds", { count: food.variants_count })}` : ""}`}
+      accessibilityLabel={`${foodName(food, language)}, ${formatInt(food.per_serving.calories)} ${t("common.kcal")}${hasKinds ? `, ${t("foods.kinds", { count: food.variants_count ?? 0 })}` : ""}`}
       accessibilityHint={hasKinds ? t("foods.openKinds") : t("foods.tapAdds")}>
-      <View style={styles.icon}>
-        <RText style={{ fontSize: 18, lineHeight: 22 }}>{FOOD_CATEGORY_EMOJI[food.category]}</RText>
-      </View>
+      {food.image_url ? (
+        <Image
+          source={{ uri: food.image_url }}
+          style={styles.icon}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          transition={120}
+          accessibilityIgnoresInvertColors
+        />
+      ) : (
+        <View style={styles.icon}>
+          <RText style={{ fontSize: 18, lineHeight: 22 }}>{FOOD_CATEGORY_EMOJI[food.category]}</RText>
+        </View>
+      )}
       <View style={styles.body}>
         <RText variant="callout" weight="medium" numberOfLines={1}>
           {foodName(food, language)}

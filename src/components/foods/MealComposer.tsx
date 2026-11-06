@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 
@@ -15,8 +15,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useMealDraft } from "@/contexts/MealDraftContext";
 import { useToast } from "@/contexts/ToastContext";
 import { makeStyles } from "@/hooks/useStyles";
-import type { Food, Meal, MealPayload, MealType } from "@/types/api";
-import { foodName, linesFromMeal, toItemInputs } from "@/utils/foodMath";
+import type { Food, Meal, MealPayload } from "@/types/api";
+import { foodName, toItemInputs } from "@/utils/foodMath";
 import { formatInt } from "@/utils/number";
 
 interface MealComposerProps {
@@ -42,19 +42,10 @@ export function MealComposer({ date, initial, submitting, onSubmit }: MealCompos
   const { language } = useLanguage();
   const draft = useMealDraft();
   const picker = useRef<FoodPickerHandle>(null);
-  const [type, setType] = useState<MealType>(initial?.meal_type ?? "lunch");
-  const [name, setName] = useState(initial?.name ?? "");
   const [pickerActive, setPickerActive] = useState(false);
-
-  // Start from the saved lines when editing, from empty when logging. Keyed on the meal id,
-  // not the object: a background refetch must not wipe in-progress edits. The SCREEN clears
-  // the draft on unmount, so toggling to the macro form and back keeps the basket.
-  const { reset } = draft;
-  const initialId = initial?.id ?? null;
-  useEffect(() => {
-    reset(initial ? linesFromMeal(initial.items) : []);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- see the comment above
-  }, [initialId, reset]);
+  // Lines, meal type and name live in the draft context; the owning screen begins new-meal
+  // (persisted on the phone) or edit mode and clears it, so nothing is cleared here on unmount.
+  const { mealType: type, setMealType: setType, name, setName } = draft;
 
   const onPick = useCallback(
     (food: Food) => {

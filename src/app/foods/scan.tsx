@@ -13,7 +13,7 @@ import { EMOJI } from "@/constants/emoji";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMealDraft } from "@/contexts/MealDraftContext";
 import { useToast } from "@/contexts/ToastContext";
-import { useFoodSearch } from "@/hooks/foods/useFoods";
+import { useBarcodeLookup, useFoodSearch, useImportFood } from "@/hooks/foods/useFoods";
 import { makeStyles } from "@/hooks/useStyles";
 import type { Food } from "@/types/api";
 import { foodName } from "@/utils/foodMath";
@@ -63,6 +63,11 @@ export default function ScanFoodScreen() {
   const [code, setCode] = useState<string | null>(null);
   const results = useFoodSearch(code ?? "", null);
   const found = results.data ?? [];
+  // Unknown locally → one online lookup (cached server-side) before offering the label form.
+  const miss = code !== null && !results.isPending && found.length === 0;
+  const online = useBarcodeLookup(miss ? code : null);
+  const importFood = useImportFood();
+  const candidate = online.data?.result ?? null;
 
   const add = (food: Food) => {
     draft.add(food, 1);
@@ -114,12 +119,12 @@ export default function ScanFoodScreen() {
         </RText>
         {code !== null ? (
           <ListState
-            loading={results.isPending}
+            loading={results.isPending || (miss && online.isPending)}
             error={results.isError ? results.error : undefined}
             onRetry={() => void results.refetch()}
-            empty={!results.isPending && found.length === 0}
+            empty={miss && !online.isPending && candidate === null}
             emptyEmoji={EMOJI.scan}
-            emptyTitle={t("foods.scanNotFound")}
+            emptyTitle={online.data?.available === false ? t("foods.onlineDown") : t("foods.scanNotFound")}
             emptyBody={t("foods.scanNotFoundHint")}
             emptyAction={
               <View style={{ gap: 8 }}>
@@ -141,6 +146,24 @@ export default function ScanFoodScreen() {
                   onPress={() => add(food)}
                 />
               ))}
+              {candidate && found.length === 0 ? (
+                <>
+                  <RText variant="footnote" weight="medium" color="textSecondary">
+                    {t("foods.onlineResults")}
+                  </RText>
+                  <FoodRow
+                    food={candidate}
+                    first
+                    onPress={() => {
+                      if (importFood.isPending) return;
+                      importFood.mutate(candidate.barcode, { onSuccess: (res) => add(res.data.data) });
+                    }}
+                  />
+                  <RText variant="caption" color="textMuted" align="center">
+                    {t("foods.attribution")}
+                  </RText>
+                </>
+              ) : null}
               <Button title={t("foods.scanAgain")} variant="ghost" onPress={() => setCode(null)} />
             </View>
           </ListState>

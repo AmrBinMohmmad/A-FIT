@@ -31,8 +31,13 @@ export default function EditMealScreen() {
   const meal = meals.data?.find((m) => String(m.id) === id) ?? null;
   // Only lines whose food still exists can be edited; otherwise fall back to the macro form.
   const composed = meal ? linesFromMeal(meal.items).length > 0 : false;
-  const { reset } = useMealDraft();
-  useEffect(() => () => reset([]), [reset]);
+  const { beginEdit, endEdit } = useMealDraft();
+  const mealId = meal?.id ?? null;
+  useEffect(() => {
+    if (meal && composed) beginEdit(linesFromMeal(meal.items), meal.meal_type, meal.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the id, not the refetched object
+  }, [mealId, composed, beginEdit]);
+  useEffect(() => () => endEdit(), [endEdit]);
 
   const onDelete = async () => {
     if (!meal) return;

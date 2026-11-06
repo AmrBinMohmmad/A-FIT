@@ -11,6 +11,7 @@ const egg: Food = {
   category: "eggs",
   source: "catalog",
   barcode: null,
+  image_url: null,
   generic_id: null,
   variants_count: 8,
   serving_grams: 50,

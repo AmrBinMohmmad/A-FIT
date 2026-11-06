@@ -15,10 +15,16 @@ import { EMOJI, FOOD_CATEGORY_EMOJI } from "@/constants/emoji";
 import { FOOD_CATEGORIES } from "@/constants/enums";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useTheme } from "@/contexts/ThemeContext";
-import { MIN_QUERY_LENGTH, useFoodSearch, useRecentFoods } from "@/hooks/foods/useFoods";
+import {
+  MIN_QUERY_LENGTH,
+  useFoodSearch,
+  useImportFood,
+  useOnlineFoodSearch,
+  useRecentFoods,
+} from "@/hooks/foods/useFoods";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { makeStyles } from "@/hooks/useStyles";
-import type { Food, FoodCategory } from "@/types/api";
+import type { Food, FoodCategory, LookupResult } from "@/types/api";
 
 export interface FoodPickerHandle {
   /** Leave search mode: clears the query, the aisle and any open kinds. */
@@ -45,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
   head: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  online: { gap: theme.spacing.sm, paddingTop: theme.spacing.md },
 }));
 
 /**
@@ -62,6 +69,10 @@ export function FoodPicker({ ref, onPick, onActiveChange }: FoodPickerProps) {
   const debounced = useDebouncedValue(query, 400);
   const search = useFoodSearch(debounced, category);
   const recent = useRecentFoods();
+  const [online, setOnline] = useState(false);
+  const onlineQuery = online ? debounced : "";
+  const lookup = useOnlineFoodSearch(onlineQuery, online);
+  const importFood = useImportFood();
 
   const searching = debounced.trim().length >= MIN_QUERY_LENGTH || category !== null;
   const active = searching || openId !== null || query.trim().length > 0;
@@ -72,6 +83,13 @@ export function FoodPicker({ ref, onPick, onActiveChange }: FoodPickerProps) {
     label: t(`enums.foodCategory.${c}`),
     emoji: FOOD_CATEGORY_EMOJI[c],
   }));
+
+  // An online candidate already in the catalog is added directly; otherwise it is imported
+  // once (one request) and then added.
+  const pickOnline = (r: LookupResult) => {
+    if (importFood.isPending) return;
+    importFood.mutate(r.barcode, { onSuccess: (res) => onPick(res.data.data) });
+  };
 
   const pick = (food: Food) => {
     if (food.variants_count > 0) {
@@ -85,6 +103,7 @@ export function FoodPicker({ ref, onPick, onActiveChange }: FoodPickerProps) {
     setQuery("");
     setCategory(null);
     setOpenId(null);
+    setOnline(false);
   };
   useImperativeHandle(ref, () => ({ clear }));
 
@@ -100,6 +119,7 @@ export function FoodPicker({ ref, onPick, onActiveChange }: FoodPickerProps) {
           onChangeText={(v) => {
             setQuery(v);
             setOpenId(null);
+            setOnline(false);
           }}
           placeholder={t("foods.searchPlaceholder")}
           returnKeyType="search"
@@ -170,10 +190,42 @@ export function FoodPicker({ ref, onPick, onActiveChange }: FoodPickerProps) {
               ))}
             </View>
           </ListState>
-          {searching ? (
-            <RText variant="caption" color="textMuted" align="center">
-              {t("foods.attribution")}
-            </RText>
+          {searching && debounced.trim().length >= MIN_QUERY_LENGTH ? (
+            <View style={styles.online}>
+              {!online ? (
+                <Button
+                  title={t("foods.searchOnline")}
+                  variant="secondary"
+                  icon="globe-outline"
+                  onPress={() => setOnline(true)}
+                />
+              ) : (
+                <>
+                  <RText variant="footnote" weight="medium" color="textSecondary">
+                    {t("foods.onlineResults")}
+                  </RText>
+                  <ListState
+                    loading={lookup.isPending}
+                    error={lookup.isError ? lookup.error : undefined}
+                    onRetry={() => void lookup.refetch()}
+                    empty={!lookup.isPending && (lookup.data?.results.length ?? 0) === 0}
+                    emptyEmoji={EMOJI.scan}
+                    emptyTitle={
+                      lookup.data?.available === false ? t("foods.onlineDown") : t("foods.onlineEmpty")
+                    }
+                    emptyBody={t("foods.searchEmptyHint")}>
+                    <View>
+                      {(lookup.data?.results ?? []).map((r, i) => (
+                        <FoodRow key={r.barcode} food={r} first={i === 0} onPress={() => pickOnline(r)} />
+                      ))}
+                    </View>
+                  </ListState>
+                  <RText variant="caption" color="textMuted" align="center">
+                    {t("foods.attribution")}
+                  </RText>
+                </>
+              )}
+            </View>
           ) : null}
         </View>
       ) : (
