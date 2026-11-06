@@ -1,6 +1,6 @@
 /**
  * Credential storage — the auth Bearer token lives ONLY here (Keychain / Keystore via
- * expo-secure-store), never in AsyncStorage or React state (Rakaya Tier 1.2).
+ * expo-secure-store), never in AsyncStorage or React state.
  */
 import * as SecureStore from "expo-secure-store";
 

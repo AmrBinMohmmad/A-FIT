@@ -1,4 +1,4 @@
-// Rakaya MOBILE track — flat ESLint config (kit v4.3.0 template), adapted to this app's
+// flat ESLint config (kit v4.3.0 template), adapted to this app's
 // `src/` root. FORCED: RN Text/TextInput → R-primitives, parent-relative imports → `@/`,
 // no-console → logger. GUARDED: credential-shaped setItem → secure-store, `*_ar` reads.
 const expoConfig = require("eslint-config-expo/flat");

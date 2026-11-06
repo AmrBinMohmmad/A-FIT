@@ -24,7 +24,7 @@ import { ToastProvider } from "@/contexts/ToastContext";
 void SplashScreen.preventAutoHideAsync();
 
 /**
- * Provider order (Rakaya mobile track): Gesture → SafeArea → Theme → Language → Query →
+ * Provider order: Gesture → SafeArea → Theme → Language → Query →
  * Auth → Toast/Alert. Auth sits inside Query because it clears the cache on sign-out. The
  * splash stays until fonts, theme, language/direction and the session have resolved.
  */

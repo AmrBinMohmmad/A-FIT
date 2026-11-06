@@ -2,7 +2,7 @@ import type { AvatarKey } from "@/constants/avatars";
 
 /**
  * The wire contract — the ONLY hand-maintained mirror of the backend's responses.
- * `ApiEnvelope<T>` and `Paginated<T>` are structural (Rakaya D1). Every enum is a string
+ * `ApiEnvelope<T>` and `Paginated<T>` are structural. Every enum is a string
  * union under a `// Mirrors app/Enums/X.php exactly` comment (Tier 1.5); labels render
  * client-side via `t("enums.<x>." + value)`.
  */

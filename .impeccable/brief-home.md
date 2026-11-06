@@ -2,7 +2,7 @@
 Surface: the A-FIT mobile app (Expo, iOS + Android), every screen; primary target the Home tab.
 Visitor mode: Operate. Audience: Arabic-first Gulf adults tracking steps and meals with friends;
 English is a full second language. Task: glance at today, log a meal, check the group.
-Constraints: Rakaya mobile standard (tokens + makeStyles + RText, envelope, secure-store,
+Constraints: project mobile standard (tokens + makeStyles + RText, envelope, secure-store,
 en/ar parity, logical props); health data from the OS store; no push this release.
 Chosen by the owner on 2026-10-30 from the direction round (the pick card).
 

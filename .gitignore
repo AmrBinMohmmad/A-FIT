@@ -27,3 +27,8 @@ yarn-error.*
 .impeccable/direction-payload.json
 .impeccable/questions
 .impeccable/serve.out
+
+# impeccable tool scratch (the contract files brief-home.md, design.json, surfaces/ are tracked)
+.impeccable/*.out
+.impeccable/questions/
+.impeccable/direction-payload.json

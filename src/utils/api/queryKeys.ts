@@ -1,5 +1,5 @@
 /**
- * Query-key factory (Rakaya D10.10): `[resource]`, `[resource, params]`, `[resource, id]`,
+ * Query-key factory: `[resource]`, `[resource, params]`, `[resource, id]`,
  * `[resource, id, nested]`. The resource segment equals the API path segment; mutations
  * invalidate the resource root.
  */

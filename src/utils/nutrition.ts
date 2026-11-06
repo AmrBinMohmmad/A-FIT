@@ -1,6 +1,6 @@
 /**
  * Mirrors app/Services/NutritionPlan.php exactly — a PREVIEW for the onboarding screen only.
- * The stored targets always come from the server (Rakaya Tier 1.1); this file exists so the
+ * The stored targets always come from the server; this file exists so the
  * user sees their plan update live while adjusting inputs. `utils/nutrition.test.ts` pins
  * this mirror against fixtures produced by the PHP implementation.
  */

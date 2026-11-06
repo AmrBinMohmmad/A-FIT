@@ -67,7 +67,7 @@ Confirmed capabilities:
 - "Sign out of all devices" for a lost phone; at most ten live sessions per account.
 
 Constraints:
-- Rakaya mobile standard: strict `{flag, data, message}` API envelope, token only in
+- project mobile standard: strict `{flag, data, message}` API envelope, token only in
   expo-secure-store, server state only in TanStack Query, all text through RText, tokens +
   makeStyles only, en/ar key parity, logical-direction styling.
 - Health permissions are requested in-context with a plain explanation; a user who declines

@@ -14,7 +14,7 @@ export const resources = {
 } as const;
 
 /**
- * First-run SUGGESTION only (Rakaya i18n-rtl §6): the persisted choice in LanguageContext
+ * First-run SUGGESTION only (i18n-rtl §6): the persisted choice in LanguageContext
  * is the source of truth; the device locale never silently overrides it.
  */
 export function deviceLanguage(): AppLanguage {

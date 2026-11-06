@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Executable folder contract — MOBILE track (Rakaya kit v4.3.0 template), adapted to this
+ * Executable folder contract — MOBILE track, adapted to this
  * app's `src/` root (Expo Router reads `src/app`). Twelve plain-regex rules (naive-GUARDED);
  * the prose lives in the skill's references/react-native.md and this script DECIDES.
  * Edit only the PROJECT CONFIG block.
