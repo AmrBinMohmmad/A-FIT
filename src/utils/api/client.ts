@@ -1,5 +1,5 @@
 /**
- * The single axios instance (Rakaya mobile track, D7 shape b). Bearer from expo-secure-store,
+ * The single axios instance (D7 shape b). Bearer from expo-secure-store,
  * `Accept` + `Accept-Language` on every request, and a 401 interceptor that clears the token
  * and notifies the AuthProvider so guards redirect to sign-in. No BFF, no cookies.
  */

@@ -1,33 +1,83 @@
-# Rakaya kit v4.3.0 — MOBILE quality gate (D10.21). Steps are EXACTLY the members of
-# `npm run verify`, plus an `expo export` bundle. Any EAS build job must `needs: quality`.
-name: mobile-quality
+# Mobile quality gate + release.
+#
+#   push/PR to dev, main ........ verify (EXACTLY the members of `npm run verify`) + Metro export
+#   tag vX.Y.Z .................. the same, then a GitHub release carrying the export bundle;
+#                                 store builds start on EAS when the EXPO_TOKEN secret is set
+#
+# Cut a release from main: `npm version <patch|minor|major>` (bumps package.json and app.json
+# through the "version" script and creates the tag) then `git push --follow-tags`.
+name: mobile
 
 on:
   push:
+    branches: [main, dev]
+    tags: ["v*.*.*"]
   pull_request:
+    branches: [main, dev]
 
 jobs:
-  quality:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: 22
           cache: npm
+
       - name: Install dependencies
         run: npm ci
-      - name: Types (npm run typecheck)
-        run: npm run typecheck
-      - name: Lint at zero warnings (npm run lint)
-        run: npm run lint
-      - name: Folder contract (npm run check:structure)
-        run: npm run check:structure
-      - name: Format (npm run format:check)
-        run: npm run format:check
-      - name: Tests incl. i18n parity + nutrition mirror (npm test)
-        run: npm test -- --ci
-      - name: Bundle (Metro export, both platforms)
-        run: npx expo export --platform ios --platform android --output-dir dist
+
+      - name: Quality gate (npm run verify)
+        run: npm run verify
+
+      - name: Metro export (both platforms bundle)
+        run: npx expo export --platform all --output-dir dist
+
+      - name: Keep the export for the release job
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: export
+          path: dist
+          retention-days: 7
+
+  release:
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: export
+          path: dist
+
+      - name: Bundle the export
+        run: tar -czf "a-fit-${GITHUB_REF_NAME}-export.tgz" -C dist .
+
+      - name: GitHub release with generated notes
         env:
-          EXPO_PUBLIC_API_URL: https://ci.invalid/api/v1
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" "a-fit-${GITHUB_REF_NAME}-export.tgz" \
+            --title "A-FIT ${GITHUB_REF_NAME}" \
+            --generate-notes
+
+      - uses: actions/setup-node@v4
+        if: env.EXPO_TOKEN != ''
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Store builds on EAS (only when EXPO_TOKEN is configured)
+        if: env.EXPO_TOKEN != ''
+        run: |
+          npm ci
+          npx eas-cli build --platform all --profile production --non-interactive --no-wait

@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-/** Plain controlled form (Rakaya D9): per-field validation for the two required fields. */
+/** Plain controlled form: per-field validation for the two required fields. */
 export function MealForm({ initial, date, submitting, submitLabel, onSubmit }: MealFormProps) {
   const { t } = useTranslation();
   const styles = useStyles();

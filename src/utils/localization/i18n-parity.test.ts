@@ -1,5 +1,5 @@
 /**
- * Locale key-parity gate (Rakaya D3.7): en and ar expose the identical set of key paths.
+ * Locale key-parity gate: en and ar expose the identical set of key paths.
  * Key-set only — translation completeness is review's job.
  */
 import { describe, expect, it } from "@jest/globals";

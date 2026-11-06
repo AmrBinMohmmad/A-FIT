@@ -41,7 +41,7 @@ async function reloadApp(): Promise<void> {
 
 /**
  * Owns the language choice and the layout direction. The device locale is only a first-run
- * suggestion (see i18n.ts); the persisted choice wins (Rakaya i18n-rtl §6).
+ * suggestion (see i18n.ts); the persisted choice wins (i18n-rtl §6).
  */
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLang] = useState<AppLanguage>(i18n.language as AppLanguage);
