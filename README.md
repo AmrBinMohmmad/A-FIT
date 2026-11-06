@@ -28,7 +28,8 @@ Run it before every pull request; this repository has no CI workflow (owner deci
 - `main` — what is shipped to the stores. Changes only through a pull request from `dev`.
 - `dev` — integration branch and the GitHub default. Feature branches (`feat/...`, `fix/...`)
   branch from `dev` and come back through a pull request with `npm run verify` green.
-- Nothing is pushed straight to `main`. Commits carry the author's own identity.
+- Nothing is pushed straight to `main` or `dev`: every change is a branch and a pull request.
+  Commits carry the author's own identity.
 
 ## Where things are
 
