@@ -21,6 +21,8 @@ export const queryKeys = {
     search: (q: string, category: string | null) => ["foods", "search", { q, category }] as const,
     recent: ["foods", "recent"] as const,
     detail: (id: number) => ["foods", id] as const,
+    lookup: (q: string) => ["foods", "lookup", { q }] as const,
+    barcode: (code: string) => ["foods", "lookup", "barcode", code] as const,
   },
   steps: {
     all: ["steps"] as const,

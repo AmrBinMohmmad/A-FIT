@@ -11,11 +11,15 @@ import { RTextInput } from "@/components/RTextInput";
 import { useFrequentMeals } from "@/hooks/meals/useMeals";
 import { makeStyles } from "@/hooks/useStyles";
 import { MEAL_TYPES } from "@/constants/enums";
+import type { ManualDraft } from "@/contexts/MealDraftContext";
 import type { FrequentMeal, Meal, MealPayload, MealType } from "@/types/api";
 import { parseIntSafe } from "@/utils/number";
 
 interface MealFormProps {
   initial?: Meal | null;
+  /** New-meal mode: the typed fields are mirrored here so leaving the screen keeps them. */
+  draft?: ManualDraft | null;
+  onDraftChange?: (draft: ManualDraft) => void;
   date: string;
   submitting: boolean;
   submitLabel: string;
@@ -42,14 +46,48 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /** Plain controlled form: per-field validation for the two required fields. */
-export function MealForm({ initial, date, submitting, submitLabel, onSubmit }: MealFormProps) {
+export function MealForm({
+  initial,
+  draft,
+  onDraftChange,
+  date,
+  submitting,
+  submitLabel,
+  onSubmit,
+}: MealFormProps) {
   const { t } = useTranslation();
   const styles = useStyles();
-  const [name, setName] = useState(initial?.name ?? "");
-  const [calories, setCalories] = useState(initial ? String(initial.calories) : "");
-  const [protein, setProtein] = useState(initial?.protein ? String(initial.protein) : "");
-  const [carbs, setCarbs] = useState(initial?.carbs ? String(initial.carbs) : "");
-  const [fat, setFat] = useState(initial?.fat ? String(initial.fat) : "");
+  const [name, setNameState] = useState(draft?.name ?? initial?.name ?? "");
+  const [calories, setCaloriesState] = useState(draft?.calories ?? (initial ? String(initial.calories) : ""));
+  const [protein, setProteinState] = useState(
+    draft?.protein ?? (initial?.protein ? String(initial.protein) : ""),
+  );
+  const [carbs, setCarbsState] = useState(draft?.carbs ?? (initial?.carbs ? String(initial.carbs) : ""));
+  const [fat, setFatState] = useState(draft?.fat ?? (initial?.fat ? String(initial.fat) : ""));
+
+  // Each setter also mirrors the whole form to the draft owner (persisted in new-meal mode).
+  const mirror = (patch: Partial<ManualDraft>) =>
+    onDraftChange?.({ name, calories, protein, carbs, fat, ...patch });
+  const setName = (v: string) => {
+    setNameState(v);
+    mirror({ name: v });
+  };
+  const setCalories = (v: string) => {
+    setCaloriesState(v);
+    mirror({ calories: v });
+  };
+  const setProtein = (v: string) => {
+    setProteinState(v);
+    mirror({ protein: v });
+  };
+  const setCarbs = (v: string) => {
+    setCarbsState(v);
+    mirror({ carbs: v });
+  };
+  const setFat = (v: string) => {
+    setFatState(v);
+    mirror({ fat: v });
+  };
   const [type, setType] = useState<MealType>(initial?.meal_type ?? "lunch");
   const [errors, setErrors] = useState<{ name?: string; calories?: string }>({});
   const frequent = useFrequentMeals();

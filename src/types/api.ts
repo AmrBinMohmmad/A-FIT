@@ -142,6 +142,7 @@ export interface Food {
   category: FoodCategory;
   source: FoodSource;
   barcode: string | null;
+  image_url: string | null;
   generic_id: number | null;
   variants_count: number;
   serving_grams: number;
@@ -151,6 +152,36 @@ export interface Food {
   per_serving: Macros;
   is_verified: boolean;
   is_mine: boolean;
+}
+
+/** LookupResultResource — an online product candidate (Open Food Facts), shaped like a Food. */
+export interface LookupResult {
+  food_id: number | null;
+  barcode: string;
+  name: string;
+  name_ar: string | null;
+  brand: string | null;
+  image_url: string | null;
+  category: FoodCategory;
+  source: "open_food_facts";
+  sold_locally: boolean;
+  serving_grams: number;
+  serving_label: string | null;
+  serving_label_ar: string | null;
+  per_100g: Macros;
+  per_serving: Macros;
+}
+
+/** GET foods/lookup → data */
+export interface LookupResults {
+  available: boolean;
+  results: LookupResult[];
+}
+
+/** GET foods/lookup/{barcode} → data */
+export interface BarcodeLookup {
+  available: boolean;
+  result: LookupResult | null;
 }
 
 /** GET foods/{id} → data */

@@ -52,7 +52,11 @@ export function foodName(food: Pick<Food, "name" | "name_ar">, language: AppLang
 }
 
 /** The serving's name, or its weight with the caller's localized unit when it has none. */
-export function servingLabel(food: Food, language: AppLanguage, gramsUnit: string): string {
+export function servingLabel(
+  food: Pick<Food, "serving_label" | "serving_label_ar" | "serving_grams">,
+  language: AppLanguage,
+  gramsUnit: string,
+): string {
   return localizedField(food, "serving_label", language) || `${food.serving_grams} ${gramsUnit}`;
 }
 
