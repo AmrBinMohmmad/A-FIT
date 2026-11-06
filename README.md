@@ -26,18 +26,20 @@ on every push and pull request to `main` and `dev`.
 
 ## Branching
 
-- `main` — what is shipped to the stores. Only fast-forward merges from `dev` via a pull request.
+- `main` — what is shipped to the stores. Changes only through a pull request from `dev`; every
+  merge tags and releases.
 - `dev` — integration branch and the GitHub default. Feature branches (`feat/...`, `fix/...`)
   branch from `dev` and come back through a pull request with the gate green.
 - Nothing is pushed straight to `main`. Commits carry the author's own identity.
 
 ## Releases
 
-```bash
-git checkout main && git pull
-npm version minor          # bumps package.json + app.json, commits, tags vX.Y.Z
-git push --follow-tags     # CI verifies, exports, publishes the GitHub release (+ EAS if EXPO_TOKEN)
-```
+Releases are automatic. Every push to `main` (normally the merge of a `dev` pull request) runs the
+gate, creates the next tag — `MAJOR.MINOR` with the minor incremented from the latest tag,
+starting at `0.1` — stamps the app with that version, attaches the Metro export bundle to a GitHub
+release, and starts store builds on EAS when the `EXPO_TOKEN` secret exists. The repository
+variable `EXPO_PUBLIC_API_URL` (your API, ending in `/api/v1`) is required. Bump the major by
+tagging it once by hand (`git tag 1.0 && git push origin 1.0`).
 
 ## Where things are
 
