@@ -21,25 +21,14 @@ The API base URL lives in `src/constants/env.ts`; point it at the machine runnin
 npm run verify   # tsc · eslint (0 warnings) · check-structure · prettier · jest
 ```
 
-CI (`.github/workflows/mobile.yml`) runs the same members plus a Metro export for both platforms
-on every push and pull request to `main` and `dev`.
+Run it before every pull request; this repository has no CI workflow (owner decision).
 
 ## Branching
 
-- `main` — what is shipped to the stores. Changes only through a pull request from `dev`; every
-  merge tags and releases.
+- `main` — what is shipped to the stores. Changes only through a pull request from `dev`.
 - `dev` — integration branch and the GitHub default. Feature branches (`feat/...`, `fix/...`)
-  branch from `dev` and come back through a pull request with the gate green.
+  branch from `dev` and come back through a pull request with `npm run verify` green.
 - Nothing is pushed straight to `main`. Commits carry the author's own identity.
-
-## Releases
-
-Releases are automatic. Every push to `main` (normally the merge of a `dev` pull request) runs the
-gate, creates the next tag — `MAJOR.MINOR` with the minor incremented from the latest tag,
-starting at `0.1` — stamps the app with that version, attaches the Metro export bundle to a GitHub
-release, and starts store builds on EAS when the `EXPO_TOKEN` secret exists. The repository
-variable `EXPO_PUBLIC_API_URL` (your API, ending in `/api/v1`) is required. Bump the major by
-tagging it once by hand (`git tag 1.0 && git push origin 1.0`).
 
 ## Where things are
 

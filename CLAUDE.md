@@ -39,7 +39,7 @@ Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before 
 - **Enforcement copied**: `scripts/check-structure.mjs` (12 rules, `src/`-rooted, no carve-outs), `eslint.config.js` (R-primitive / `@/` / no-console / secure-store /
   `*_ar` bans), `src/utils/localization/i18n-parity.test.ts`, `npm run verify` + jest block.
   Fail-then-pass verified 2026-10-30 on the raw-`Text` import ban and the hex-literal rule.
-- **CI**: `.github/workflows/mobile.yml` — verify members + `expo export` both platforms
+- **CI**: none on this repository (owner decision 2026-11-06); `npm run verify` runs locally before every pull request
 - **Hooks**: SessionStart trigger on (global); Stop check opt-out
 
 ### Design
