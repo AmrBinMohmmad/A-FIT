@@ -147,6 +147,7 @@ export default function MealsScreen() {
               key={meal.id}
               meal={meal}
               first={i === 0}
+              index={i}
               onPress={() => router.push({ pathname: "/meals/[id]", params: { id: String(meal.id), date } })}
             />
           ))}

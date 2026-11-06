@@ -1,11 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { DraftLineRow } from "@/components/foods/DraftLineRow";
 import { RText } from "@/components/RText";
 import { EMOJI } from "@/constants/emoji";
 import { useMealDraft } from "@/contexts/MealDraftContext";
 import { makeStyles } from "@/hooks/useStyles";
+import { listLayout } from "@/utils/motion";
 
 const useStyles = makeStyles((theme) => ({
   wrap: { gap: theme.spacing.sm },
@@ -42,7 +44,7 @@ export function MealBasket() {
 
   return (
     <View style={styles.wrap}>
-      <View>
+      <Animated.View layout={listLayout}>
         {lines.map((line, i) => (
           <DraftLineRow
             key={line.key}
@@ -53,7 +55,7 @@ export function MealBasket() {
             onRemove={() => remove(line.key)}
           />
         ))}
-      </View>
+      </Animated.View>
     </View>
   );
 }

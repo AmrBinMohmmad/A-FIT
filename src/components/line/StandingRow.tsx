@@ -1,4 +1,5 @@
 import { Pressable, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { Avatar } from "@/components/Avatar";
 import { CodeChip } from "@/components/line/CodeChip";
@@ -8,6 +9,7 @@ import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useTheme } from "@/contexts/ThemeContext";
 import { makeStyles } from "@/hooks/useStyles";
 import type { Standing } from "@/types/api";
+import { enterAt } from "@/utils/motion";
 import { formatInt } from "@/utils/number";
 
 interface StandingRowProps {
@@ -17,6 +19,7 @@ interface StandingRowProps {
   ownerLabel?: string;
   onLongPress?: () => void;
   first?: boolean;
+  index?: number;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -41,7 +44,15 @@ const useStyles = makeStyles((theme) => ({
  * A ranked member on the group line: crown/medal for the podium (rank chip from fourth
  * place), avatar, name, exact-magnitude bar on one shared scale, steps.
  */
-export function StandingRow({ standing, max, youLabel, ownerLabel, onLongPress, first }: StandingRowProps) {
+export function StandingRow({
+  standing,
+  max,
+  youLabel,
+  ownerLabel,
+  onLongPress,
+  first,
+  index,
+}: StandingRowProps) {
   const styles = useStyles();
   const { theme } = useTheme();
   const share = Math.max(0, Math.min(1, standing.steps / Math.max(max, 1)));
@@ -92,14 +103,22 @@ export function StandingRow({ standing, max, youLabel, ownerLabel, onLongPress, 
     </>
   );
 
-  if (!onLongPress) return <View style={[styles.row, first && styles.first]}>{content}</View>;
+  if (!onLongPress) {
+    return (
+      <Animated.View entering={enterAt(index)} style={[styles.row, first && styles.first]}>
+        {content}
+      </Animated.View>
+    );
+  }
   return (
-    <Pressable
-      onLongPress={onLongPress}
-      style={[styles.row, first && styles.first]}
-      accessibilityRole="button"
-      accessibilityLabel={standing.name}>
-      {content}
-    </Pressable>
+    <Animated.View entering={enterAt(index)}>
+      <Pressable
+        onLongPress={onLongPress}
+        style={[styles.row, first && styles.first]}
+        accessibilityRole="button"
+        accessibilityLabel={standing.name}>
+        {content}
+      </Pressable>
+    </Animated.View>
   );
 }

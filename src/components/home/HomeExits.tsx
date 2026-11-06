@@ -39,6 +39,7 @@ export function HomeExits({ data, date }: { data: Dashboard; date: string }) {
 
       <ExitRow
         first
+        index={0}
         code={1}
         title={t("home.mealsExit")}
         subtitle={n.meals_count ? t("home.mealsCount", { count: n.meals_count }) : t("home.noMeals")}
@@ -59,6 +60,7 @@ export function HomeExits({ data, date }: { data: Dashboard; date: string }) {
       />
 
       <ExitRow
+        index={1}
         code={2}
         title={data.group ? data.group.name : t("home.groupExit")}
         subtitle={
@@ -86,6 +88,7 @@ export function HomeExits({ data, date }: { data: Dashboard; date: string }) {
 
       {data.challenge ? (
         <ExitRow
+          index={2}
           code={3}
           tone="accent"
           title={data.challenge.title}
@@ -120,6 +123,7 @@ export function HomeExits({ data, date }: { data: Dashboard; date: string }) {
       ) : null}
 
       <ExitRow
+        index={3}
         code={data.challenge ? 4 : 3}
         title={t("home.waterExit")}
         value={`${formatDecimal(waterMl / 1000, 2)} / ${formatDecimal(data.water.goal_ml / 1000, 1)} ${t("common.liters")}`}
@@ -139,6 +143,7 @@ export function HomeExits({ data, date }: { data: Dashboard; date: string }) {
       />
 
       <ExitRow
+        index={4}
         code={data.challenge ? 5 : 4}
         title={t("home.weightExit")}
         subtitle={data.weight ? undefined : t("home.noWeight")}

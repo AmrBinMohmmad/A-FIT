@@ -8,6 +8,7 @@ import { Button } from "@/components/Button";
 import { type Chip, Chips } from "@/components/foods/Chips";
 import { FoodRow } from "@/components/foods/FoodRow";
 import { FoodVariants } from "@/components/foods/FoodVariants";
+import { OnlineResults } from "@/components/foods/OnlineResults";
 import { ListState } from "@/components/ListState";
 import { RText } from "@/components/RText";
 import { RTextInput } from "@/components/RTextInput";
@@ -15,13 +16,7 @@ import { EMOJI, FOOD_CATEGORY_EMOJI } from "@/constants/emoji";
 import { FOOD_CATEGORIES } from "@/constants/enums";
 import { MIN_TOUCH_TARGET } from "@/constants/tokens";
 import { useTheme } from "@/contexts/ThemeContext";
-import {
-  MIN_QUERY_LENGTH,
-  useFoodSearch,
-  useImportFood,
-  useOnlineFoodSearch,
-  useRecentFoods,
-} from "@/hooks/foods/useFoods";
+import { MIN_QUERY_LENGTH, useFoodSearch, useImportFood, useRecentFoods } from "@/hooks/foods/useFoods";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { makeStyles } from "@/hooks/useStyles";
 import type { Food, FoodCategory, LookupResult } from "@/types/api";
@@ -51,7 +46,6 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
   head: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  online: { gap: theme.spacing.sm, paddingTop: theme.spacing.md },
 }));
 
 /**
@@ -70,8 +64,6 @@ export function FoodPicker({ ref, onPick, onActiveChange }: FoodPickerProps) {
   const search = useFoodSearch(debounced, category);
   const recent = useRecentFoods();
   const [online, setOnline] = useState(false);
-  const onlineQuery = online ? debounced : "";
-  const lookup = useOnlineFoodSearch(onlineQuery, online);
   const importFood = useImportFood();
 
   const searching = debounced.trim().length >= MIN_QUERY_LENGTH || category !== null;
@@ -186,46 +178,17 @@ export function FoodPicker({ ref, onPick, onActiveChange }: FoodPickerProps) {
             emptyBody={searching ? t("foods.searchEmptyHint") : t("foods.noRecent")}>
             <View>
               {foods.map((food, i) => (
-                <FoodRow key={food.id} food={food} first={i === 0} onPress={() => pick(food)} />
+                <FoodRow key={food.id} food={food} first={i === 0} index={i} onPress={() => pick(food)} />
               ))}
             </View>
           </ListState>
           {searching && debounced.trim().length >= MIN_QUERY_LENGTH ? (
-            <View style={styles.online}>
-              {!online ? (
-                <Button
-                  title={t("foods.searchOnline")}
-                  variant="secondary"
-                  icon="globe-outline"
-                  onPress={() => setOnline(true)}
-                />
-              ) : (
-                <>
-                  <RText variant="footnote" weight="medium" color="textSecondary">
-                    {t("foods.onlineResults")}
-                  </RText>
-                  <ListState
-                    loading={lookup.isPending}
-                    error={lookup.isError ? lookup.error : undefined}
-                    onRetry={() => void lookup.refetch()}
-                    empty={!lookup.isPending && (lookup.data?.results.length ?? 0) === 0}
-                    emptyEmoji={EMOJI.scan}
-                    emptyTitle={
-                      lookup.data?.available === false ? t("foods.onlineDown") : t("foods.onlineEmpty")
-                    }
-                    emptyBody={t("foods.searchEmptyHint")}>
-                    <View>
-                      {(lookup.data?.results ?? []).map((r, i) => (
-                        <FoodRow key={r.barcode} food={r} first={i === 0} onPress={() => pickOnline(r)} />
-                      ))}
-                    </View>
-                  </ListState>
-                  <RText variant="caption" color="textMuted" align="center">
-                    {t("foods.attribution")}
-                  </RText>
-                </>
-              )}
-            </View>
+            <OnlineResults
+              query={debounced.trim()}
+              online={online}
+              onOnline={() => setOnline(true)}
+              onPick={pickOnline}
+            />
           ) : null}
         </View>
       ) : (

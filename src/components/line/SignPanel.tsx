@@ -1,6 +1,8 @@
 import { View, type StyleProp, type ViewStyle } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { RText } from "@/components/RText";
+import { useTheme } from "@/contexts/ThemeContext";
 import { makeStyles } from "@/hooks/useStyles";
 
 interface SignPanelProps {
@@ -30,15 +32,18 @@ const useStyles = makeStyles((theme) => ({
 /** The dark station sign carrying the one fact that matters: "Next station · 8,000 steps". */
 export function SignPanel({ label, value, endLabel, endValue, tone = "default", style }: SignPanelProps) {
   const styles = useStyles();
+  const { theme } = useTheme();
   return (
     <View style={[styles.panel, style]} accessibilityRole="summary">
       <View style={styles.col}>
         <RText variant="caption" color="signPanelMuted">
           {label}
         </RText>
-        <RText variant="subtitle" color="onSignPanel" tabular>
-          {value}
-        </RText>
+        <Animated.View key={value} entering={FadeIn.duration(theme.duration.base)}>
+          <RText variant="subtitle" color="onSignPanel" tabular>
+            {value}
+          </RText>
+        </Animated.View>
       </View>
       {endLabel || endValue ? (
         <View style={[styles.col, styles.end]}>
@@ -48,9 +53,11 @@ export function SignPanel({ label, value, endLabel, endValue, tone = "default", 
             </RText>
           ) : null}
           {endValue ? (
-            <RText variant="subtitle" color={tone === "accent" ? "accent" : "onSignPanel"} tabular>
-              {endValue}
-            </RText>
+            <Animated.View key={endValue} entering={FadeIn.duration(theme.duration.base)}>
+              <RText variant="subtitle" color={tone === "accent" ? "accent" : "onSignPanel"} tabular>
+                {endValue}
+              </RText>
+            </Animated.View>
           ) : null}
         </View>
       ) : null}
