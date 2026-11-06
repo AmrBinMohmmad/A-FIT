@@ -1,4 +1,4 @@
-import type { MealType } from "@/types/api";
+import type { FoodCategory, MealType } from "@/types/api";
 
 /**
  * Friendly accents (owner request 2026-10-31, an adaptation of the Metro Line contract: emoji
@@ -26,3 +26,24 @@ export const EMOJI = {
   meals: "🥘",
   sparkle: "✨",
 } as const;
+
+/** Grocery aisles in the food picker. */
+export const FOOD_CATEGORY_EMOJI: Record<FoodCategory, string> = {
+  eggs: "🥚",
+  dairy: "🥛",
+  bread: "🍞",
+  grains: "🍚",
+  legumes: "🫘",
+  meat: "🥩",
+  poultry: "🍗",
+  seafood: "🐟",
+  vegetables: "🥕",
+  fruits: "🍎",
+  nuts_seeds: "🥜",
+  fats_oils: "🫒",
+  beverages: "🥤",
+  snacks: "🍿",
+  sweets: "🍫",
+  dishes: "🍲",
+  other: "🛒",
+};

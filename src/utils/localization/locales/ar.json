@@ -187,7 +187,23 @@
     "macroOf": "{{value}} من {{goal}} غ",
     "history": "آخر 7 أيام",
     "frequent": "تسجيل مجدداً",
-    "frequentHint": "اضغط لتعبئة النموذج من وجبة تسجلها كثيراً."
+    "frequentHint": "اضغط لتعبئة النموذج من وجبة تسجلها كثيراً.",
+    "fromFoods": "من الأصناف",
+    "manual": "إدخال المغذيات",
+    "added": "أُضيف {{name}}",
+    "nameOptional": "اسم الوجبة (اختياري)",
+    "basketEmpty": "لا شيء في هذه الوجبة بعد",
+    "basketHint": "ابحث في القائمة أعلاه أو اختر قسماً، ثم اضغط على صنف لإضافة حصة واحدة.",
+    "basketCount": "{{count}} أصناف في هذه الوجبة",
+    "basketCount_one": "صنف واحد في هذه الوجبة",
+    "totals": "إجمالي الوجبة",
+    "itemsCount": "{{count}} أصناف",
+    "itemsCount_one": "صنف واحد",
+    "lineMacros": "ب {{p}} · ك {{c}} · د {{f}}",
+    "less": "أقل",
+    "more": "أكثر",
+    "grams": "الغرامات",
+    "editGrams": "تعديل الغرامات"
   },
   "groups": {
     "title": "المجموعات",
@@ -395,6 +411,30 @@
       "today": "اليوم",
       "week": "الأسبوع",
       "month": "الشهر"
+    },
+    "foodCategory": {
+      "eggs": "بيض",
+      "dairy": "ألبان",
+      "bread": "خبز",
+      "grains": "حبوب وأرز",
+      "legumes": "بقوليات",
+      "meat": "لحوم",
+      "poultry": "دواجن",
+      "seafood": "أسماك",
+      "vegetables": "خضار",
+      "fruits": "فواكه",
+      "nuts_seeds": "مكسرات وبذور",
+      "fats_oils": "دهون وزيوت",
+      "beverages": "مشروبات",
+      "snacks": "سناك",
+      "sweets": "حلويات",
+      "dishes": "أطباق",
+      "other": "أخرى"
+    },
+    "foodSource": {
+      "catalog": "مرجعي",
+      "open_food_facts": "Open Food Facts",
+      "user": "خاص بي"
     }
   },
   "errors": {
@@ -428,5 +468,35 @@
     "bee": "نحلة",
     "rocket": "صاروخ",
     "star": "نجمة"
+  },
+  "foods": {
+    "searchPlaceholder": "ابحث: بيض، توست، لبنة…",
+    "results": "النتائج",
+    "recent": "الأخيرة",
+    "noRecent": "ابحث في القائمة أو اختر قسماً للبدء. الأصناف التي تسجلها تظهر هنا.",
+    "searchEmpty": "لا نتائج لـ «{{q}}»",
+    "searchEmptyHint": "جرّب كتابة مختلفة، أو أضفه من ملصق العبوة.",
+    "kinds": "{{count}} أنواع",
+    "kinds_one": "نوع واحد",
+    "kindsHint": "اختر النوع الذي اشتريته؛ الصف الأول هو الصنف العام.",
+    "backToResults": "عودة إلى النتائج",
+    "mine": "خاص بي",
+    "addMine": "أضف صنفي",
+    "newTitle": "إضافة صنف",
+    "newSubtitle": "اكتب الأرقام من ملصق العبوة. لا يرى هذا الصنف غيرك.",
+    "nameLabel": "الاسم",
+    "namePlaceholder": "مثال: توست، شريحة كبيرة",
+    "brandLabel": "العلامة التجارية",
+    "brandPlaceholder": "مثال: لوزين",
+    "categoryLabel": "القسم",
+    "servingGrams": "حجم الحصة (غ)",
+    "servingLabelLabel": "اسم الحصة",
+    "servingPlaceholder": "مثال: شريحة",
+    "servingInvalid": "حجم الحصة بين 1 و2000 غ.",
+    "perLabel": "قيم الملصق لكل",
+    "perServing": "حصة",
+    "per100": "100 غ",
+    "saveAndAdd": "حفظ وإضافة إلى الوجبة",
+    "attribution": "منتجات العلامات التجارية: Open Food Facts (ODbL)"
   }
 }
