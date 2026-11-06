@@ -1,14 +1,13 @@
 /**
  * Environment, resolved once at module load. `EXPO_PUBLIC_API_URL` is inlined by Metro and
- * must include the `/api/v1` suffix. In development, when the variable is absent, the API
- * is assumed to run on the machine serving the Metro bundle (the existing dev convention).
+ * must include the `/api/v1` suffix (`.env.development` sets it for dev builds). In development
+ * the API is always 127.0.0.1:8000, forwarded from the phone to this machine by adb reverse.
  */
 import Constants from "expo-constants";
 
+/** Development: the API is reached on the phone's own localhost via `adb reverse tcp:8000 tcp:8000`. */
 function devFallback(): string {
-  const hostUri = Constants.expoConfig?.hostUri;
-  const host = hostUri?.split(":")[0];
-  return host ? `http://${host}:8000/api/v1` : "http://localhost:8000/api/v1";
+  return "http://127.0.0.1:8000/api/v1";
 }
 
 function readApiUrl(): string {

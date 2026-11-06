@@ -77,7 +77,8 @@
     "verify": "npm run typecheck && npm run lint && npm run check:structure && npm run format:check && npm test",
     "build:dev": "eas build --platform all --profile development",
     "build:preview": "eas build --platform all --profile preview",
-    "build:prod": "eas build --platform all --profile production"
+    "build:prod": "eas build --platform all --profile production",
+    "android:reverse": "adb reverse tcp:8000 tcp:8000 && adb reverse --list"
   },
   "private": true,
   "jest": {

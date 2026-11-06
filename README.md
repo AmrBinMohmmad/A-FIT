@@ -12,8 +12,10 @@ npx expo start            # Metro; the dev client on the phone connects over the
 npx expo run:android      # or run:ios — builds the dev client (needed after native changes)
 ```
 
-The API base URL lives in `src/constants/env.ts`; point it at the machine running
-`php artisan serve --host 0.0.0.0 --port 8000` from the backend repo.
+Development builds call `http://127.0.0.1:8000/api/v1` (`.env.development`). Run the API with
+`php artisan serve` (localhost only, from the backend repo) and forward the phone's port once per
+connection: `npm run android:reverse` (= `adb reverse tcp:8000 tcp:8000`). Nothing is exposed on
+the LAN. Restart Metro after changing an `EXPO_PUBLIC_*` value.
 
 ## Quality gate
 
